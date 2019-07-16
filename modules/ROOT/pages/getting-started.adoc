@@ -1,3 +1,4 @@
+:experimental:
 = Fedora CoreOS - Getting Started
 
 Fedora CoreOS has no install-time configuration. Every Fedora CoreOS system begins with a generic, unconfigured disk image. On first boot Ignition will read the supplied config and configure the system. Ignition configs are usually supplied via the cloud’s userdata mechanism, or, in the case of bare metal, injected at install time. This guide will show you how to launch Fedora CoreOS on AWS, QEMU, and bare metal as well as how to create Ignition configs.

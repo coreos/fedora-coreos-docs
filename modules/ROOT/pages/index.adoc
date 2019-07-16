@@ -1,3 +1,4 @@
+:experimental:
 = Fedora CoreOS Documentation
 
 Welcome to the Fedora CoreOS documentation!

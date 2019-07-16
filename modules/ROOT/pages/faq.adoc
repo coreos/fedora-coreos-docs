@@ -1,3 +1,4 @@
+:experimental:
 = Fedora CoreOS Frequently Asked Questions
 
 If you have other questions than are mentioned here or want to discuss
