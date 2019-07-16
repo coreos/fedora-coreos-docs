@@ -1,3 +1,3 @@
-= Introduction
+= Welcome to Fedora CoreOS!
 
 == What is Fedora CoreOS?
