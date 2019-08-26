@@ -1,0 +1,70 @@
+:experimental:
+= Fedora CoreOS Disk Layout
+
+All Fedora CoreOS systems start with the same disk image which varies slightly between architectures. On first boot
+the root filesystem is expanded to fill the rest of the disk. The disk image can be customized using Fedora CoreOS configs to repartition
+the disk and create/reformat filesystems. Bare metal installations are not different; the installer only copies the raw image to the target disk
+and injects the specified config into `/boot` for use on first boot.
+
+The boot partition cannot be reformatted, deleted, or moved. Right now the root partition also cannot be reformatted, deleted, or moved, though
+we plan to support that in the future.
+
+== Partition Tables
+
+The Fedora CoreOS partition layout varies slightly between architecures based on what is needed for bootloading. Using partition numbers to refer to
+specific partitions is discouraged. Labels or UUIDs should be used instead. Fedora CoreOS reserves the `boot`, `root`, `BIOS-BOOT` and `EFI-SYSTEM` labels;
+creating partitions or filesystems with those labels is not supported.
+
+=== x86_64 Partition Table
+
+The x86_64 disk image is GPT formatted with a protective MBR. It supports booting via both BIOS and UEFI (including secure boot).
+
+.Partition Table for x86_64
+|================================
+|Number|Label|Description|Partition Type
+|1|boot|Contains GRUB configuration, kernel/initramfs images|ext4
+|2|EFI-SYSTEM|Contains EFI GRUB image and secure boot shim|FAT32
+|3|BIOS-BOOT|Contains BIOS GRUB image|raw data
+|4|root|Contains the root filesystem|xfs
+|================================
+
+The EFI-SYSTEM partition can be deleted or reformatted when BIOS booting. Similarly, the BIOS-BOOT partition can be deleted or reformatted when
+EFI booting.
+
+== Mounted Filesystems
+
+Fedora CoreOS uses OSTree, which contains multiple deployments of the same OS. Each deployment contains a full root filesystem which gets mounted to / on boot.
+All deployments of the same OS share the same /var, which is kept separately.
+
+=== State in /var
+
+OSTree requires all state be kept in `/var`. Traditional places that might hold state (e.g. `/home`, or `/srv`) are symlinks
+to directories in `/var` (e.g. `/var/home` or `/var/srv`). Creating new directories under the root directory is not supported and disallowed by the
+immutable attribute. The contents of `/var` are located at `/ostree/deploy/fedora-coreos/deploy/var` by default, though moving `/var` to it's own filesystem
+is also supported using Fedora CoreOS configs.
+
+=== Read only /usr
+
+OSTree mounts `/usr` read only. Making changes to `/usr` or remounting it read/write is not supported.
+
+=== Multiple deployments
+
+The root filesystem contents are located at `/ostree/deploy/fedora-coreos/deploy/$deployment_hash`. On boot OSTree will read the `ostree=` kernel argument to
+determine which deployment to use. This deployment is then mounted as `/`. Each update creates a new deployment. This enables rolling back to a previous deployment
+if the update causes problems.
+
+=== Default Mountpoints
+
+This shows the default mountpoints of the filesystems described above, assuming Fedora CoreOS is installed on `/dev/vda`.
+
+.Default mountpoints on x86_64
+[source,bash]
+----
+$ findmnt  # detail elided
+/             /dev/vda4[/ostree/deploy/fedora-coreos/deploy/$hash]     xfs
+|-/sysroot    /dev/vda4                                                xfs
+|-/usr        /dev/vda4[/ostree/deploy/fedora-coreos/deploy/$hash/usr] xfs  ro
+|-/var        /dev/vda4[/ostree/deploy/fedora-coreos/deploy/var]       xfs
+`-/boot       /dev/vda1                                                ext4
+  `-/boot/efi /dev/vda2                                                vfat
+----
