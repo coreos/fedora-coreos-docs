@@ -1,0 +1,49 @@
+digraph initramfs {
+	compound=true
+	newrank=true
+	size=8
+	ranksep=0.1
+
+	node [shape=box]
+
+	subgraph cluster_normal {
+		center=true
+		basic [label="basic.target"]
+		rootdev [label="initrd-root-device.target"]
+		sysroot [label="sysroot.mount"]
+		oproot [label="ostree-prepare-root.service"]
+		rootfs [label="initrd-root-fs.target"]
+		initrd [label="initrd.target"]
+
+		basic -> rootdev -> sysroot -> oproot -> rootfs -> initrd
+	}
+
+	subgraph cluster_firstboot {
+		label="pulled in on first boot"
+
+		gpt [label="coreos-gpt-setup.service"]
+		ignuser [label="ignition-setup-user.service"]
+		ignbase [label="ignition-setup-base.service"]
+		network [label="network.target"]
+		igndisks [label="ignition-disks.service"]
+
+		mountvar [label="coreos-mount-var.service" color=red]
+		ignmount [label="ignition-mount.service" color=red]
+		popvar [label="coreos-populate-var.service"]
+		ignfiles [label="ignition-files.service"]
+		igncomplete [label="ignition-complete.target"]
+
+		gpt -> ignuser
+		ignbase -> igndisks
+		ignuser -> igndisks
+		network -> igndisks
+
+		mountvar -> ignmount -> popvar -> ignfiles -> igncomplete
+	}
+
+	basic -> gpt
+	basic -> ignbase
+	igndisks -> rootdev
+	rootfs -> mountvar
+	igncomplete -> initrd
+}

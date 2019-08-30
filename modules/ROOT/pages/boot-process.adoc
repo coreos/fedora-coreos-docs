@@ -1,0 +1,110 @@
+:experimental:
+= Fedora CoreOS Boot Process
+
+The Fedora CoreOS boot process is more complex than traditional Linux systems. Fedora CoreOS uses both Ignition and OSTree which both complicate the boot process.
+
+== Loading the Bootloader
+
+How the bootloader is loaded is architecture specific. Ultimately all architectures read the same grub config, but how it gets to that point varies.
+
+It may be helpful to review the disk layout before reading this section.
+
+=== x86_64
+
+Fedora CoreOS supports both BIOS and UEFI booting (including secure boot) from the same disk image.
+
+==== BIOS
+
+When BIOS booting, the firmware loads the first sector of the disk (the MBR) into RAM then executes it. Since this section is restricted to 446 bytes, it loads the
+rest of the GRUB binary from the BIOS-BOOT partition. This partition is not formatted and contains the raw contents of the grub core.img. Grub is installed with its
+$prefix variable set to the `grub2` directory in the `boot` partition (`/boot/grub2` when mounted on a running system). Once loaded, grub loads it's config at `$prefix/grub.cfg`.
+
+==== UEFI
+
+Unless configured otherwise, UEFI systems will search for a FAT32 filesystem with the label `EFI-SYSTEM` then execute `EFI/BOOT/BOOTX64.EFI` from that filesystem. This is
+the signed secure boot shim. It then loads `EFI/BOOT/grubx64.efi` which is the actual grub EFI executable. This executable was created with `$prefix` set to `EFI/fedora/`.
+Once loaded, grub loads the config from `$prefix/grub.cfg`. This grub config then finds the `boot` partition and executes sets `$prefix` to the `grub2` directory in that filesystem. 
+This is the same config file that the BIOS grub uses.
+
+=== aarch64
+
+On arm only EFI booting is supported. Booting with EFI on aarch64 is the same as on x86_64, except the EFI executables end in `...AA64.EFI` instead od `...X64.EFI`.
+
+== Bootloading
+
+Once grub is loaded and executing the grub config, it looks for a file `ignition.firstboot` on the `boot` filesystem. If this file is present, that indicates this is the first boot
+and that `/var` needs to be populated and Ignition should run. If the file exists, grub will add the `ignition.firstboot` kernel argument and set any other kernel arguments needed to
+turn on networking in the initramfs.
+
+Fedora CoreOS does not update it's grub configuration on update; instead it uses the Boot Loader Specification to define menu entries. teh `blscfg` command in the grub config generates
+menu entries from config files at `/loader/entries/*.conf` on the `boot` filesystem.
+
+== Initramfs (first boot)
+
+Fedora CoreOS uses systemd in it's initramfs. When running in the initramfs, systemd's default target is `initrd.target` which indicates the system is ready to switch root.
+
+=== Deciding if it's first boot
+
+The `ignition-generator` systemd generator checks for the `ignition.firstboot` kernel command line parameter. If it is present, it pulls in `ignition-complete.target` as a requirement
+for `initrd.target`.
+
+<graph>
+
+==== Fixing the GPT header *
+
+Since every Fedora CoreOS system starts from the same disk image, every system also shares the same disk GUID. This is problematic since GUIDs are supposed to be unique. Addtionally,
+the GPT backup header is located at the end of the disk image that was copied instead of at the end of the disk. The `coreos-gpt-setup.service` unit fixes both of these problems
+
+==== Ignition Setup *
+
+Ignition uses two configs: one provided by the OS vendor (the base config) and one provided by the user (the user config). On Fedora CoreOS each platform has it's own base config. The
+`ignition-setup-base.service` unit copies the base config for the platform in use to `/usr/lib/ignition/` where Ignition looks for it. The user config is usually fetched either from
+cloud metadata (like on AWS) or from the hypervisor (like on VMWare). In the case of bare metal installs however, neither of those sources exist. On bare metal the user config is written
+to `/boot` at install time. The `ignition-setup-user.service` unit copies the user config in `/boot` to `/usr/lib/ignition` if it exists.
+
+==== Networking *
+
+Ignition needs networking to fetch it's config or fetch files. Fedora CoreOS currently uses the `35legacy-network` dracut module, but will be switching to NetworkManager soon. The 
+`ignition-disks.service` unit depends on the `network.target` unit which both the legacy dracut module and NetworkManager support.
+
+==== Ignition disks *
+
+The Ignition disks stage fetches the config and caches it to `/run/ignition.json`. It then performs all tasks that must be done before filesystems get mounted, like partitioning, creating
+RAID arrays or creating filesystems.
+
+==== Mounting Root
+
+After Ignition disks has run the root device can be mounted. The systemd fstab generator generates the `sysroot.mount` unit based on the kernel command line option `root=/dev/disk/by-label/root`.
+After the root block device is mounted it is not immediately ready for use; the OSTree mount points must be set up first. `ostree-prepare-root.service` does this. Once the root device is ready for
+use `initrd-root-fs.target` is reached.
+
+==== Mounting filesystems *
+
+Before Ignition files runs, filesystems must be mounted as described by the Ignition config. Additionally, `/var` must be mounted and populated (`/var` is empty by default). The `coreos-mount-var.service`
+unit mounts the `/var` directory to `/sysroot/var`, then the `ignition-mount.service` unit mounts any filesystems defined in the Ignition config (if `/var` is also specified in the config, it is mounted
+over the default var location. Once all the mounts are set up, `/var` can be populated, which is done by the `coreos-populate-var.service` unit.
+
+==== Ignition files *
+
+Once all the defined filesystems are mounted and `/var` is populated, Ignition files runs and performs all the other configuration tasks like creating users, systemd units, or files. After the files
+stage completes, `ignition-complete.target` is reached, which in turn means `initrd.target` is reached.
+
+==== Switching root
+
+Once `initrd.target` is reached, systemd does some cleanup and isolates to `initrd-switch-root.target`. This means the running services started as dependencies of `initrd.target` are stopped. The
+`coreos-populate-var.service` and `ignition-mount.service` units (highlighted in red) have `ExecStop=` lines that undo the mounts they did before. This ensures anything mounted specifically for
+the first boot isn't carried over past the switch-root. This avoids issues where the first boot works but subseqent boots do not. After all of those units stop, systemd switches root to `/sysroot`.
+
+==== Marking the boot as complete
+
+
+== Other Resources:
+
+Talks:
+
+Talk on the Fedora CoreOS Boot Process (devconf.us, Aug 2019)
+
+Docs:
+
+disk layout guide
+man 7 bootup
