@@ -1,16 +1,16 @@
 * User guides
-** xref:getting-started.adoc[Getting Started]
-** xref:bare-metal.adoc[Installing on Bare Metal]
-** xref:faq.adoc[FAQ]
+** xref:pages/getting-started.adoc[Getting Started]
+** xref:pages/bare-metal.adoc[Installing on Bare Metal]
+** xref:pages/faq.adoc[FAQ]
 ** System Configuration
-*** xref:producing-ign.adoc[Producing an Ignition File]
-*** xref:fcct-config.adoc[FCCT Specification]
-*** xref:using-fcct.adoc[Using FCCT]
-*** xref:sysctl.adoc[Kernel Tuning]
-*** xref:running-containers.adoc[Running Containers]
+*** xref:pages/producing-ign.adoc[Producing an Ignition File]
+*** xref:pages/fcct-config.adoc[FCCT Specification]
+*** xref:pages/using-fcct.adoc[Using FCCT]
+*** xref:pages/sysctl.adoc[Kernel Tuning]
+*** xref:pages/running-containers.adoc[Running Containers]
 ** OS updates
-*** xref:auto-updates.adoc[Auto-Updates]
+*** xref:pages/auto-updates.adoc[Auto-Updates]
 ** Troubleshooting
-*** xref:manual-rollbacks.adoc[Manual Rollbacks]
+*** xref:pages/manual-rollbacks.adoc[Manual Rollbacks]
 * Reference pages
-// ** xref:platforms.adoc[Platforms]
+// ** xref:pages/platforms.adoc[Platforms]
