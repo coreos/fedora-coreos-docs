@@ -1,0 +1,40 @@
+:experimental:
+= Configuring FCOS to Use a Static IP Address
+By default, an FCOS instance will attempt to grab a DHCP address from the local network. However, if you need FCOS to use a static IP address, you can do so by specifying the NetworkManager configuration in the Ignition configuration file.
+
+As with any custom configuration on FCOS, you can write specific files in the xref:ign-storage.adoc[`storage` node] of the Ignition file.
+
+The following snippet shows how to assign the following to eth0:
+
+* static IP range: `192.0.2.1/24`
+* gateway: `192.0.2.255`
+* DNS: `192.0.2.53`
+
+.Example assignment of static IP address
+[source, yaml]
+----
+variant: fcos
+version: 1.0.0
+storage:
+  files:
+    - path: /etc/NetworkManager/system-connections/eth0.nmconnection
+      mode: 0600
+      overwrite: true
+      contents: inline
+      [connection]
+          id=Uplink
+          type=802-3-ethernet
+          autoconnect=true
+          interface-name=eth0
+          match-device=interface-name:eth0
+          uuid=<insert UUID>
+          [ethernet]
+          mac-address=<insert MAC address>
+          [ipv4]
+          method=manual
+          addresses=192.0.2.1/24
+          gateway=192.0.2.255
+          dns=192.0.2.53
+          dns-search=example.com
+----
+NOTE: During the initramfs portion of the boot process, dracut will attempt to grab a DHCP address. When it times out, Ignition will take over and write the above configuration into the filesystem.
