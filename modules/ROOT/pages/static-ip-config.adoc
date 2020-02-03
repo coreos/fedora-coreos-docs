@@ -6,9 +6,10 @@ As with any custom configuration on FCOS, you can write specific files in the xr
 
 The following snippet shows how to assign the following to eth0:
 
-* static IP range: `192.0.2.1/24`
-* gateway: `192.0.2.255`
-* DNS: `192.0.2.53`
+* static IP: `192.0.2.10/24`
+* gateway: `192.0.2.1`
+* DNS: `92.168.124.1;1.1.1.1;8.8.8.8`
+* DNS search domain: `redhat.com`
 
 .Example assignment of static IP address
 [source, yaml]
@@ -20,21 +21,26 @@ storage:
     - path: /etc/NetworkManager/system-connections/eth0.nmconnection
       mode: 0600
       overwrite: true
-      contents: inline
-      [connection]
-          id=Uplink
-          type=802-3-ethernet
-          autoconnect=true
+      contents:
+        inline:
+          [connection]
+          type=ethernet
           interface-name=eth0
-          match-device=interface-name:eth0
-          uuid=<insert UUID>
+
           [ethernet]
           mac-address=<insert MAC address>
+
           [ipv4]
           method=manual
-          addresses=192.0.2.1/24
-          gateway=192.0.2.255
-          dns=192.0.2.53
-          dns-search=example.com
+          addresses=192.0.2.10/24
+          gateway=192.0.2.1
+          dns=192.168.124.1;1.1.1.1;8.8.8.8
+          dns-search=redhat.com
 ----
 NOTE: During the initramfs portion of the boot process, dracut will attempt to grab a DHCP address. When it times out, Ignition will take over and write the above configuration into the filesystem.
+
+If the interface does not come up correctly on first boot, issue the following commands to force the static IP to take effect:
+
+`nmcli connection down eth0`
+
+`nmcli connection up eth0`
