@@ -27,6 +27,7 @@ Here is a list of all supported platforms and their identifier:
  * `azure`: Microsoft Azure (cloud platform)
  * `gcp`: Google Cloud Platform (cloud platform)
  * `ibmcloud`: IBM Cloud, VPC Generation 2 (cloud platform)
+ * `ibmcloud-classic`: IBM Cloud, Classic (cloud platform)
  * `metal`: bare metal with BIOS or UEFI boot
  * `openstack`: OpenStack (cloud platform)
  * `qemu`: QEMU (hypervisor)
