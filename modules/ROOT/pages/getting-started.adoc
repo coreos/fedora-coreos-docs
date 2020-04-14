@@ -7,9 +7,17 @@ NOTE: For more information on configuration, refer to the documentation for xref
 
 == Launching FCOS
 
+=== Launching in a cloud
+
+Follow the corresponding guide for xref:provisioning-aws.adoc[Amazon Web Services], xref:provisioning-azure.adoc[Azure], or xref:provisioning-digitalocean.adoc[DigitalOcean] to launch an instance of Fedora CoreOS.
+
+=== Launching in a virtual machine hypervisor
+
+Follow the corresponding guide for xref:provisioning-qemu.adoc[QEMU or libvirt] or xref:provisioning-vmware.adoc[VMware] to launch an instance of Fedora CoreOS.
+
 == Installing on bare metal
 
-Follow the xref:bare-metal.adoc[Bare Metal Installation Instructions] to install Fedora CoreOS to disk. This procedure injects the specified Ignition configuration at install time.
+Follow the xref:bare-metal.adoc[bare metal installation instructions] to install Fedora CoreOS to disk. This procedure injects the specified Ignition configuration at install time.
 
 == Where to report bugs and ask questions
 
