@@ -72,6 +72,21 @@ NOTE: When using `virt-install`, you must specify absolute paths to the image an
 
 TIP: If running with SELinux enabled, you may need to change the label of the Ignition file to allow access: `chcon -t svirt_home_t path/to/example.ign`
 
+TIP: If running with AppArmor enabled, you may need to change the AppArmor profile for libvirt. `/etc/apparmor.d/libvirt/TEMPLATE.qemu` should contain the full path to your template:
+[source, bash]
+----
+#
+# This profile is for the domain whose UUID matches this file.
+#
+
+#include <tunables/global>
+
+profile LIBVIRT_TEMPLATE flags=(attach_disconnected) {
+  #include <abstractions/libvirt-qemu>
+  /path/to/example.ign rk,
+}
+----
+
 Once the VM has finished booting, its IP addresses will appear on the serial console. You can then SSH into the FCOS VM as the `core` user:
 
 [source, bash]
