@@ -1,6 +1,6 @@
 = Access the emergency shell on boot.
 
-If there is an error while booting Fedora CoreOS and emergency.target is reached a shell prompt will open by default on ttyS0 (i.e. serial console). This usually only happens during first-boot provisioning..
+If there is an error while booting Fedora CoreOS and emergency.target is reached a shell prompt will open by default on ttyS0 (i.e. serial console). This usually only happens during first-boot provisioning.
 
 To access the emergency shell when not using a serial console, you should intercept the GRUB menu and edit the entry to drop all 'console' parameters from the kernel line that you don't need, then press Ctrl+X to resume booting.
 
