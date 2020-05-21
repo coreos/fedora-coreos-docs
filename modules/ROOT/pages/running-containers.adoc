@@ -32,6 +32,36 @@ systemd:
         WantedBy=multi-user.target
 ----
 
+=== Running container processes that requires listening on port 
+The following FCOS Configuration (FCC) snippet configures the systemd grafana.service. 
+
+.Example for running container processes that needs to listen on port
+[source,yaml]
+----
+variant: fcos
+version: 1.0.0
+systemd:
+  units:
+    - name: grafana.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Grafana Podman in Systemd
+
+        [Service]
+        Restart=on-failure
+        ExecStartPre=/bin/podman pull grafana/grafana
+        ExecStartPre=/usr/bin/rm -f /%t/%n-pid /%t/%n-cid
+        ExecStart=/usr/bin/podman run --conmon-pidfile /%t/%n-pid --cidfile /%t/%n-cid -d -p 3000:3000 --name grafana grafana/grafana top
+        ExecStop=/usr/bin/sh -c "/usr/bin/podman rm -f `cat /%t/%n-cid`"
+        KillMode=none
+        Type=forking
+        PIDFile=/%t/%n-pid
+        
+        [Install]
+        WantedBy=multi-user.target
+----
+
 === Running etcd
 
 etcd is not shipped as part of Fedora CoreOS. To use it, run it as a container, as shown below.
