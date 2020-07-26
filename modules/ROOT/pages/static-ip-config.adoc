@@ -41,4 +41,3 @@ storage:
           dns-search=redhat.com
 ----
 NOTE: Additional parameters for NetworkManager key files can be found in the https://developer.gnome.org/NetworkManager/stable/settings-connection.html[NetworkManager documentation].
-NOTE: During the initramfs portion of the boot process, dracut will attempt to grab a DHCP address. When it times out, Ignition will take over and write the above configuration into the filesystem.
