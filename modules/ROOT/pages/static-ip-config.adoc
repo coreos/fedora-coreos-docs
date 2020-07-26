@@ -42,13 +42,3 @@ storage:
 ----
 NOTE: Additional parameters for NetworkManager key files can be found in the https://developer.gnome.org/NetworkManager/stable/settings-connection.html[NetworkManager documentation].
 NOTE: During the initramfs portion of the boot process, dracut will attempt to grab a DHCP address. When it times out, Ignition will take over and write the above configuration into the filesystem.
-
-If the interface does not come up correctly on first boot (see https://github.com/coreos/fedora-coreos-tracker/issues/358[tracker issue 358]), you have two possible workarounds.
-
-. If you configured a username and password in your Ignition configuration, you can log in to the
-host via the console and issue the following commands to force the static IP to take effect:
-
-    nmcli connection down enp1s0
-    nmcli connection up enp1s0
-
-. If you are not able to access the host via the console, you can reboot the host and the static IP configuration will take effect.
