@@ -33,6 +33,6 @@
 * Reference pages
 ** xref:platforms.adoc[Platforms]
 * xref:tutorials.adoc[Tutorials]
-** xref:getting-started-tutorial.adoc[Getting Started Tutorial]
-** xref:intermediate-provisioning-tutorial.adoc[Intermediate Provisioning Tutorial Scenario]
-** xref:advanced-provisioning-tutorial.adoc[Advanced Provisioning Tutorial Scenario]
+** xref:getting-started-tutorial.adoc[Getting Started]
+** xref:intermediate-provisioning-tutorial.adoc[Intermediate Provisioning Scenario]
+** xref:advanced-provisioning-tutorial.adoc[Advanced Provisioning Scenario]
