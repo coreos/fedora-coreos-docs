@@ -181,7 +181,11 @@ localhost login: core (automatic login)
 *Note:* IP address and Kernel version can differ.
 
 Magic? Yes! The systemd dropin was created and we were automatically logged in to the terminal.
-You can see the full configuration for serial-getty@ttyS0.service by using systemctl cat serial-getty@ttyS0.service.
+You can see the full configuration for serial-getty@ttyS0.service by using
+[source,bash]
+----
+systemctl cat serial-getty@ttyS0.service.
+----
 
 We can also check that the zincati configuration file got created by Ignition:
 
