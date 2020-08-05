@@ -4,7 +4,7 @@
 == Prerequisites:
 
 - You have basic knowledge of what Fedora CoreOS is.
-- You have libvirtd installed and active on out system.
+- You have libvirtd installed and active on your system.
 - This guide is written targeting a Linux environment with a working `libvirt / kvm` setup.
 
 == Let's get Started:
