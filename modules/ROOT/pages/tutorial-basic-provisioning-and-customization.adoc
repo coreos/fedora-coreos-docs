@@ -20,7 +20,7 @@ Once the archive is verified, We can extract it with:
 xz -d [archive_name]
 ----
 
-Along with the extracted `.qcow2` image, you would also need two other programs in order to transpile and validate the ignition scripts, which are:
+Along with the extracted `.qcow2` archive, you would also need two other programs in order to transpile and validate the ignition scripts, which are:
 
 - fcct : Fedora CoreOS Config Transpiler.
 - ignition-validate : A tool to validate a config for ignition.
@@ -53,13 +53,13 @@ Ignition files are used to customize a delivered artifact which is a disk image 
 
 Fedora CoreOS uses Ignition to provision a node in an automated fashion. Ignition config files are written in JSON and typically not user friendly.
 For that reason Fedora CoreOS offers the Fedora CoreOS Config Transpiler (also known as FCCT) that will create Ignition configs from a more user friendly format.
-Additionally we offer the ignition-validate sub-utility that can be used to verify Ignition config and catch issues before launching a machine.
+Additionally the ignition-validate tool can be used to verify Ignition configs and catch issues before launching a machine.
 
 == First Ignition config via Fedora CoreOS Config Transpiler
 
 Let's create a very simple FCCT config that will perform the following actions:
 
-- Add a systemd dropin to override the norman `serial-getty@ttyS0.service`. The override will make the service automatically log the `core` user in to the serial console of the booted machine.
+- Add a systemd dropin to override the default `serial-getty@ttyS0.service`. The override will make the service automatically log the `core` user in to the serial console of the booted machine.
 - Place a file at `/etc/zincati/config.d/90-disable-auto-updates.toml` to https://github.com/coreos/zincati/blob/master/docs/usage/auto-updates.md#disabling-auto-updates[disable automatic updates] while we're working on the booted machine for the guide.
 
 We can create a simple FCCT config file named `fcct-simple.yaml` now as:

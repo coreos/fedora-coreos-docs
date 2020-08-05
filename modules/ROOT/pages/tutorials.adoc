@@ -1,7 +1,7 @@
 = Tutorials
 
 The following tutorials are focused on helping you getting started with provisioning scenarios for Fedora CoreOS.
-Each tutorial has its roots in its previous tutorial scenario and it's recommended to follow it sequentially.
+Each tutorial has its roots in its previous tutorial scenario and it's recommended to follow them sequentially.
 
 xref:tutorial-basic-provisioning-and-customization.adoc[**Basic Provisioing with Fedora CoreOS**] - Getting Started with Fedora CoreOS Tutorial.
 It includes basic configuration steps and serves as a 101 guide for newcomers.
