@@ -263,11 +263,12 @@ And finally, of course you can use the docker (provided by moby-engine rpm) or p
 ----
 [core@localhost]$ podman version
 [core@localhost]$ podman info
-[core@localhost]$ sudo docker info
-[core@localhost]$ sudo docker version
 ----
 
 *Note:* You need `sudo` for docker commands. `podman` commands can be run as root or as non-root user.
+
+*Note:* Running `docker` daemon and `podman` at the same time can cause issues and result in expected behaviour.
+Here's an https://docs.fedoraproject.org/en-US/fedora-coreos/faq/#_can_i_run_containers_via_docker_and_podman_at_the_same_time[FAQ Entry] describing the issue.
 
 *Note:* Running a `docker` command will cause the docker daemon to be started if it was not already started.
 
