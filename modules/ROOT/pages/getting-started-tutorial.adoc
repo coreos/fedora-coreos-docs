@@ -282,26 +282,3 @@ First escape out of the serial console by pressing `CTRL + ]` and then type:
 [host]$ virsh undefine --remove-all-storage fcos
 ----
 
-== Booting Fedora CoreOS: Intermediate Provisioning Scenario
-
-For a more intermediate provisioning scenario let's add an SSH key to our `authorized_keys` file and run a script on the first boot.
-We'll add to the `fcct` config from the previous scenario such that the provisioning configuration will now tell Ignition to:
-
-- Add a systemd dropin for auto login from serial console.
-- Disable automatic updates
-- Add a script at `/usr/local/bin/public-ipv4.sh` to run on boot.
-- Configure a systemd service to run the script on first boot.
-
-=== Write the Script
-
-So what script should we run? Here's a good small script:
-
-[source,bash]
-----
-#!/bin/bash
-echo "Detected Public IPv4: is $(curl https://ipv4.icanhazip.com)" > \
-         /run/console-login-helper-messages/issue.d/30_public-ipv4.issue
-----
-
-This script uses icanhazip.com to update the issuegen from console-login-helper-messages to output the node's public IPv4 address on the serial console during bootup.
-This is useful in cloud environments when you might have different public and private addresses.
