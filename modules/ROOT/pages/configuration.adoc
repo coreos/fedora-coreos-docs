@@ -1,5 +1,0 @@
-= Configuration
-
-* link:systemd.adoc[systemd-*]
-* link:network.adoc[network configuration]
-* link:containerruntimes.adoc[container runtimes]
