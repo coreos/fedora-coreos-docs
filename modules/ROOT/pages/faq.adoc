@@ -262,7 +262,7 @@ Although similar, Ignition configurations and FCCT ones do not have the same str
 FCCT exposes several customization helpers (e.g. distribution specific entries and common abstractions) that are not present in Ignition and make the formats not interchangeable.
 Additionally, the different formats (YAML for FCCT, JSON for Ignition) help to avoid mixing up inputs by mistake.
 
-## What is the format of the version number?
+== What is the format of the version number?
 
 This is covered in detail in the https://github.com/coreos/fedora-coreos-tracker/blob/master/Design.md#version-numbers[design docs].
 
