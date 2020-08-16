@@ -1,4 +1,3 @@
-:experimental:
 = Use Case and Developer Guides
 
 * link:developerguides.adoc[Developers]

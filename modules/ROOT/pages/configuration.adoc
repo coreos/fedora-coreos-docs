@@ -1,4 +1,3 @@
-:experimental:
 = Configuration
 
 * link:systemd.adoc[systemd-*]
