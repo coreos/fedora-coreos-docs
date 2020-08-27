@@ -19,9 +19,11 @@ VM_NAME="fcos-test-01"
 RAM_MB="2048"
 DISK_GB=10
 
-virt-install --connect qemu:///system -n "${VM_NAME}" -r "${RAM_MB}" --os-variant=fedora32 \
-        --import --graphics=none --disk "size=${DISK_GB},backing_store=${IMAGE}" \
-        --qemu-commandline="-fw_cfg name=opt/com.coreos/config,file=${IGNITION_CONFIG}"
+virt-install --connect qemu:///system --name fcos-test-01 --memory 2048 --os-variant=fedora32 \
+        --import --graphics=none vcpus=2,maxcpus=4 --disk
+        size=10,format=qcow2,backing_store=/path/to/image.qcow2 \
+        --qemu-commandline="-fw_cfg
+        name=opt/com.coreos/config,file=/path/to/example.ign
 ----
 
 NOTE: `virt-install` requires both the OS image and Ignition file to be specified as absolute paths.
