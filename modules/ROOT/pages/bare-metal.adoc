@@ -14,7 +14,7 @@ Before installing FCOS, you must have an Ignition configuration file and host it
 
 To install FCOS onto bare metal using the live ISO, follow these steps:
 
-- Download the ISO image:
+- Take the latest ISO image from the https://getfedora.org/coreos/download?tab=metal_virtualized&stream=stable[download page] or using podman (download stable by default, see https://github.com/coreos/coreos-installer/blob/master/docs/cmd/download.md[documentation] for options):
 [source, bash]
 ----
 podman run --privileged --pull=always --rm -v .:/data -w /data \
