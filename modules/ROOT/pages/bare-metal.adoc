@@ -18,7 +18,7 @@ To install FCOS onto bare metal using the live ISO, follow these steps:
 [source, bash]
 ----
 podman run --privileged --pull=always --rm -v .:/data -w /data \
-    quay.io/coreos/coreos-installer:release download -f iso
+    quay.io/coreos/coreos-installer:release download -s stable -p metal -f iso
 ----
 
 NOTE: You can boot the live ISO in either legacy BIOS or UEFI mode, regardless of what mode the OS will use once installed.
