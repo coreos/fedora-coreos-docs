@@ -88,7 +88,7 @@ The provisioning flow follows the usual steps, plus an additional `guestinfo.aft
 [source, bash]
 ----
 VM_NAME='fcos-node02'
-IFACE='ens9'
+IFACE='ens192'
 IPCFG="ip=192.0.2.42::192.0.2.1:255.255.255.0:${VM_NAME}:${IFACE}:off"
 
 govc library.deploy "${LIBRARY}/${TEMPLATE_NAME}" "${VM_NAME}"
