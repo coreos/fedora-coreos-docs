@@ -83,7 +83,9 @@ For this reason, on first-boot FCOS instances try to perform network autoconfigu
 If your VMware setup employs static network configuration instead, you can override this automatic DHCP setup with your own custom configuration.
 Custom networking command-line `ip=` parameter can be configured via guestinfo properties as shown below, before booting a VM for the first time.
 
-The provisioning flow follows the usual steps, plus an additional `guestinfo.afterburn.initrd.network-kargs` entry. Note that the network-kargs attribute needs to be added to the the VM's Advanced Configuration parameters ($vm.ExtensionData.Config.ExtraConfig). While the govc tool takes care of this detail when using the "-e" flag with the change command, other management tools may require more explicit reference to the Advanced Parameters attributes.  
+The provisioning flow follows the usual steps, plus an additional `guestinfo.afterburn.initrd.network-kargs` entry. 
+
+NOTE: if you are using a provisioning method other than `govc`, make sure that the guestinfo attribute is provisioned in the VM's Advanced Configuration Parameters (also known as `ExtraConfig`). Some management tools may default to a vApp Property instead, which does not work in this scenario.
 
 [source, bash]
 ----
