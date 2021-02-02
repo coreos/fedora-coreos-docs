@@ -1,0 +1,27 @@
+= Example PR to Docs repo
+
+- Create a page under `modules/ROOT/pages/`
+
+Give the file a name like `example.adoc`. Fill in the contents.
+
+- Add an entry in the navigation file (`modules/ROOT/nav.adoc`) under `System Configuration`.
+
+[source]
+----
+** System Configuration                                        
+*** xref:example.adoc[Example Docs PR]
+----
+
+- Here's how to embed a Fedora CoreOS Config in the docs. If this template is followed, FCCs will be automatically validated by CI.
+
+[source,yaml]
+----
+variant: fcos
+version: 1.3.0
+storage:
+  files:
+    - path: /etc/example
+      contents:
+        inline: |
+          Hello world.
+----
