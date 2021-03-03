@@ -136,10 +136,11 @@ The contents of `files` is as follows. Unless specified as optional, all nodes a
 * `overwrite` (boolean, optional): Defaults to `false`. If `true`, `source` must be specified, and any preexisting file of the specified `path` will be overwritten with the contents of `source`.
 * `contents` (object, optional): Specifies the contents of the file.
 ** `compression` (string, optional): Type of compression of the source. Possible values are `null` or `gzip`. Defaults to `null`. Compression cannot be specified if `source` uses an `s3` scheme.
-** `source` (string, optional):  Mandatory if `overwrite` is true. Mutually exclusive with option `inline`. Specifies the URL of the source to be copied to the `path`. Supported schemes are `http`, `https`, `tftp`, `s3`, and https://tools.ietf.org/html/rfc2397[`data`]. If you use the `http` scheme, you should specify a verification option to ensure the remote contents have not changed. If `source` is omitted, Ignition checks if the file already exists:
+** `source` (string, optional):  Mandatory if `overwrite` is true. Mutually exclusive with option `inline` and `local`. Specifies the URL of the source to be copied to the `path`. Supported schemes are `http`, `https`, `tftp`, `s3`, and https://tools.ietf.org/html/rfc2397[`data`]. If you use the `http` scheme, you should specify a verification option to ensure the remote contents have not changed. If `source` is omitted, Ignition checks if the file already exists:
 *** File exists: Ignition does nothing.
 *** File does not exist: Ignition creates an empty file.
-** `inline` (string, optional): Mutually exclusive with option `source`. Specifies a string to be written to the file.
+** `inline` (string, optional): Mutually exclusive with option `source` and `local`. Specifies a string to be written to the file.
+** `local` (string, optional): Mutually exclusive with option `source` and `inline`. Specifies a path with a file to embed. A root directory must be provided using the `-d <root>` option of `fcct`.
 ** `verification` (object, optional): Tells Ignition to verify the contents of the file. Currently, only one verification option has been implemented: `hash`.
 *** `hash` (string, mandatory if `verification` is specified): Hash of the file contents, in the form `+<type>-<value>+`. The only supported `type` is `sha512`.
 * `append` (object list, optional): This node has the same options as `source`. It specifies contents to be appended to the (presumably existing) file.
