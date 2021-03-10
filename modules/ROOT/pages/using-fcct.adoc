@@ -21,6 +21,9 @@ This example uses podman, but you can use docker in a similar manner. Note that 
 .Example running `fcct` using standard in and standard out:
 `podman run -i --rm quay.io/coreos/fcct:release --pretty --strict < your_config.fcc > transpiled_config.ign`
 +
+.Same example as above just for powershell (`<` is a reserved char.):
+`Get-Content your_config.fcc | podman run -i --rm quay.io/coreos/fcct:release --pretty --strict > transpiled_config.ign`
++
 .Example running `fcct` using files:
 `podman run --rm -v /path/to/your_config.fcc:/config.fcc:z quay.io/coreos/fcct:release --pretty --strict /config.fcc > transpiled_config.ign`
 +
