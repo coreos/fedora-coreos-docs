@@ -1,8 +1,9 @@
 * xref:faq.adoc[FAQ]
 * xref:getting-started.adoc[Getting Started]
-* xref:bare-metal.adoc[Installing on Bare Metal]
 * Provisioning Machines
 ** xref:stream-metadata.adoc[Stream metadata]
+** xref:bare-metal.adoc[Installing on Bare Metal]
+** xref:live-booting-ipxe.adoc[Live-booting via iPXE]
 ** xref:provisioning-aliyun.adoc[Booting on Alibaba Cloud]
 ** xref:provisioning-aws.adoc[Booting on AWS]
 ** xref:provisioning-azure.adoc[Booting on Azure]
@@ -15,8 +16,6 @@
 ** xref:provisioning-qemu.adoc[Booting on QEMU]
 ** xref:provisioning-vmware.adoc[Booting on VMware]
 ** xref:provisioning-vultr.adoc[Booting on Vultr]
-* Provisioning Transient Systems
-** xref:live-booting-ipxe.adoc[Live-booting via iPXE]
 * System Configuration
 ** xref:producing-ign.adoc[Producing an Ignition File]
 ** link:https://coreos.github.io/fcct/specs/[FCCT Specification]
