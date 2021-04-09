@@ -531,8 +531,6 @@ passwd:
 storage:
   directories:
     - path: /var/mnt/data
-      mode: 0755
-      overwrite: false
 
 systemd: 
   units:
