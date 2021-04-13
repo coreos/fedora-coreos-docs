@@ -494,12 +494,8 @@ passwd:
 storage:
   directories:
     - path: /var/mnt/data
-      mode: 0777
+      mode: 0755
       overwrite: false
-      user:
-        name: root
-      group:
-        name: root
 
 systemd: 
   units:
@@ -535,12 +531,8 @@ passwd:
 storage:
   directories:
     - path: /var/mnt/data
-      mode: 0777
+      mode: 0755
       overwrite: false
-      user:
-        name: root
-      group:
-        name: root
 
 systemd: 
   units:
