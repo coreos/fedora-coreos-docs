@@ -83,7 +83,7 @@ To make the tutorial simpler, you should rename the image that we have just down
 
 [source,bash]
 ----
-mv fedora-coreos-32.20200715.3.0-qemu.x86_64.qcow2 fedora-coreos.qcow2
+mv fedora-coreos-<version_number>-qemu.x86_64.qcow2 fedora-coreos.qcow2
 ----
 
 You are now ready to proceed with the xref:tutorial-autologin.adoc[first tutorial].
