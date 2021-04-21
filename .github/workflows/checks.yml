@@ -14,5 +14,9 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
+      - name: Print Podman version
+        run: dpkg -s podman
+      - name: Trivial Podman run
+        run: sudo podman run -i --rm quay.io/coreos/butane --version
       - name: Run validator
         run: ./check.py -v
