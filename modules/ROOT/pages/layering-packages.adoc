@@ -11,7 +11,7 @@ The intention of Fedora CoreOS is to keep the base image as simple and small as 
 To start the layering of a package, you need to write an systemd unit that executes the `rpm-ostree` command to install the wanted package(s). 
 Changes are applied to a new deployment and a reboot is necessary for those to take effect.
 
-== Example: Layering nano and setting it as a default editor
+== Example: Layering nano and setting it as the default editor
 
 This example shows on how to install the text editor `nano` and add a script to `/etc/profile.d` so that it is set as the default editor for all users.
 The parameter `--allow-inactive` is useful if the package is added to the root image in a future Fedora CoreOS release. In such a case, the parameter prevents that the service would fail.
