@@ -31,7 +31,7 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        Description=Layer nano as with rpm-ostree
+        Description=Layer nano with rpm-ostree
         # We run after `systemd-machine-id-commit.service` to ensure that
         # `ConditionFirstBoot=true` services won't rerun on the next boot.
         After=systemd-machine-id-commit.service
