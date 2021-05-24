@@ -18,7 +18,7 @@ The parameter `--allow-inactive` is useful if the package is added to the root i
 
 NOTE: In the future, we will have a more Ignition-friendly method of doing this with stronger guarantees. See upstream issues https://github.com/coreos/butane/issues/81[butane#81] and https://github.com/coreos/fedora-coreos-tracker/issues/681[fedora-coreos-tracker#681] for more information.
 
-NOTE:  The `After=systemd-machine-id-commit.service` directive is important in the following examples to avoid some subtle issues. Similarly, any `ConditionFirstBoot=true` services should use `Before=first-boot-complete.target systemd-machine-id-commit.service`. See https://github.com/systemd/systemd/blob/3045c416e1cbbd8ab40577790522217fd1b9cb3b/man/systemd.unit.xml#L1315[the systemd documentation] for more details.
+NOTE: The `After=systemd-machine-id-commit.service` directive is important in the following examples to avoid some subtle issues. Similarly, any `ConditionFirstBoot=true` services should use `Before=first-boot-complete.target systemd-machine-id-commit.service`. See https://github.com/systemd/systemd/blob/3045c416e1cbbd8ab40577790522217fd1b9cb3b/man/systemd.unit.xml#L1315[the systemd documentation] for more details.
 
 [source,yaml]
 ----
