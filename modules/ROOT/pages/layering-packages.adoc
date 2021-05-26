@@ -4,7 +4,7 @@ To make other software accessible on the host system installation you can use ht
 
 [NOTE]
 ====
-It is recommend to use layering only if there is no other possible containerisation option.
+It is recommended to use layering only if there is no other possible containerisation option.
 The intention of Fedora CoreOS is to keep the base image as simple and small as possible for security and maintainability reasons. That is why you should in general prefer the usage of `podman` containers over layering software.
 ====
 
