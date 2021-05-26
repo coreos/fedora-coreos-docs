@@ -1,6 +1,6 @@
 = Layering packages on the host system
 
-To make other software accessible on the host system installation you can use https://coreos.github.io/rpm-ostree/[`rpm-ostree install`] to layer rpm packages. By default, packages are downloaded from the https://src.fedoraproject.org/[Fedora repository].
+To make other software accessible on the host system installation you can use https://coreos.github.io/rpm-ostree/[`rpm-ostree install`] to layer rpm packages. By default, packages are downloaded from the https://docs.fedoraproject.org/en-US/quick-docs/repositories/[Fedora repositories].
 
 [NOTE]
 ====
