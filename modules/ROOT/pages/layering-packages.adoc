@@ -36,7 +36,6 @@ systemd:
         # `ConditionFirstBoot=true` services won't rerun on the next boot.
         After=systemd-machine-id-commit.service
         After=network-online.target
-        WantedBy=first-boot-complete.target
         ConditionPathExists=!/var/lib/rpm-ostree-install-nano.stamp
 
         [Service]
