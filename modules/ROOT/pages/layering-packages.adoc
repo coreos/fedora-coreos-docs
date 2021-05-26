@@ -8,7 +8,7 @@ It is recommended to use layering only if there is no other possible containeris
 The intention of Fedora CoreOS is to keep the base image as simple and small as possible for security and maintainability reasons. That is why you should in general prefer the usage of `podman` containers over layering software.
 ====
 
-To start the layering of a package, you need to write an systemd unit that executes the `rpm-ostree` command to install the wanted package(s). 
+To start the layering of a package, you need to write a systemd unit that executes the `rpm-ostree` command to install the wanted package(s). 
 Changes are applied to a new deployment and a reboot is necessary for those to take effect.
 
 == Example: Layering nano and setting it as the default editor
