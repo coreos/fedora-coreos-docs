@@ -485,11 +485,6 @@ Fedora CoreOS systems can be configured to mount network storage such as NFS and
 ----
 variant: fcos
 version: 1.3.0
-passwd:
-  users:
-    - name: core
-      ssh_authorized_keys:
-        - ssh-rsa ... 
 
 storage:
   directories:
