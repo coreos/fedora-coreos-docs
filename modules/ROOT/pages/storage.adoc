@@ -476,7 +476,7 @@ A GRUB menu entry is created for each version of Fedora CoreOS currently availab
 
 == Network Storage
 
-Fedora CoreOS systems can be configured to mount network storage such as NFS and CIFS. This is best achieved by using Ignition to create systemd units. Shares can be mounted on boot by creating a standard mount unit. Alternately, a share can be mounted when users access the mount point by creating an additional automount unit. Below are examples of each for an NFS share.
+Fedora CoreOS systems can be configured to mount network storage such as NFS and CIFS. This is best achieved by using Ignition to create systemd units. Shares can be mounted on boot by creating a standard mount unit. Alternately, a share can be mounted when users access the mountpoint by creating an additional automount unit. Below are examples of each for an NFS share.
 
 === NFS Mounts
 
