@@ -498,10 +498,9 @@ systemd:
         What=example.server.edu:/data
         Where=/var/mnt/data
         Type=nfs4
-        Options=_netdev
 
         [Install]
-        WantedBy=multi-user.target
+        WantedBy=remote-fs.target
 ----
 
 .Creating a systemd unit to mount an NFS share when users access the mount point (automount) 
