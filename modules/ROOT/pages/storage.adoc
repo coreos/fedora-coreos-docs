@@ -493,8 +493,6 @@ systemd:
       contents: |
         [Unit]
         Description=Mount data directory
-        Requires=network-online.target
-        After=network-online.target
 
         [Mount]
         What=example.server.edu:/data
