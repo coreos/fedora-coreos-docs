@@ -485,6 +485,10 @@ Fedora CoreOS systems can be configured to mount network storage such as NFS and
 ----
 variant: fcos
 version: 1.3.0
+<<<<<<< HEAD
+=======
+
+>>>>>>> d92610efdaa00f440bc0ad5642fd3a8641535dc6
 systemd: 
   units:
     - name: var-mnt-data.mount
