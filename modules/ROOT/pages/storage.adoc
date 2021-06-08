@@ -508,17 +508,6 @@ systemd:
 ----
 variant: fcos
 version: 1.3.0
-passwd:
-  users:
-    - name: core
-      ssh_authorized_keys:
-        - ssh-rsa ... 
-
-storage:
-  directories:
-    - path: /var/mnt/data
-      mode: 0755
-      overwrite: false
 
 systemd: 
   units:
@@ -526,17 +515,14 @@ systemd:
       contents: |
         [Unit]
         Description=Mount data directory
-        Requires=network-online.target
-        After=network-online.target
 
         [Mount]
         What=example.server.edu:/data
         Where=/var/mnt/data
         Type=nfs4
-        Options=_netdev
 
         [Install]
-        WantedBy=multi-user.target
+        WantedBy=remote-fs.target
 
     - name: var-mnt-data.automount
       enabled: true
