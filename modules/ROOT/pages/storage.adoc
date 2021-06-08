@@ -473,3 +473,81 @@ The only supported writable locations are `/etc` and `/var`. `/etc` should conta
 === Version selection and bootup
 
 A GRUB menu entry is created for each version of Fedora CoreOS currently available on a system. This menu entry references an `ostree` deployment which consist of a Linux kernel, an initramfs and a hash linking to an `ostree` commit (passed via the `ostree=` kernel argument). During bootup, `ostree` will read this kernel argument to determine which deployment to use as the root filesystem. Each update or change to the system (package installation, addition of kernel arguments) creates a new deployment. This enables rolling back to a previous deployment if the update causes problems.
+
+== Network Storage
+
+Fedora CoreOS systems can be configured to mount network storage such as NFS and CIFS. This is best achieved by using Ignition to create systemd units. Shares can be mounted on boot by creating a standard mount unit. Alternately, a share can be mounted when users access the mountpoint by creating an additional automount unit. Below are examples of each for an NFS share.
+
+=== NFS Mounts
+
+.Creating a systemd unit to mount an NFS share on boot. 
+[source,yaml]
+----
+variant: fcos
+version: 1.3.0
+
+systemd: 
+  units:
+    - name: var-mnt-data.mount
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Mount data directory
+
+        [Mount]
+        What=example.server.edu:/data
+        Where=/var/mnt/data
+        Type=nfs4
+
+        [Install]
+        WantedBy=remote-fs.target
+----
+
+.Creating a systemd unit to mount an NFS share when users access the mount point (automount) 
+[source,yaml]
+----
+variant: fcos
+version: 1.3.0
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - ssh-rsa ... 
+
+storage:
+  directories:
+    - path: /var/mnt/data
+      mode: 0755
+      overwrite: false
+
+systemd: 
+  units:
+    - name: var-mnt-data.mount
+      contents: |
+        [Unit]
+        Description=Mount data directory
+        Requires=network-online.target
+        After=network-online.target
+
+        [Mount]
+        What=example.server.edu:/data
+        Where=/var/mnt/data
+        Type=nfs4
+        Options=_netdev
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: var-mnt-data.automount
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Automount data directory
+
+        [Automount]
+        TimeoutIdleSec=20min
+        Where=/var/mnt/data
+
+        [Install]
+        WantedBy=multi-user.target
+----
