@@ -109,6 +109,10 @@ systemd:
         # We run after `systemd-machine-id-commit.service` to ensure that
         # `ConditionFirstBoot=true` services won't rerun on the next boot.
         After=systemd-machine-id-commit.service
+        # Since this unit creates an rpm-ostree transaction, we run before
+        # `boot-complete.target` to ensure that there are no other conflicting
+        # transactions that might cause this unit to fail.
+        Before=boot-complete.target
         ConditionKernelCommandLine=!systemd.unified_cgroup_hierarchy
         ConditionPathExists=!/var/lib/cgroups-v1-karg.stamp
 
@@ -154,6 +158,10 @@ systemd:
         # We run after `systemd-machine-id-commit.service` to ensure that
         # `ConditionFirstBoot=true` services won't rerun on the next boot.
         After=systemd-machine-id-commit.service
+        # Since this unit creates an rpm-ostree transaction, we run before
+        # `boot-complete.target` to ensure that there are no other conflicting
+        # transactions that might cause this unit to fail.
+        Before=boot-complete.target
         ConditionKernelCommandLine=!mitigations=off
         ConditionPathExists=!/var/lib/cpu-mitigations-karg.stamp
 
