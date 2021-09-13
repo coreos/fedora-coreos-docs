@@ -36,7 +36,7 @@ ignition:
 
 NOTE: The certificate authorities listed here are not automatically added to the host filesystem. They are solely used by Ignition itself when fetching over `https`. If you'd like to also install them on the host filesystem, include them as usual under the `storage.files` array.
 
-.Retrieving a remote Ignition file via HTTP, also add other config to be merged to the current config
+.Retrieving a remote Ignition file via HTTP and merging it with the current config
 [source,yaml]
 ----
 variant: fcos
