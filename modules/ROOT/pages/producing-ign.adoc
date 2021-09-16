@@ -94,6 +94,16 @@ Butane is available as a https://www.macports.org/[MacPorts] package:
 sudo port install butane
 ----
 
+==== Installing via Scoop
+
+Butane is available as a https://scoop.sh[Scoop] package via the https://github.com/lukesampson/scoop-extras[extras]:
+
+[source,powershell]
+----
+scoop bucket add extras
+scoop install butane
+----
+
 === Standalone binary
 
 ==== Linux
@@ -130,6 +140,23 @@ curl https://getfedora.org/static/fedora.gpg | gpg --import
 gpg --verify butane-x86_64-apple-darwin.asc
 ----
 
+==== Windows
+To use the Butane binary on Windows, follow these steps:
+
+. If you have not already done so, download the https://getfedora.org/static/fedora.gpg[Fedora signing keys] and import them:
++
+[source,powershell]
+----
+Invoke-RestMethod -Uri https://getfedora.org/static/fedora.gpg | gpg --import
+----
+. Download the latest version of Butane and the detached signature from the https://github.com/coreos/butane/releases[releases page].
+. Verify it with gpg:
++
+[source,powershell]
+----
+gpg --verify butane-x86_64-pc-windows-gnu.exe.asc
+----
+
 == A simple example
 
 Create a basic Ignition config that modifies the default Fedora CoreOS user `core` to allow this user to log in with an SSH key.
@@ -153,7 +180,7 @@ The SSH public key will be provisioned to the Fedora CoreOS machine (via Ignitio
 [source,yaml]
 ----
 variant: fcos
-version: 1.3.0
+version: 1.4.0
 passwd:
   users:
     - name: core
@@ -173,7 +200,7 @@ TIP: YAML files must have consistent indentation. Although Butane checks for syn
 +
 [source,bash]
 ----
-butane --pretty --strict < example.bu > example.ign
+butane --pretty --strict example.bu > example.ign
 ----
 +
 . Use the `example.ign` file to xref:getting-started.adoc[boot Fedora CoreOS].

@@ -2,7 +2,7 @@
 
 NOTE: Make sure that you have completed the steps described in the xref:tutorial-setup.adoc[initial setup page] before starting this tutorial.
 
-In this tutorial, we will not focus on provisionning but on what happens during updates and the options that are available in case of failures.
+In this tutorial, we will not focus on provisioning but on what happens during updates and the options that are available in case of failures.
 
 == Downloading an older Fedora CoreOS release
 
@@ -51,7 +51,7 @@ Let's write this Butane config to a file called `updates.bu`:
 [source,yaml]
 ----
 variant: fcos
-version: 1.3.0
+version: 1.4.0
 passwd:
   users:
     - name: core
