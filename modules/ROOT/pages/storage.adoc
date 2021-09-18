@@ -354,14 +354,14 @@ storage:
       with_mount_unit: true
 ----
 
-== Adding Network Storage
+== Adding network storage
 
-Fedora CoreOS systems can be configured to mount network file systems such as NFS and CIFS. This is best achieved by using Ignition to create systemd units. File systems can be mounted on boot by creating a standard mount unit. Alternately, a file system can be mounted when users access the mountpoint by creating an additional automount unit. Below are examples of each for an NFS file system.
+Fedora CoreOS systems can be configured to mount network filesystems such as NFS and CIFS. This is best achieved by using Ignition to create systemd units. Filesystems can be mounted on boot by creating a standard mount unit. Alternately, a filesystem can be mounted when users access the mountpoint by creating an additional automount unit. Below are examples of each for an NFS filesystem.
 
-=== Configuring NFS Mounts
+=== Configuring NFS mounts
 
-Creating a systemd unit to mount an NFS file system on boot. Note: the .mount file must be named based on the path (e.g. /var/mnt/data = var-mnt-data.mount)
-
+.Creating a systemd unit to mount an NFS filesystem on boot.
+NOTE: The `.mount` file must be named based on the path (e.g. `/var/mnt/data` = `var-mnt-data.mount`)
 [source,yaml]
 ----
 variant: fcos
@@ -375,15 +375,15 @@ systemd:
         Description=Mount data directory
 
         [Mount]
-        What=example.server.edu:/data
+        What=example.org:/data
         Where=/var/mnt/data
         Type=nfs4
 
         [Install]
-        WantedBy=remote-fs.target
+        WantedBy=multi-user.target
 ----
 
-Creating a systemd unit to mount an NFS file system when users access the mount point (automount) 
+.Creating a systemd unit to mount an NFS file system when users access the mount point (automount) 
 [source,yaml]
 ----
 variant: fcos
@@ -396,12 +396,12 @@ systemd:
         Description=Mount data directory
 
         [Mount]
-        What=example.server.edu:/data
+        What=example.org:/data
         Where=/var/mnt/data
         Type=nfs4
 
         [Install]
-        WantedBy=remote-fs.target
+        WantedBy=multi-user.target
 
     - name: var-mnt-data.automount
       enabled: true
