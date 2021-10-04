@@ -417,7 +417,6 @@ systemd:
         WantedBy=multi-user.target
 ----
 
-
 == Advanced examples
 
 This example configures a mirrored boot disk with a TPM2-encrypted root filesystem, overrides the sizes of the automatically-generated root partition replicas, and adds an encrypted mirrored `/var` partition which consumes the remainder of the disks.
