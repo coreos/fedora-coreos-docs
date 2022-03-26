@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Supported Platforms
 
 Fedora CoreOS is provisioned via prebuilt disk images, and configured on first-boot via https://github.com/coreos/ignition[Ignition]. Each platform may require specific logic and components, thus dedicated images are provided for each supported environment. Additionally, a unique platform ID is available in the host environment for runtime introspection.

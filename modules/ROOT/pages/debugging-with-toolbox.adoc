@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Debugging with Toolbx
 
 The FCOS image is kept minimal by design to reduce the image size and the

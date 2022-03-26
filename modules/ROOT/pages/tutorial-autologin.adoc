@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Enabling autologin and setting a custom hostname
 
 NOTE: Make sure that you have completed the steps described in the xref:tutorial-setup.adoc[initial setup page] before starting this tutorial.

@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Provisioning Fedora CoreOS on Exoscale
 
 This guide shows how to provision new Fedora CoreOS (FCOS) instances on https://exoscale.com[Exoscale] Cloud Hosting.

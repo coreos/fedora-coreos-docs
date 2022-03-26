@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Installing CoreOS on Bare Metal
 
 This guide provides instructions to install Fedora CoreOS to bare metal. Three options are available:

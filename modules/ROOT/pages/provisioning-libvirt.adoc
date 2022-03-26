@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Provisioning Fedora CoreOS on libvirt
 
 This guide shows how to provision new Fedora CoreOS (FCOS) instances on a https://libvirt.org/[libvirt] platform, using the https://www.qemu.org/[QEMU] hypervisor.

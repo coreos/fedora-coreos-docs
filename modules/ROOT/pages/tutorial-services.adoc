@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Starting a script on first boot via a systemd service
 
 NOTE: Make sure that you have completed the steps described in the xref:tutorial-setup.adoc[initial setup page] before starting this tutorial.

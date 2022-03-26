@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Adding OS extensions to the host system
 
 Fedora CoreOS keeps the base image as simple and small as possible for security and maintainability reasons. That is why you should in general prefer the usage of `podman` containers over layering software.

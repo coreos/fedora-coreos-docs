@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Provisioning Fedora CoreOS on the Raspberry Pi 4
 
 Fedora CoreOS produces 64-bit ARM (`aarch64`) artifacts. These images can be used as the Operating System for the Raspberry Pi 4 device. Before trying to get FCOS up and running on your Raspberry Pi 4 you'll want to xref:#_updating_eeprom_on_raspberry_pi_4[Update the EEPROM] to the latest version and choose how you want to boot the Raspberry Pi 4. There are two options:

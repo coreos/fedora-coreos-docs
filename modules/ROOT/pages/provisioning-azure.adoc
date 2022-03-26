@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Provisioning Fedora CoreOS on Azure
 
 This guide shows how to provision new Fedora CoreOS (FCOS) nodes on Azure. Fedora currently does not publish Fedora CoreOS images within Azure, so you must download an Azure image from Fedora and upload it to your Azure subscription.

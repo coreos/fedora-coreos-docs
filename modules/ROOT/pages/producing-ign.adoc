@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Producing an Ignition Config
 
 == Ignition overview

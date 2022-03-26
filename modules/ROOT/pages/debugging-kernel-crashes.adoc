@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Debugging kernel crashes using kdump
 
 . Memory must be reserved for the crash kernel during booting of the first kernel. `crashkernel=auto` is likely insufficient memory on Fedora CoreOS. It is recommended to start testing with 300M. Kernel arguments can be provided like this:

@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Setting a Hostname
 
 To set a custom hostname for your system, use the following Butane config to write to `/etc/hostname`:

@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Configuring Storage
 
 Fedora CoreOS ships with a simple default storage layout: the root partition is the last one and expands to take the full size of the disk. Apart from the boot partition, all data is stored on the root partition. See the xref:#_disk_layout[Disk layout section] for more details.

@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Setting up SSH access and starting containers at boot
 
 NOTE: Make sure that you have completed the steps described in the xref:tutorial-setup.adoc[initial setup page] before starting this tutorial.

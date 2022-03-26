@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Manual Rollbacks
 
 When an update is complete, the previous OS deployment remains on disk. If an update causes issues, you can use it as a fallback. This is a manual operation that requires human intervention and console access.

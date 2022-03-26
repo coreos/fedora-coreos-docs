@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Modifying Kernel Arguments
 
 Kernel arguments changes are managed by `rpm-ostree` via the https://www.mankier.com/1/rpm-ostree[`rpm-ostree kargs`] sub command. Changes are applied to a new deployment and a reboot is necessary for those to take effect.

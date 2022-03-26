@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Kernel tunables (sysctl)
 
 The Linux kernel offers a plethora of knobs under `/proc/sys` to control the availability of different features and tune performance parameters.

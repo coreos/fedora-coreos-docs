@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Provisioning Fedora CoreOS on DigitalOcean
 
 This guide shows how to provision new Fedora CoreOS (FCOS) nodes on DigitalOcean. Fedora CoreOS images are currently not published directly on DigitalOcean, so you must download a Fedora CoreOS DigitalOcean image and upload it to your DigitalOcean account as a https://www.digitalocean.com/docs/images/custom-images/[custom image].

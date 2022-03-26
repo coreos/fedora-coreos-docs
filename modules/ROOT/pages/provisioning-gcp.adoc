@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Provisioning Fedora CoreOS on Google Cloud Platform
 
 This guide shows how to provision new Fedora CoreOS (FCOS) instances on Google Cloud Platform (GCP).

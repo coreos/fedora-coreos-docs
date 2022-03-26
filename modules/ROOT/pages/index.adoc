@@ -1,4 +1,6 @@
-= Fedora CoreOS Documentation
+include::partial$attributes.adoc[]
+
+= Fedora CoreOS Documentation {stable-version}
 
 image::welcomefedoracoreos.jpg[]
 

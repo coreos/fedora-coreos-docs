@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Running Fedora CoreOS directly from RAM
 :page-aliases: live-booting-ipxe.adoc
 

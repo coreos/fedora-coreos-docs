@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Managing Files
 
 .Example for defining files, directories and links

@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Setting alternatives
 
 Due to an https://github.com/fedora-sysv/chkconfig/issues/9[ongoing issue] in how alternatives configurations are stored on the system, Fedora CoreOS systems can not use the usual `alternatives` commands to configure them.

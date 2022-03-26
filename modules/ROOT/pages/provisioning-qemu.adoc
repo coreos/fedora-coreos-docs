@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Provisioning Fedora CoreOS on QEMU
 
 This guide shows how to provision new Fedora CoreOS (FCOS) instances on a bare https://www.qemu.org/[QEMU] hypervisor.

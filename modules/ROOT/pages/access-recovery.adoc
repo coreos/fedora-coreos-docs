@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Access Recovery
 
 If you've lost the private key of an SSH key pair used to log into Fedora CoreOS, and do not have any password logins set up to use at the console, you can gain access back to the machine by booting into single user mode with the `single` kernel command-line argument:

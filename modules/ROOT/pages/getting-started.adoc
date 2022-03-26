@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Getting Started with Fedora CoreOS
 
 == Introduction

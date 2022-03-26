@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Provisioning Fedora CoreOS on Amazon Web Services
 
 This guide shows how to provision new Fedora CoreOS (FCOS) instances on the Amazon Web Services (AWS) cloud platform.

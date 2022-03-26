@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Live ISO and PXE image reference
 
 For an introduction to running Fedora CoreOS directly from RAM, see the xref:live-booting.adoc[provisioning guide].

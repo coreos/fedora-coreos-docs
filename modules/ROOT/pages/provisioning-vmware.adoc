@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Provisioning Fedora CoreOS on VMware
 
 This guide shows how to provision new Fedora CoreOS (FCOS) nodes on the VMware hypervisor.

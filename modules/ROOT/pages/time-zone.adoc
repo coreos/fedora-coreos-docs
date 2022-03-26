@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Configuring time zone
 
 By default, Fedora CoreOS machines keep time in the Coordinated Universal Time (UTC) zone and synchronize their clocks with the Network Time Protocol (NTP). This page contains information about customizing the time zone.

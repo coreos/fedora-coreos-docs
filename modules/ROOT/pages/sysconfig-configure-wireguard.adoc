@@ -1,4 +1,5 @@
-:experimental:
+include::partial$attributes.adoc[]
+
 = Configuring FCOS to use WireGuard
 
 == Introduction

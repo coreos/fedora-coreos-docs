@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Provisioning Fedora CoreOS on IBM Cloud
 
 This guide shows how to provision new Fedora CoreOS (FCOS) instances in IBM Cloud VPC Generation 2.

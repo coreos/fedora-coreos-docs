@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Prerequisites for the tutorials
 
 The following tutorials are focused on helping you get started with Fedora CoreOS by learning how to automatically configure (or provision) an instance on first boot. Each tutorial has its roots in the previous one thus it is recommended to follow them sequentially.

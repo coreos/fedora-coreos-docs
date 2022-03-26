@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = How to Customize a NIC Name
 
 == Using a systemd Link File

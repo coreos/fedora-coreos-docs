@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Auto-Updates and Manual Rollbacks
 
 Fedora CoreOS provides atomic updates and rollbacks via https://ostree.readthedocs.io/en/latest/[OSTree] deployments.

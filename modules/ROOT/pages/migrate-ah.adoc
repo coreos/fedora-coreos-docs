@@ -1,3 +1,4 @@
+include::partial$attributes.adoc[]
 
 = Migrating from Fedora Atomic Host (FAH) to Fedora CoreOS (FCOS)
 

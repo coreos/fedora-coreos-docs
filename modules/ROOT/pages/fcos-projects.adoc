@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Projects Using Fedora CoreOS
 
 This a list of projects that are actively using Fedora CoreOS:

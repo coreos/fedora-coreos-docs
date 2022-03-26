@@ -1,3 +1,5 @@
+include::partial$attributes.adoc[]
+
 = Provisioning Fedora CoreOS on Alibaba Cloud (Aliyun)
 
 This guide shows how to provision new Fedora CoreOS (FCOS) nodes on Alibaba Cloud.  Fedora currently does not publish Fedora CoreOS images within Alibaba Cloud, so you must download an Alibaba Cloud image from Fedora and upload it to one of your Object Storage Service (OSS) buckets.
