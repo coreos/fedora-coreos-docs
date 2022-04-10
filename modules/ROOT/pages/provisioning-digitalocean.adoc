@@ -21,7 +21,7 @@ Fedora CoreOS is designed to be updated automatically, with different schedules 
 .Example uploading FCOS to a DigitalOcean custom image
 [source, bash]
 ----
-doctl compute image create my-fcos-image --region sfo2 --image-url <download-url> --wait
+doctl compute image create my-fcos-image --region sfo2 --image-url <download-url>
 ----
 
 === Launching a droplet
