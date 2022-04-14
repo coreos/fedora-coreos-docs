@@ -75,3 +75,13 @@ username is `core`.
 ----
 kubectl virt ssh core@my-fcos
 ----
+
+== Mirroring the image for use in private registries
+
+If a private registry in air-gaped installations is used, the image can be mirrored to that registry.
+
+.Mirroring a fcos image from stable stream
+[source, bash]
+----
+skopeo copy docker://quay.io/coreos/fedora-coreos:stable docker://myregistry.io/myorg/fedora-coreos:stable
+----
