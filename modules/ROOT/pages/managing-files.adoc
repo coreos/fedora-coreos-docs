@@ -50,3 +50,33 @@ storage:
       target: /opt/tools/transmogrifier
       hard: false
 ----
+
+.Example for how to set permissions and ownership for a file and its parent directories
+[source,yaml]
+----
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+      # This creates a file, and sets the ownership
+    - path: /home/directory/you/want.txt
+      contents:
+        inline: Hello, world!
+      user:
+        name: exampleuser
+      group:
+        name: examplegroup
+  # This creates the directory that the file should be inside. Its mode is set to 0755 by default, that
+  # is, readable and executable by all, and writable by the owner.
+  directories:
+    - path: /home/directory
+      user:
+        name: exampleuser
+      group:
+        name: examplegroup
+    - path: /home/directory/you
+      user:
+        name: exampleuser
+      group:
+        name: examplegroup
+----
