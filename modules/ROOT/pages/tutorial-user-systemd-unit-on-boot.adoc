@@ -58,6 +58,30 @@ storage:
         name: sleeper
       group:
         name: sleeper
+    - path: /home/sleeper/.config/systemd/user/
+      mode: 0755
+      user:
+        name: sleeper
+      group:
+        name: sleeper
+    - path: /home/sleeper/.config/systemd/
+      mode: 0755
+      user:
+        name: sleeper
+      group:
+        name: sleeper
+    - path: /home/sleeper/.config/
+      mode: 0755
+      user:
+        name: sleeper
+      group:
+        name: sleeper
+    - path: /home/sleeper/
+      mode: 0755
+      user:
+        name: sleeper
+      group:
+        name: sleeper
   links:
     - path: /home/sleeper/.config/systemd/user/default.target.wants/linger-example.service
       user:
@@ -97,7 +121,31 @@ passwd:
 storage:
   directories:
     - path: /home/sleeper/.config/systemd/user/default.target.wants
-      mode: 0744
+      mode: 0755
+      user:
+        name: sleeper
+      group:
+        name: sleeper
+    - path: /home/sleeper/.config/systemd/user/
+      mode: 0755
+      user:
+        name: sleeper
+      group:
+        name: sleeper
+    - path: /home/sleeper/.config/systemd/
+      mode: 0755
+      user:
+        name: sleeper
+      group:
+        name: sleeper
+    - path: /home/sleeper/.config/
+      mode: 0755
+      user:
+        name: sleeper
+      group:
+        name: sleeper
+    - path: /home/sleeper/
+      mode: 0755
       user:
         name: sleeper
       group:
