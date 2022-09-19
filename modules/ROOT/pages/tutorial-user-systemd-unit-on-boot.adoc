@@ -80,13 +80,11 @@ storage:
       mode: 0644
 ----
 
-The directories
+The following directories do not exist yet so they need to be created to tell ignition to set the right ownership and permissions:
 
-* _/home/sleeper/.config_
-* _/home/sleeper/.config/systemd_
-* _/home/sleeper/.config/systemd/user_
-
-do not exist so they need to be created.
+* `/home/sleeper/.config`
+* `/home/sleeper/.config/systemd`
+* `/home/sleeper/.config/systemd/user`
 
 == Writing the Butane config and converting to Ignition
 
