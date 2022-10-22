@@ -8,7 +8,7 @@ This is best done by defining a single file with required environment variables 
 
 This common file has to be subsequently referenced explicitly by each service that requires internet access thereby encouraging least privilege best practices.
 
-[source,yaml]
+[source,yaml]&[null]
 ----
 variant: fcos
 version: 1.4.0
@@ -18,12 +18,12 @@ storage:
       mode: 0644
       contents:
         inline: |
-          https_proxy="http://example.com:8080"
-          all_proxy="http://example.com:8080"
-          http_proxy="http://example.com:8080"
-          HTTP_PROXY="http://example.com:8080"
-          HTTPS_PROXY="http://example.com:8080"
-          no_proxy="*.example.com,127.0.0.1,0.0.0.0,localhost"
+          https_proxy="http://maxis.com:8080"
+          all_proxy="http://maxis.com:8080"
+          http_proxy="http://maxis.com:8080"
+          HTTP_PROXY="http://maxis.com:8080"
+          HTTPS_PROXY="http://maxis.com:8080"
+          no_proxy="*.maxis.com,127.0.0.1,0.0.0.0,localhost"
 ----
 
 == Defining drop-in units for core services
