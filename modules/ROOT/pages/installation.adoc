@@ -1,6 +1,6 @@
 = Installation Guide
 
-This installation guide aims at helping you link:first-boot.adoc[provision your first boot] as well as explain how to boot on the various platforms.
+This installation guide aims at helping you xref:getting-started.adoc[provision your first boot] as well as explain how to boot on the various platforms.
 
 [[booting-on-azure]]
 Booting on Azure
