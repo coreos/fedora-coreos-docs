@@ -127,6 +127,27 @@ storage:
           method=manual
 ----
 
+=== Renaming NICs via .link files
+
+One general issue is that kernel and systemd changes over time may end up changing
+the name of your network interfaces.  A pattern that can be very useful is to
+assign explicit names to your network interfaces via https://www.freedesktop.org/software/systemd/man/systemd.link.html[systemd .link files].  The following is just a copy of the `dmz0` example which pins to a MAC address.  Combine this with any of the above examples for NetworkManager configuration to use the chosen custom name like `dmz0` instead of a system-assigned default.
+
+[source, yaml]
+----
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/systemd/network/50-dmz0.link
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          MACAddress=00:a0:de:63:7a:e6
+          [Link]
+          Name=dmz0
+----
 
 == Host Network Configuration Examples
 
