@@ -24,7 +24,8 @@ The currently supported platforms and their identifiers are listed below.
 * VMware ESXi, Fusion, and Workstation (`vmware`): Hypervisor. See xref:provisioning-vmware.adoc[Booting on VMware]. Fedora CoreOS images currently use https://kb.vmware.com/s/article/1003746[hardware version] 17, supporting VMware ESXi 7.0 or later, Fusion 12.0 or later, and Workstation 16.0 or later.
 * Vultr (`vultr`): Cloud platform. See xref:provisioning-vultr.adoc[Booting on Vultr].
 
-NOTE: The supported cloud platforms do not include previous generation of cloud platform services, such as:
+Important note: The supported cloud platforms do not include previous generation of cloud platform services, such as:
+
 - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-classic-platform.html[AWS EC2-Classic Networking environment] and https://aws.amazon.com/ec2/previous-generation/[Amazon EC2 Previous Generation Instances].
 - https://cloud.google.com/vpc/docs/legacy[Google Cloud Legacy Networks].
 - https://cloud.ibm.com/docs/cloud-infrastructure?topic=cloud-infrastructure-compare-infrastructure[IBM Cloud Classic Infrastructure environment] and https://cloud.ibm.com/docs/virtual-servers[IBM Cloud Virtual Servers (Classic)] using https://cloud.ibm.com/docs/vlans?topic=vlans-about-vlans[IBM Cloud VLAN (Classic) and VLAN Subnets (Classic)].
