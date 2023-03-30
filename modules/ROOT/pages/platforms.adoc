@@ -15,7 +15,7 @@ The currently supported platforms and their identifiers are listed below.
 * DigitalOcean (`digitalocean`): Cloud platform. See xref:provisioning-digitalocean.adoc[Booting on DigitalOcean].
 * Exoscale (`exoscale`): Cloud platform. See xref:provisioning-exoscale.adoc[Booting on Exoscale].
 * Google Cloud Platform (`gcp`): Cloud platform. See xref:provisioning-gcp.adoc[Booting on GCP].
-* IBM Cloud, VPC Generation 2 (`ibmcloud`): Cloud platform. See xref:provisioning-ibmcloud.adoc[Booting on IBM Cloud].
+* IBM Cloud (`ibmcloud`): Cloud platform. See xref:provisioning-ibmcloud.adoc[Booting on IBM Cloud].
 * Bare metal (`metal`): With BIOS, UEFI or network boot, with standard or 4k Native disks. See xref:bare-metal.adoc[Installing on Bare Metal] or xref:live-booting-ipxe.adoc[Live-booting via iPXE].
 * Nutanix (`nutanix`): Hypervisor.
 * OpenStack (cloud platform): `openstack`): Cloud platform. See xref:provisioning-openstack.adoc[Booting on OpenStack].
@@ -23,6 +23,12 @@ The currently supported platforms and their identifiers are listed below.
 * VirtualBox ('virtualbox'): Hypervisor. See xref:provisioning-virtualbox.adoc[Booting on VirtualBox].
 * VMware ESXi, Fusion, and Workstation (`vmware`): Hypervisor. See xref:provisioning-vmware.adoc[Booting on VMware]. Fedora CoreOS images currently use https://kb.vmware.com/s/article/1003746[hardware version] 17, supporting VMware ESXi 7.0 or later, Fusion 12.0 or later, and Workstation 16.0 or later.
 * Vultr (`vultr`): Cloud platform. See xref:provisioning-vultr.adoc[Booting on Vultr].
+
+NOTE: The supported cloud platforms do not include previous generation of cloud platform services, such as:
+- https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-classic-platform.html[AWS EC2-Classic Networking environment] and https://aws.amazon.com/ec2/previous-generation/[Amazon EC2 Previous Generation Instances].
+- https://cloud.google.com/vpc/docs/legacy[Google Cloud Legacy Networks].
+- https://cloud.ibm.com/docs/cloud-infrastructure?topic=cloud-infrastructure-compare-infrastructure[IBM Cloud Classic Infrastructure environment] and https://cloud.ibm.com/docs/virtual-servers[IBM Cloud Virtual Servers (Classic)] using https://cloud.ibm.com/docs/vlans?topic=vlans-about-vlans[IBM Cloud VLAN (Classic) and VLAN Subnets (Classic)].
+- https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/deployment-models[Azure Service Manager (ASM) control plane environment] and https://learn.microsoft.com/en-us/azure//virtual-machines/classic-vm-deprecation[Azure IaaS VM (Classic)] or Hyper-V Gen1 format using https://learn.microsoft.com/en-us/previous-versions/azure/virtual-network/create-virtual-network-classic[Azure VNET (Classic)].
 
 === AArch64
 
@@ -33,7 +39,7 @@ The currently supported platforms and their identifiers are listed below.
 
 === s390x
 
-* IBM Cloud, VPC Generation 2 (`ibmcloud`): Cloud platform. See xref:provisioning-ibmcloud.adoc[Booting on IBM Cloud].
+* IBM Cloud (`ibmcloud`): Cloud platform. See xref:provisioning-ibmcloud.adoc[Booting on IBM Cloud].
 * Bare metal (`metal`): From disk or network boot. See xref:bare-metal.adoc[Installing on Bare Metal] or xref:live-booting-ipxe.adoc[Live-booting via iPXE].
 * QEMU (`qemu`): Hypervisor. See xref:provisioning-libvirt.adoc[Booting on libvirt]
 * OpenStack (cloud platform): `openstack`): Cloud platform. See xref:provisioning-openstack.adoc[Booting on OpenStack].
