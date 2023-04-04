@@ -19,6 +19,7 @@ The currently supported platforms and their identifiers are listed below.
 * Bare metal (`metal`): With BIOS, UEFI or network boot, with standard or 4k Native disks. See xref:bare-metal.adoc[Installing on Bare Metal] or xref:live-booting-ipxe.adoc[Live-booting via iPXE].
 * Nutanix (`nutanix`): Hypervisor.
 * OpenStack (cloud platform): `openstack`): Cloud platform. See xref:provisioning-openstack.adoc[Booting on OpenStack].
+* Podman Machine (local): See xref:provisioning-podman-machine.adoc[Booting on Podman]
 * QEMU (`qemu`): Hypervisor. See xref:provisioning-libvirt.adoc[Booting on libvirt]
 * VirtualBox ('virtualbox'): Hypervisor. See xref:provisioning-virtualbox.adoc[Booting on VirtualBox].
 * VMware ESXi, Fusion, and Workstation (`vmware`): Hypervisor. See xref:provisioning-vmware.adoc[Booting on VMware]. Fedora CoreOS images currently use https://kb.vmware.com/s/article/1003746[hardware version] 17, supporting VMware ESXi 7.0 or later, Fusion 12.0 or later, and Workstation 16.0 or later.
@@ -30,6 +31,7 @@ The currently supported platforms and their identifiers are listed below.
 * Bare metal (`metal`): With UEFI or network boot, with standard or 4k Native disks. See xref:bare-metal.adoc[Installing on Bare Metal] or xref:live-booting-ipxe.adoc[Live-booting via iPXE] and xref:provisioning-raspberry-pi4.adoc[Booting on the Raspberry Pi 4].
 * QEMU (`qemu`): Hypervisor. See xref:provisioning-libvirt.adoc[Booting on libvirt]
 * OpenStack (cloud platform): `openstack`): Cloud platform. See xref:provisioning-openstack.adoc[Booting on OpenStack].
+* Podman Machine (local): See xref:provisioning-podman-machine.adoc[Booting on Podman]
 
 === s390x
 

@@ -1,0 +1,15 @@
+= Provisioning Fedora CoreOS via Podman Machine
+
+The [podman machine](https://docs.podman.io/en/latest/markdown/podman-machine.1.html) project uses Fedora CoreOS on the backend.
+
+This project will be particularly useful for people who want to spin up a local virtual machine using Fedora CoreOS on non-Linux platforms (e.g. MacOS X).
+
+Please see the documentation of that project for more details.
+
+== Using Podman Machine to test Ignition configuration
+
+When developing Ignition (or Butane) configuration, there can be a trial-and-error process.  Using local virtual machines instead of cloud resources can speed up iteration.
+
+[source, bash]
+----
+podman machine init --ignition-path /path/to/config.ign
