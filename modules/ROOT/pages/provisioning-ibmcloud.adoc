@@ -2,7 +2,7 @@
 
 This guide shows how to provision new Fedora CoreOS (FCOS) instances in IBM Cloud for either the `x86_64` or `s390x` architectures.
 
-NOTE: This guide does not describe Fedora CoreOS (FCOS) with https://cloud.ibm.com/docs/virtual-servers[IBM Cloud Virtual Servers (Classic)], using https://cloud.ibm.com/docs/vlans?topic=vlans-about-vlans[IBM Cloud VLAN (Classic) and VLAN Subnets (Classic)] within the https://cloud.ibm.com/docs/cloud-infrastructure?topic=cloud-infrastructure-compare-infrastructure[IBM Cloud Classic Infrastructure environment]. The guide exclusively refers to Fedora CoreOS (FCOS) with IBM Cloud infrastructure services, also known as IBM Cloud VPC Infrastructure environment.
+NOTE: Fedora CoreOS (FCOS) is not supported with https://cloud.ibm.com/docs/virtual-servers[IBM Cloud Virtual Servers (Classic)], using https://cloud.ibm.com/docs/vlans?topic=vlans-about-vlans[IBM Cloud VLAN (Classic) and VLAN Subnets (Classic)] within the https://cloud.ibm.com/docs/cloud-infrastructure?topic=cloud-infrastructure-compare-infrastructure[IBM Cloud Classic Infrastructure environment]. The guide exclusively refers to Fedora CoreOS (FCOS) with IBM Cloud infrastructure services, also known as IBM Cloud VPC Infrastructure environment.
 
 == Prerequisites
 

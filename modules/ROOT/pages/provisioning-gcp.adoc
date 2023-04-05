@@ -2,8 +2,6 @@
 
 This guide shows how to provision new Fedora CoreOS (FCOS) instances on Google Cloud Platform (GCP).
 
-NOTE: This guide does not describe Fedora CoreOS (FCOS) with previous generation of Google Cloud services such as https://cloud.google.com/vpc/docs/legacy[Google Cloud Legacy Networks].
-
 == Prerequisites
 
 Before provisioning an FCOS machine, you must have an Ignition configuration file containing your customizations. If you do not have one, see xref:producing-ign.adoc[Producing an Ignition File].

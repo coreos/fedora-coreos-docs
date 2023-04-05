@@ -2,7 +2,7 @@
 
 This guide shows how to provision new Fedora CoreOS (FCOS) instances on the Amazon Web Services (AWS) cloud platform.
 
-NOTE: This guide does not describe Fedora CoreOS (FCOS) with https://aws.amazon.com/ec2/previous-generation/[Amazon EC2 Previous Generation Instances], within the https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-classic-platform.html[AWS EC2-Classic Networking environment].
+NOTE: Fedora CoreOS (FCOS) is not supported with https://aws.amazon.com/ec2/previous-generation/[Amazon EC2 Previous Generation Instances], within the https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-classic-platform.html[AWS EC2-Classic Networking environment].
 
 == Prerequisites
 
