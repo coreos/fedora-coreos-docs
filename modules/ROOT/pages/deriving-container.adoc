@@ -1,0 +1,127 @@
+= Deriving from Fedora CoreOS as a bootable container image
+
+NOTICE: At the current time, the suggested model here does not integrate with the current "update barriers" model used for default Fedora CoreOS updates.  While relatively rare so far, this means that some container-based updates may see issues that were otherwise gated.  This issue is being worked on.  More information in https://github.com/coreos/fedora-coreos-tracker/issues/1263[this issue].
+
+== Bootable containers overview
+
+The operating system images used for Fedora CoreOS are available as a standard container image; there is one per stream. See xref:update-streams.adoc[Update Streams].
+
+- quay.io/fedora/fedora-coreos:stable
+- quay.io/fedora/fedora-coreos:next
+- quay.io/fedora/fedora-coreos:testing
+
+== Creating custom builds
+
+See the https://github.com/coreos/layering-examples[layering examples] git repository.  While the examples there tend to use Containerfile/Dockerfile style builds, you can use any tool which can build containers and push the result to a registry.
+
+The default suggested approach is to have container tags be the source of truth for initating upgrades, and to have the client systems poll.  Example systemd units for this are in [https://github.com/coreos/layering-examples/tree/main/autoupdate-host]; they boil down to a systemd `.service` which just runs `rpm-ostree upgrade --reboot` and a corresponding `.timer` unit to run it once a day.
+
+Of course, client side logic could be much more complex, including a privileged container image that runs completely arbitrary logic.
+
+== Using Ignition to switch to a bootable container image
+
+The https://coreos.github.io/rpm-ostree/container/[rpm-ostree container page] describes the commands for interacting with bootable ostree container images.
+
+This systemd unit will run only on the first boot, and switch a "stock" Fedora CoreOS node to your custom image.
+
+[source,yaml]
+----
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    # Our custom unit for rebasing
+    - name: rebase-custom.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Fetch and deploy target image
+        # Only run on the firstboot
+        ConditionFirstBoot=true
+        After=network-online.target
+        [Service]
+        # This ordering is important
+        After=ignition-firstboot-complete.service
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=rpm-ostree rebase --reboot ostree-unverified-registry:quay.io/example/example-derived:latest
+        [Install]
+        WantedBy=multi-user.target
+----
+
+== Adding pull secrets for private container images
+
+If your registry requires authentication, then you can add a pull secret.  See https://coreos.github.io/rpm-ostree/container/#registry-authentication[container pull secrets].
+
+[source,yaml]
+----
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/ostree/auth.json
+      mode: 0600
+      contents:
+        inline: >
+              {
+                   "auths": {
+                        "quay.io": {
+                             "auth": "..."
+                        }
+                   }
+              }
+----
+
+== Maintaining custom builds
+
+As the upstream container image (e.g. quay.io/fedora/fedora-coreos:stable) changes for security and functionality improvements, you are responsible for re-building your derived image.  Implementing this depends on your chosen container build system.
+
+However, key to this model is the assumption that if you're deploying Fedora CoreOS, you have already invested in container infrastructure and can manage the operating system updates in the same way as application containers.
+
+== Understanding Ignition versus container content
+
+=== Storage
+
+First, if you wish to configure storage (see xref:storage.adoc[Configuring Storage] ) that must still be done via the initial Ignition configuration. 
+If you wish to change a system's storage configuration, the current recommendation is still that that be done via full system reprovisioning.
+
+=== Filesystem
+
+Ignition's philosophy is that it runs exactly once, and any subsequent changes should generally be done by node reprovisioning.  This can
+be very expensive in some environments.  Storing configuration directly
+with the OS content allows strongly coupling them and ensuring that
+the state of your machines is exactly what you build and replicate
+as a container image.
+
+Note however that content injected via Ignition will still persist as
+machine-local state into subsequent OS updates (including by default
+our unit to perform the switch, which will remain inactive; though your
+container could run code to delete or mask the unit).
+
+=== Machine local state
+
+A powerful ability of using OCI containers as a mechanism for host
+systems management is that one can create chains of derived images;
+for example, you might have a "base" image derived from Fedora CoreOS
+that include e.g. basic agents or logging configuration, but then further builds
+that customize that base for particular sites or cloud environments.
+
+It's even possible to create builds which are targeted solely for
+a specific machine.
+
+However, this may not always be ergonomic to do.  Ignition here
+can serve as a mechanism to apply machine-specific state.  Commonly,
+this machine specific state does not need to change often.  A classic
+example here is configuring `/etc/hostname`.
+
+=== Bootstrap configuration to fetch container images
+
+The pull secret described above is also a form of configuration on
+the system that must be present (in some environments) to pull the container
+image, and hence must be configured via Ignition today.
+
+==== Machine local bootstrap configuration
+
+There is a class of configuration which combines these two previous types,
+such as static IP addressing.  Here, Ignition again makes sense
+to perform this configuration.
