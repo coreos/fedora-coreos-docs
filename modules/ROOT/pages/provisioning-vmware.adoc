@@ -22,7 +22,7 @@ Once you have picked the relevant stream, you can download the latest OVA:
 [source, bash]
 ----
 STREAM="stable"
-coreos-installer download -s "${STREAM}" -p vmware -f ova
+coreos-installer download -s $STREAM -p vmware -f ova
 ----
 
 Alternatively, OVA images can be manually downloaded from the https://fedoraproject.org/coreos/download/?stream=stable#baremetal[download page].
@@ -39,7 +39,7 @@ For maximum compatibility, it is recommended to use `base64` encoding and to pre
 [source, bash]
 ----
 CONFIG_ENCODING='base64'
-CONFIG_ENCODED=$(cat example.ign | base64 -w0 -)
+CONFIG_ENCODED=$(base64 -w0 example.ign)
 ----
 
 An alternative to plain `base64` encoding is `gzip+base64` as described in the https://coreos.github.io/ignition/supported-platforms/[Ignition supported platforms]. This is especially useful when submitting the Ignition config via `govc` as an _inline_ argument. In that case the encoded config is limited to slightly under 128 KiB on Linux, 256 KiB on macOS, and 32 KiB on Windows (8 KiB if using `cmd.exe` or PowerShell). If your config is larger than that limit, you may be able to submit it inline after compressing it with `gzip`.
@@ -47,7 +47,7 @@ An alternative to plain `base64` encoding is `gzip+base64` as described in the h
 [source, bash]
 ----
 CONFIG_ENCODING='gzip+base64'
-CONFIG_ENCODED=$(cat example.ign | gzip -9 | base64 -w0 -)
+CONFIG_ENCODED=$(gzip -9c example.ign | base64 -w0 -)
 ----
 
 If your generated Ignition configuration is still too large, you will encounter an `Argument list too long` error or similar. The solution to that problem depends on whether you are working with vSphere or Workstation/Fusion.
@@ -58,7 +58,7 @@ For vSphere, instead of inlining the configuration file within your shell, `govc
 ----
 CONFIG_ENCODING="gzip+base64"
 CONFIG_FILE="example.ign"
-CONFIG_FILE_ENCODED="${CONFIG_FILE}.gzip.b64"
+CONFIG_FILE_ENCODED="${CONFIG_FILE}.gz.b64"
 
 gzip -9c "${CONFIG_FILE}" | base64 -w0 - > "${CONFIG_FILE_ENCODED}"
 
@@ -72,7 +72,7 @@ In the case of Workstation/Fusion, or as a last resort in general, there is the 
 
 [source, bash]
 ----
-printf "extraConfig:guestinfo.ignition.config.data=$(cat example.ign | base64 -w0 -)\n" > ovftool.cfg
+echo "extraConfig:guestinfo.ignition.config.data=$(base64 -w0 example.ign)" > ovftool.cfg
 ----
 
 == Booting a new VM on Workstation or Fusion

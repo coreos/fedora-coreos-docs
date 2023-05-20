@@ -16,7 +16,7 @@ The `coreos-installer` tool has built-in support for fetching artifacts:
 
 [source, bash]
 ----
-STREAM='stable'
+STREAM="stable"
 coreos-installer download --decompress -s $STREAM -p openstack -f qcow2.xz
 ----
 
@@ -32,7 +32,7 @@ Fetch the latest `x86_64` AMI in `us-west-1` and use it to launch an instance:
 [source, bash]
 ----
 $ AMI=$(curl -sSL https://builds.coreos.fedoraproject.org/streams/stable.json | jq -r '.architectures.x86_64.images.aws.regions["us-west-1"].image')
-$ echo $AMI
+$ echo "${AMI}"
 ami-021238084bf8c95ff
 $ aws ec2 run-instances --region us-west-1 --image-id "${AMI}" ...
 ----
