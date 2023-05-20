@@ -105,7 +105,7 @@ chcon --verbose --type svirt_home_t containers.ign
 virt-install --name=fcos --vcpus=2 --ram=2048 --os-variant=fedora-coreos-stable \
     --import --network=bridge=virbr0 --graphics=none \
     --qemu-commandline="-fw_cfg name=opt/com.coreos/config,file=${PWD}/containers.ign" \
-    --disk=size=20,backing_store=${PWD}/fedora-coreos.qcow2
+    --disk="size=20,backing_store=${PWD}/fedora-coreos.qcow2"
 ----
 
 On the console you will see:

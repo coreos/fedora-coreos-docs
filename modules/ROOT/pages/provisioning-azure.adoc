@@ -21,8 +21,8 @@ Once you have picked the relevant stream, download, verify, and decompress the l
 
 [source, bash]
 ----
-stream="stable"
-coreos-installer download --decompress -s "${stream}" -p azure -f vhd.xz
+STREAM="stable"
+coreos-installer download --decompress -s $STREAM -p azure -f vhd.xz
 ----
 
 Alternatively, you can manually download an Azure image from the https://fedoraproject.org/coreos/download/?stream=stable#cloud_images[download page]. Verify the download, following the instructions on that page, and decompress it.
