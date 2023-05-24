@@ -24,6 +24,7 @@
 ** link:https://coreos.github.io/butane/specs/[Butane Specification]
 ** xref:remote-ign.adoc[Using a remote Ignition config]
 * Storage Configuration
+** xref:disk-layout.adoc[Default layout]
 ** xref:storage.adoc[Configuring Storage]
 * Network Configuration
 ** xref:sysconfig-network-configuration.adoc[Network Configuration]
