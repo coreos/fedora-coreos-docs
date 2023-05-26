@@ -1,6 +1,6 @@
 = Configuring FCOS to use WireGuard
 
-IMPORTANT: An issue with WireGuard SELinux isolation break Pre/Post actions in WireGuard configuration file with Fedora Coreos 38. You can check the progress of this issue on the https://github.com/coreos/fedora-coreos-tracker/issues/1487[tracker]. Some example in this page may not work properly. 
+WARNING: Some examples in this page may not work properly. An issue with WireGuard SELinux isolation breaks Pre/Post actions in the WireGuard configuration for recent releases of Fedora Coreos. You can check the progress of this issue on the https://github.com/coreos/fedora-coreos-tracker/issues/1487[issue tracker]. 
 
 == Introduction
 
