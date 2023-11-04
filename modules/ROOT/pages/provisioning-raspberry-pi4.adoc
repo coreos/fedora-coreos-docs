@@ -48,7 +48,7 @@ WARNING: The following commands to extract the contents of the RPMs, the use of 
 [source, bash]
 ----
 for rpm in /tmp/RPi4boot/*rpm; do rpm2cpio $rpm | sudo cpio -idv -D /tmp/RPi4boot/; done
-sudo mv /tmp/RPi4boot/usr/share/uboot/rpi_4/u-boot.bin /tmp/RPi4boot/boot/efi/rpi4-u-boot.bin
+sudo mv /tmp/RPi4boot/usr/share/uboot/rpi_4/u-boot.bin /tmp/RPi4boot/boot/efi/rpi-u-boot.bin
 ----
 
 Run `coreos-installer` to install to the target disk. There are https://coreos.github.io/coreos-installer/getting-started/[various ways] to run `coreos-installer` and install to a target disk. We won't cover them all here, but this workflow most closely mirrors the xref:bare-metal.adoc#_installing_from_the_container["Installing from the container"] documentation.
