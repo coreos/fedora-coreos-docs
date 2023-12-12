@@ -47,6 +47,13 @@ NOTE: `DISK_GB` should be at least as big as the default size of the image. For 
 
 TIP: Make sure that your user has access to `/dev/kvm`. The default is to allow access for everyone, but on some distributions you may need to add yourself to the `kvm` group.
 
+TIP: Make sure that your home directory and the path to and including the directory used to store the CoreOS image is accessible to the `qemu` unprivileged user. One method to ensure access is to use `chmod` (see below; there are security implications).
+
+[source, bash]
+----
+chmod a+X $HOME $HOME/{.local,.local/share,.local/share/libvirt,.local/share/libvirt/images}
+----
+
 TIP: You can escape out of the serial console by pressing `CTRL + ]`.
 
 If you set up an xref:authentication.adoc[SSH key] for the default `core` user, you can SSH into the VM and explore the OS:
