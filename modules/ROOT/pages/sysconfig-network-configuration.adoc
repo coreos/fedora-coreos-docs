@@ -99,12 +99,15 @@ See https://coreos.github.io/afterburn/usage/initrd-network-cmdline/[the Afterbu
 
 WARNING: If you need networking to grab your Ignition config and your environment requires more complex networking than the default of DHCP to grab the Ignition config, then you'll need to use another method other than Ignition to configure the network.
 
-Networking configuration can be performed by writing out files described in an Ignition config. These are https://networkmanager.dev/docs/api/latest/nm-settings-keyfile.html[NetworkManager keyfiles] that are written to `/etc/NetworkManager/system-connections/` that tell NetworkManager what to do.
+There are to main methods for configuring networking with ignition 
+- By creating NetworkManager configuration files described in an Ignition config. These are https://networkmanager.dev/docs/api/latest/nm-settings-keyfile.html[NetworkManager keyfiles] that are written to `/etc/NetworkManager/system-connections/` that tell NetworkManager what to do.
+- By creating a nmstate desire state YAML(postfix .yml) files at /etc/nmstate following https://nmstate.io[NMstate syntax]. The applied network state file will be renamed with postfix .applied to prevent repeated applied on next run.
 
 Any configuration provided via Ignition will be considered at a higher priority than any other method of configuring the Network for a Fedora CoreOS instance. If you specify Networking configuration via Ignition, try not to use other mechanisms to configure the network.
 
 An example https://docs.fedoraproject.org/en-US/fedora-coreos/producing-ign/[Butane] config for the same static networking example that we showed above is:
 
+NetworkManager
 [source, yaml]
 ----
 variant: fcos
@@ -120,17 +123,45 @@ storage:
           type=ethernet
           interface-name=ens2
           [ipv4]
-          address1=10.10.10.10/24,10.10.10.1
+          address1=10.10.10.10/24
           dns=8.8.8.8;
           dns-search=
           may-fail=false
           method=manual
 ----
 
+NMstate
+[source, yaml]
+----
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/nmstate/ens2.yml
+      mode: 0600
+      contents:
+        inline: |
+          hostname:
+            config: myhostname
+          dns-resolver:
+            config:
+              search: []
+              server:
+              - 8.8.8.8
+          interfaces:
+          - name: ens2
+            type: ethernet
+            wait-ip: ipv4
+            ipv4:
+              enable: true
+              address:
+              - ip: 10.10.10.10
+                prefix-length: 24
 
+----
 == Host Network Configuration Examples
 
-In this section we'll go through common examples of setting up different types of networking devices using both dracut kernel arguments as well as NetworkManager keyfiles via Ignition/Butane.
+In this section we'll go through common examples of setting up different types of networking devices using dracut kernel arguments, NetworkManager keyfiles and nmstate via Ignition/Butane.
 
 Examples in this section that use a static IP will assume these values unless otherwise stated:
 
@@ -244,7 +275,7 @@ ip=${ip}::${gateway}:${netmask}:${hostname}:${interface}:none:${nameserver}
 ip=10.10.10.10::10.10.10.1:255.255.255.0:myhostname:ens2:none:8.8.8.8
 ----
 
-==== Butane config
+==== Butane NetworkManager config
 
 .Template
 [source, yaml]
@@ -286,7 +317,7 @@ storage:
           type=ethernet
           interface-name=ens2
           [ipv4]
-          address1=10.10.10.10/24,10.10.10.1
+          address1=10.10.10.10/24
           dhcp-hostname=myhostname
           dns=8.8.8.8;
           dns-search=
@@ -294,7 +325,65 @@ storage:
           method=manual
 ----
 
+==== Butane Nmstate config
 
+.Template
+[source, yaml]
+----
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/nmstate/${interface}.yml
+      mode: 0600
+      contents:
+        inline: |
+          hostname:
+            config: ${hostname}
+          routes:
+          - destination: 0.0.0.0/0
+            next-hop-address: ${gateway}
+            next-hop-interface: ${interface}
+          interfaces:
+          - name: ${interface}
+            type: ethernet
+            state: up
+            wait-ip: ipv4
+            ipv4:
+              enable: true
+              address:
+              - ip: ${ip}
+                prefix-length: ${prefix}
+----
+
+.Rendered
+[source, yaml]
+----
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/nmstate/ens2.yml
+      mode: 0600
+      contents:
+        inline: |
+          hostname:
+            config: myhostname
+          routes:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.10.10.1
+            next-hop-interface: ens2
+          interfaces:
+          - name: ens2
+            type: ethernet
+            state: up
+            wait-ip: ipv4
+            ipv4:
+              enable: true
+              address:
+              - ip: 10.10.10.10
+                prefix-length: 24
+----
 
 === Configuring a Bond (Static IP)
 
@@ -314,7 +403,7 @@ ip=10.10.10.10::10.10.10.1:255.255.255.0:myhostname:bond0:none:8.8.8.8
 bond=bond0:ens2,ens3:mode=active-backup,miimon=100
 ----
 
-==== Butane config
+==== Butane NetworkManager config
 
 .Template
 [source, yaml]
@@ -382,7 +471,7 @@ storage:
           miimon=100
           mode=active-backup
           [ipv4]
-          address1=10.10.10.10/24,10.10.10.1
+          address1=10.10.10.10/24
           dhcp-hostname=myhostname
           dns=8.8.8.8;
           dns-search=
@@ -410,6 +499,92 @@ storage:
           slave-type=bond
 ----
 
+==== Butane NMstate config
+
+.Template
+[source, yaml]
+----
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/nmstate/${bondname}.yml
+      mode: 0600
+      contents:
+        inline: |
+          hostname:
+            config: ${hostname}
+          dns-resolver:
+            config:
+              search: []
+              server:
+              - ${nameserver}
+          routes:
+            config:
+              destination: 0.0.0.0/0
+              next-hop-interface: ${bondname}
+              next-hop-address: ${gateway}
+          interfaces:
+          - name: ${bondname}
+            type: bond
+            state: up
+            wait-ip: ipv4
+            ipv4:
+              enabled: true
+              address:
+              - ip: ${ip}
+                prefix-length: ${prefix}
+            link-aggregation:
+              mode: active-backup
+              options:
+                miimon: '100'
+              ports:
+              - ${subnic1}
+              - ${subnic2}
+----
+
+.Rendered
+[source, yaml]
+----
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/nmstate/bond0.yml
+      mode: 0600
+      contents:
+        inline: |
+          hostname:
+            config: myhostname
+          dns-resolver:
+            config:
+              search: []
+              server:
+              - 8.8.8.8
+          routes:
+            config:
+              destination: 0.0.0.0/0
+              next-hop-interface: bond0
+              next-hop-address: 10.10.10.1
+          interfaces:
+          - name: bond0
+            type: bond
+            state: up
+            wait-ip: ipv4
+            ipv4:
+              enabled: true
+              address:
+              - ip: 10.10.10.10
+                prefix-length: 24
+            link-aggregation:
+              mode: active-backup
+              options:
+                miimon: '100'
+              ports:
+              - ens2
+              - ens3
+----
+
 
 === Configuring a Bridge (DHCP)
 
@@ -429,7 +604,7 @@ ip=br0:dhcp
 bridge=br0:ens2,ens3
 ----
 
-==== Butane config
+==== Butane NetworkManager config
 
 .Template
 [source, yaml]
@@ -519,6 +694,55 @@ storage:
           [bridge-port]
 ----
 
+==== Butane MNstate config
+
+.Template
+[source, yaml]
+----
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/nmstate/${bridgename}.yml
+      mode: 0600
+      contents:
+        inline: |
+          interfaces:
+          - name: ${bridgename}
+            type: linux-bridge
+            state: up
+            ipv4: 
+              enabled: true
+              dhcp: true 
+            bridge:
+              ports:
+              - name: ${subnic1}
+              - name: ${subnic2}
+----
+
+.Rendered
+[source, yaml]
+----
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/nmstate/br0.yml
+      mode: 0600
+      contents:
+        inline: |
+          interfaces:
+          - name: br0
+            type: linux-bridge
+            state: up
+            ipv4: 
+              enabled: true
+              dhcp: true 
+            bridge:
+              ports:
+              - name: ens2
+              - name: ens3
+----
 
 === Configuring a Team (DHCP)
 
@@ -722,7 +946,7 @@ storage:
           ingress-priority-map=
           parent=ens2
           [ipv4]
-          address1=10.10.10.10/24,10.10.10.1
+          address1=10.10.10.10/24
           dhcp-hostname=myhostname
           dns=8.8.8.8;
           dns-search=
@@ -743,6 +967,82 @@ storage:
           addr-gen-mode=eui64
           dns-search=
           method=disabled
+----
+
+==== Butane Nmstate config
+
+.Template
+[source, yaml]
+----
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/nmstate/${interface}.yml
+      mode: 0600
+      contents:
+        inline: |
+          hostname:
+            config: ${hostname}
+          dns-resolver:
+            config:
+              search: []
+              server:
+              - ${nameserver}
+          routes:
+          - destination: 0.0.0.0/0
+            next-hop-address: ${gateway}
+            next-hop-interface: ${interface}.${vlanid}
+          interfaces:
+          - name: ${interface}.${vlanid}
+            type: vlan
+            state: up
+            wait-ip: ipv4
+            vlan:
+              id: ${vlanid}
+              base-iface: ${interface}
+            ipv4:
+              enable: true
+              address:
+              - ip: ${ip}
+                prefix-length: ${prefix}
+----
+
+.Rendered
+[source, yaml]
+----
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/nmstate/ens2.yml
+      mode: 0600
+      contents:
+        inline: |
+          hostname:
+            config: myhostname
+          dns-resolver:
+            config:
+              search: []
+              server:
+              - 8.8.8.8
+          routes:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.10.10.1
+            next-hop-interface: ens2.100
+          interfaces:
+          - name: ens2.100
+            type: vlan
+            state: up
+            wait-ip: ipv4
+            vlan:
+              id: 100
+              base-iface: ens2
+            ipv4:
+              enable: true
+              address:
+              - ip: 10.10.10.10
+                prefix-length: 24
 ----
 
 === Configuring a Vlan on a Bond (DHCP)
@@ -889,6 +1189,76 @@ storage:
           interface-name=ens3
           master=bond0
           slave-type=bond
+----
+
+==== Butane Nmstate config
+
+.Template
+[source, yaml]
+----
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/nmstate/${interface}.yml
+      mode: 0600
+      contents:
+        inline: |
+          interfaces:
+          - name: ${bondname}.${vlanid}
+            type: vlan
+            state: up
+            wait-ip: ipv4
+            vlan:
+              id: ${vlanid}
+              base-iface: ${bondname}
+            ipv4:
+              enable: true
+              dhcp: true
+          - name: ${bondname}
+            type: bond
+            state: up
+            link-aggregation:
+              mode: active-backup
+              options:
+                miimon: 100
+              ports:
+              - ${subnic1}
+              - ${subnic2}
+----
+
+.Rendered
+[source, yaml]
+----
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/nmstate/ens2.yml
+      mode: 0600
+      contents:
+        inline: |
+          interfaces:
+          - name: bond0.100
+            type: vlan
+            state: up
+            wait-ip: ipv4
+            vlan:
+              id: 100
+              base-iface: bond0
+            ipv4:
+              enable: true
+              dhcp: true
+          - name: bond0
+            type: bond
+            state: up
+            link-aggregation:
+              mode: active-backup
+              options:
+                miimon: 100
+              ports:
+              - ens2
+              - ens3
 ----
 
 === Disabling Automatic Configuration of Ethernet Devices
