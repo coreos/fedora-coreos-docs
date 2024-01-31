@@ -133,7 +133,7 @@ You can now deploy a new VM, starting from the template in the library and the e
 VM_NAME='fcos-node01'
 govc library.deploy "${LIBRARY}/${TEMPLATE_NAME}" "${VM_NAME}"
 govc vm.change -vm "${VM_NAME}" -e "guestinfo.ignition.config.data.encoding=${CONFIG_ENCODING}"
-govc vm.change -vm "${VM_NAME}" -e "guestinfo.ignition.config.data=${CONFIG_ENCODED}"
+govc vm.change -vm "${VM_NAME}" -f "guestinfo.ignition.config.data=${CONFIG_FILE_ENCODED}" # using `-f` with a file path instead of `-e`
 ----
 
 Note: If the vcenter has multiple datacenters and datastores, you must specify them explicitly:
