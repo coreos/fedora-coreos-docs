@@ -91,7 +91,7 @@ For more about this, please refer to xref:running-containers.adoc[documentation]
 The FCOS image is kept minimal by design. Not every troubleshooting tool are
 included by default. Instead, it is recommended to use the `toolbox` utility.
 
-xref:debugging-with-toolbox.adoc[Debugging with Toolbx].
+xref:debugging-with-toolbox.adoc[Debugging with Toolbox].
 
 == How do I coordinate cluster-wide OS updates?
 
