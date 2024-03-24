@@ -22,7 +22,7 @@ Exoscale provides https://community.exoscale.com/documentation/compute/custom-te
 [source, bash]
 ----
 STREAM="stable"
-coreos-installer download -d -s "${STREAM}" -p exoscale -f qcow2.xz
+coreos-installer download -d -s $STREAM -p exoscale -f qcow2.xz
 ----
 
 Alternatively, QCOW2 images can be downloaded from the https://fedoraproject.org/coreos/download/?stream=stable#cloud_images[download page] and manually decompressed.
@@ -35,15 +35,15 @@ Next you can https://community.exoscale.com/documentation/compute/custom-templat
 # Set the version and calcuate the checksum
 FCOS_VERSION='...'
 FILE="fedora-coreos-${FCOS_VERSION}-exoscale.x86_64.qcow2"
-CHECKSUM=$(md5sum $FILE | cut -d " " -f 1)
+CHECKSUM=$(md5sum "${FILE}" | cut -d " " -f 1)
 
 # Upload to object storage
 BUCKET='newbucket'
 exo storage mb "sos://${BUCKET}"
-exo storage upload --acl public-read $FILE "sos://${BUCKET}/image-import/"
+exo storage upload --acl public-read "${FILE}" "sos://${BUCKET}/image-import/"
 
 # Create the template using given URL and CHECKSUM
-URL=$(exo storage show "sos://${BUCKET}/image-import/$FILE" --output-template "{{.URL}}")
+URL=$(exo storage show "sos://${BUCKET}/image-import/${FILE}" --output-template "{{.URL}}")
 TEMPLATE="fedora-coreos-${FCOS_VERSION}"
 exo compute instance-template register --boot-mode=uefi $TEMPLATE $URL $CHECKSUM
 ----
@@ -72,9 +72,9 @@ TYPE='standard.medium'
 DISK='10' # in GiB
 SSHKEY='key-name'
 TEMPLATE=$TEMPLATE # template name set above
-exo compute instance create $NAME \
+exo compute instance create "${NAME}" \
     --disk-size $DISK \
-    --ssh-key $SSHKEY \
+    --ssh-key "${SSHKEY}" \
     --template $TEMPLATE \
     --template-visibility private \
     --cloud-init "path/to/ignition-file.ign"
@@ -82,7 +82,7 @@ exo compute instance create $NAME \
 
 NOTE: If just SSH access is desired and no further customization is required, you don't need to pass any Ignition file and can omit the `--cloud-init` argument.
 
-TIP: You can find out the instance's assigned IP by running `exo compute instance show $NAME`
+TIP: You can find out the instance's assigned IP by running `exo compute instance show "${NAME}"`
 
 You now should be able to SSH into the instance using the associated IP address.
 

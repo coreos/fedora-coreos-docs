@@ -29,7 +29,7 @@ Fedora CoreOS comes in three streams, with different update schedules per stream
 [source, bash]
 ----
 STREAM='stable'
-coreos-installer download -s "${STREAM}" -p vultr -f raw.xz --decompress
+coreos-installer download -s $STREAM -p vultr -f raw.xz --decompress
 ----
 
 . https://www.vultr.com/docs/how-to-use-s3cmd-with-vultr-object-storage[Use s3cmd to upload] the raw image to your bucket, and note its public URL.

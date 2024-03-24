@@ -30,7 +30,7 @@ NOTE: For more information on FCOS stream offerings see xref:update-streams.adoc
 
 [source, bash]
 ----
-STREAM='stable'
+STREAM="stable"
 coreos-installer download --decompress -s $STREAM -p openstack -f qcow2.xz
 ----
 
@@ -45,7 +45,7 @@ Verify the download, following the instructions on that page, and decompress it.
 ----
 FILE=fedora-coreos-XX.XXXXXXXX.X.X-openstack.x86_64.qcow2
 IMAGE=${FILE:0:-6} # pull off .qcow2
-openstack image create --disk-format=qcow2 --min-disk=10 --min-ram=2 --progress --file=$FILE $IMAGE
+openstack image create --disk-format=qcow2 --min-disk=10 --min-ram=2 --progress --file="${FILE}" "${IMAGE}"
 ----
 
 NOTE: If you're uploading an `aarch64` disk image then add `--property architecture=aarch64`.
@@ -53,7 +53,7 @@ NOTE: If you're uploading an `aarch64` disk image then add `--property architect
 .Monitor image creation progress by listing the image
 [source, bash]
 ----
-openstack image list --name=$IMAGE
+openstack image list --name="${IMAGE}"
 ----
 
 Once the image is listed as `active`, it's ready to be used.
@@ -71,22 +71,22 @@ a file in the current directory named `example.ign`.
 .Launching a VM instance
 [source, bash]
 ----
-OPENSTACK_NETWORK=private
-OPENSTACK_KEYPAIR=mykeypair # optional
-OPENSTACK_FLAVOR=v1-standard-2
-INSTANCE_NAME=myinstance # choose a name
-openstack server create            \
-     --key-name=$OPENSTACK_KEYPAIR \
-     --network=$OPENSTACK_NETWORK  \
-     --flavor=$OPENSTACK_FLAVOR    \
-     --image=$IMAGE                \
-     --user-data ./example.ign     \
-     $INSTANCE_NAME
+OPENSTACK_NETWORK="private"
+OPENSTACK_KEYPAIR="mykeypair" # optional
+OPENSTACK_FLAVOR="v1-standard-2"
+INSTANCE_NAME="myinstance" # choose a name
+openstack server create                \
+     --key-name="${OPENSTACK_KEYPAIR}" \
+     --network=$OPENSTACK_NETWORK      \
+     --flavor=$OPENSTACK_FLAVOR        \
+     --image="${IMAGE}"                \
+     --user-data ./example.ign         \
+     "${INSTANCE_NAME}"
 ----
 
 NOTE: Specifying `--key-name` is optional if you provide an SSH key in your Ignition config.
 
-TIP: Monitor progress of the instance creation with `openstack server show $INSTANCE_NAME`.
+TIP: Monitor progress of the instance creation with `openstack server show "${INSTANCE_NAME}"`.
 You can also use the `--wait` parameter when calling `openstack server create` to block
 until the instance is active.
 
@@ -101,7 +101,7 @@ OPENSTACK_NETWORK=public
 openstack floating ip create $OPENSTACK_NETWORK
 
 FLOATING_IP=1.1.1.1  # from just created floating IP
-openstack server add floating ip $INSTANCE_NAME $FLOATING_IP
+openstack server add floating ip "${INSTANCE_NAME}" $FLOATING_IP
 ----
 
 You now should be able to SSH into the instance using the floating IP address.
