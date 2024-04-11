@@ -11,8 +11,8 @@ One of the defining features of Fedora CoreOS is automatic updates. To see them 
 [source,bash]
 ----
 RELEASE=$(curl https://builds.coreos.fedoraproject.org/prod/streams/stable/releases.json | jq -r .releases[-2].version)
-curl -O https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/$RELEASE/x86_64/fedora-coreos-$RELEASE-qemu.x86_64.qcow2.xz
-curl -O https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/$RELEASE/x86_64/fedora-coreos-$RELEASE-qemu.x86_64.qcow2.xz.sig
+curl -O https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/${RELEASE}/x86_64/fedora-coreos-${RELEASE}-qemu.x86_64.qcow2.xz
+curl -O https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/${RELEASE}/x86_64/fedora-coreos-${RELEASE}-qemu.x86_64.qcow2.xz.sig
 ----
 
 Once the archive has been downloaded, make sure to verify its integrity:
@@ -20,7 +20,7 @@ Once the archive has been downloaded, make sure to verify its integrity:
 [source,bash]
 ----
 curl https://fedoraproject.org/fedora.gpg | gpg --import
-gpg --verify fedora-coreos-$RELEASE-qemu.x86_64.qcow2.xz.sig
+gpg --verify fedora-coreos-${RELEASE}-qemu.x86_64.qcow2.xz.sig
 ----
 
 TIP: Look for *"Good signature from"* in the output.
@@ -29,14 +29,14 @@ Once you have verified the archive, you can extract it with:
 
 [source,bash]
 ----
-unxz fedora-coreos-$RELEASE-qemu.x86_64.qcow2.xz
+unxz fedora-coreos-${RELEASE}-qemu.x86_64.qcow2.xz
 ----
 
 To make the tutorial simpler, you should rename this image to a shorter name:
 
 [source,bash]
 ----
-mv fedora-coreos-$RELEASE-qemu.x86_64.qcow2 fedora-coreos-older.qcow2
+mv fedora-coreos-${RELEASE}-qemu.x86_64.qcow2 fedora-coreos-older.qcow2
 ----
 
 == Writing the Butane config and converting to Ignition
@@ -101,7 +101,7 @@ chcon --verbose --type svirt_home_t updates.ign
 virt-install --name=fcos --vcpus=2 --ram=2048 --os-variant=fedora-coreos-stable \
     --import --network=bridge=virbr0 --graphics=none \
     --qemu-commandline="-fw_cfg name=opt/com.coreos/config,file=${PWD}/updates.ign" \
-    --disk=size=20,backing_store=${PWD}/fedora-coreos-older.qcow2
+    --disk="size=20,backing_store=${PWD}/fedora-coreos-older.qcow2"
 ----
 
 Disconnect from the serial console by pressing `CTRL` + `]` and then use the reported IP address for the NIC from the serial console to log in using the `core` user via SSH:
