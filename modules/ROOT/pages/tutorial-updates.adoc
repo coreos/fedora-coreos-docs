@@ -10,7 +10,7 @@ One of the defining features of Fedora CoreOS is automatic updates. To see them 
 
 [source,bash]
 ----
-RELEASE=$(curl https://builds.coreos.fedoraproject.org/prod/streams/stable/releases.json | jq -r .releases[-2].version)
+RELEASE=$(curl https://builds.coreos.fedoraproject.org/prod/streams/stable/releases.json | jq -r '.releases[-2].version')
 curl -O https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/$RELEASE/x86_64/fedora-coreos-$RELEASE-qemu.x86_64.qcow2.xz
 curl -O https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/$RELEASE/x86_64/fedora-coreos-$RELEASE-qemu.x86_64.qcow2.xz.sig
 ----
