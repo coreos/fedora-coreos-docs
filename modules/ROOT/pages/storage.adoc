@@ -519,14 +519,16 @@ storage:
         # Override size of root partition on first disk, via the label
         # generated for boot_device.mirror
         - label: root-1
-          size_mib: 8192
+          # Mirroring the boot disk creates root partition smaller than
+          # required 8 GiB, so we increase it to 10 GiB
+          size_mib: 10240
         # Add a new partition filling the remainder of the disk
         - label: var-1
     - device: /dev/sdb
       partitions:
         # Similarly for second disk
         - label: root-2
-          size_mib: 8192
+          size_mib: 10240
         - label: var-2
   raid:
     - name: md-var
