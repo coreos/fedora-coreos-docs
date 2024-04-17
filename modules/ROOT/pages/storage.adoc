@@ -519,8 +519,6 @@ storage:
         # Override size of root partition on first disk, via the label
         # generated for boot_device.mirror
         - label: root-1
-          # Mirroring the boot disk creates root partition smaller than
-          # required 8 GiB, so we increase it to 10 GiB
           size_mib: 10240
         # Add a new partition filling the remainder of the disk
         - label: var-1
