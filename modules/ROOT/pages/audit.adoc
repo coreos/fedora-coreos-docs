@@ -16,7 +16,7 @@ To stop and restart the audit daemon, you should use the following commands:
 [source,bash]
 ----
 $ sudo auditctl --signal stop
-$ sudo systemctl start  # Only if you want it started again
+$ sudo systemctl start auditd.service  # Only if you want it started again
 ----
 
 You may also use the following commands to reload the rules, rotate the logs, resume logging or dump the daemon state:
