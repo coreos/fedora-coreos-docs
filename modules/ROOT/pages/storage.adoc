@@ -390,7 +390,7 @@ variant: fcos
 version: {butane-latest-stable-spec}
 storage:
   disks:
-    - device: /dev/vda
+    - device: /dev/disk/by-id/coreos-boot-disk
       partitions:
         - label: root
           number: 4
