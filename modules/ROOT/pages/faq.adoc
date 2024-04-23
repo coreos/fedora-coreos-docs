@@ -311,6 +311,7 @@ xref:storage.adoc[Configuring Storage] page for examples.
 See the xref:faq.adoc#_why_is_the_dnsmasq_service_systemd_unit_masked[Why is the `dnsmasq.service` systemd unit masked]
 entry for an example config to unmask this unit.
 
+[#wifi-fw]
 == How do I keep dropped wireless firmware?
 
 Some Wi-Fi firmwares were split into subpackages in Fedora 39 and Fedora 40. Fedora CoresOS will keep them in until Fedora 41, but display a warning message in the console if `NetworkManager-wifi` is layered without any other Wi-Fi firmware packages layered.
