@@ -56,8 +56,9 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/rpm-ostree install --apply-live --allow-inactive NetworkManager-wifi iwlwifi-dvm-firmware
+        ExecStart=/usr/bin/rpm-ostree install --allow-inactive NetworkManager-wifi iwlwifi-dvm-firmware
         ExecStart=/bin/touch /var/lib/%N.stamp
+        ExecStart=/bin/systemctl --no-block reboot
         [Install]
         WantedBy=multi-user.target
 storage:
