@@ -1,0 +1,59 @@
+= Installing Docker CE
+
+By default, Fedora CoreOS comes with out-of-the-box support for `docker` CLI (as provided via https://mobyproject.org/[Moby]). However, in some cases Docker Community Edition (CE) may be preferred for various reasons. This page explains how to replace the provided version with the latest from the upstream Docker sources.
+
+The recommended approach from the official https://docs.docker.com/engine/install/fedora/[Docker documentation] is to add the Docker repository to your system. You can then install and update Docker CE from this repository.
+
+
+== Installing Docker CE on a running system
+
+First you need to remove `moby-engine` and several other conflicting packages that ship by default in the Fedora CoreOS image. Next, download and setup the Docker repository. Afterward, you install the necessary packages, and finally reboot the system.
+
+[source, bash]
+----
+sudo rpm-ostree override remove moby-engine containerd runc
+curl --remote-name https://download.docker.com/linux/fedora/docker-ce.repo
+sudo install --owner 0 --group 0 --mode 644 docker-ce.repo /etc/yum.repos.d/docker-ce.repo
+sudo rpm-ostree install --assumeyes --allow-inactive docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo reboot
+----
+
+=== Upgrading Docker CE
+
+Docker CE should be upgraded automatically with each new release of Fedora CoreOS.
+
+
+== Installing Docker CE on first boot
+
+On provisioning, you can install Docker CE during the first boot of the system via ignition configuration.
+
+.Butane config for setting up Docker CE
+[source,yaml,subs="attributes"]
+----
+variant: fcos
+version: {butane-latest-stable-spec}
+systemd:
+  units:
+    # Install Docker CE
+    - name: rpm-ostree-install-docker-ce.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Install Docker CE
+        Wants=network-online.target
+        After=network-online.target
+        Before=zincati.service
+        ConditionPathExists=!/var/lib/%N.stamp
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/usr/bin/rpm-ostree override remove moby-engine containerd runc
+        ExecStart=/usr/bin/curl --output-dir "/etc/yum.repos.d" --remote-name https://download.docker.com/linux/fedora/docker-ce.repo
+        ExecStart=/usr/bin/rpm-ostree install --allow-inactive docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        ExecStart=/usr/bin/touch /var/lib/%N.stamp
+        ExecStart=/usr/bin/systemctl --no-block reboot
+
+        [Install]
+        WantedBy=multi-user.target
+----

@@ -29,6 +29,7 @@
 ** xref:sysconfig-network-configuration.adoc[Network Configuration]
 ** xref:sysconfig-enabling-wifi.adoc[Enabling Wi-Fi]
 ** xref:sysctl.adoc[Kernel Tuning]
+** xref:docker-ce.adoc[Installing Docker CE]
 ** xref:running-containers.adoc[Running Containers]
 ** xref:authentication.adoc[Configuring Users and Groups]
 ** xref:hostname.adoc[Setting a Hostname]
