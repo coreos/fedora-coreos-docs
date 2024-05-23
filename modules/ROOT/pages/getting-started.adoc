@@ -19,6 +19,11 @@ Fedora CoreOS does not have a separate install disk. Instead, every instance sta
 
 Each platform has specific logic to retrieve and apply the first boot configuration. For cloud deployments, Ignition gathers the configuration via user-data mechanisms. In the case of bare metal, Ignition can fetch its configuration from the disk or from a remote source.
 
+[WARNING]
+====
+FCOS is tested with SELinux in `enforcing` mode. If you temporarily disable SELinux, such as for troubleshooting, and attempt to re-enable SELinux later you will run into issues with `rpm-ostree`. It is recommended to re-provision the system if this occurs.
+====
+
 For more information on configuration, refer to the documentation for xref:producing-ign.adoc[Producing an Ignition File].
 
 == Quickstart
