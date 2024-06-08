@@ -10,5 +10,5 @@ asciidoc:
   attributes:
     stable-version: 40.20240519.3.0
     ignition-version: 2.19.0
-    butane-version: 0.20.0
+    butane-version: 0.21.0
     butane-latest-stable-spec: 1.5.0
