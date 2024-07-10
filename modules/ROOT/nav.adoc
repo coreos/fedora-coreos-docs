@@ -16,6 +16,7 @@
 ** xref:provisioning-kubevirt.adoc[Booting on KubeVirt]
 ** xref:provisioning-libvirt.adoc[Booting on libvirt]
 ** xref:provisioning-openstack.adoc[Booting on OpenStack]
+** xref:provisioning-oraclecloud.adoc[Booting on Oracle Cloud]
 ** xref:provisioning-nutanix.adoc[Booting on Nutanix]
 ** xref:provisioning-qemu.adoc[Booting on QEMU]
 ** xref:provisioning-raspberry-pi4.adoc[Booting on the Raspberry Pi 4]
