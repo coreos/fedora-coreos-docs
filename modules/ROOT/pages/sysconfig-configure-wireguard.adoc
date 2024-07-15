@@ -10,9 +10,16 @@ https://www.wireguard.com/[WireGuard] is a novel VPN that runs inside the Linux 
 
 FCOS has full support for WireGuard out of the box. This guide is going to demonstrate how to set up a single connection between a FCOS server and one client computer. It goes over the basic client configuration, but it does not cover installing WireGuard on your clients.
 
+There are two options to set up wireguard on FCOS:
+ * Using [wg-quick](https://www.man7.org/linux/man-pages/man8/wg-quick.8.html).
+ * Importing the Wireguard configuration in NetworkManager.
+
 == Generate Keys
 
-You will need to generate some keys to configure WireGuard. For this guide, the keys should be pre-generated on your workstation. First, let's create the FCOS WireGuard keys:
+You will need to generate some keys to configure WireGuard.
+You can generate the keys on your workstation or a running FCOS system.
+
+First, let's create the FCOS WireGuard keys:
 
 .Generate FCOS WireGuard keys
 [source,bash]
@@ -34,7 +41,7 @@ $ wg genkey | tee privatekey | wg pubkey > publickey
 
 These keys will be referenced as `client_one_public_key` and `client_one_private_key` from here on out in this guide.
 
-Now create a PresharedKey:
+You can optionnaly generate a pre-shared key to increase security:
 
 .Generate a Preshared key per peer pair
 [source,bash]
@@ -69,12 +76,55 @@ storage:
           [Peer]
           PublicKey = <client_one_public_key>
           PresharedKey = <fcos_client_one_psk>
-          AllowedIPs = 192.168.71.0/24,fdc9:3c6b:21c7:e6bd::/64
+          AllowedIPs = 192.168.71.2/32,fdc9:3c6b:21c7:e6bd::2/128
+----
+
+=== Import the wireguard configuration to NetworkManager
+
+You can import the configuration with a simple oneshot unit :
+[source,yaml,subs="attributes"]
+----
+systemd:
+  units:
+    - name: import-wireguard-config.service
+      enabled: true
+      contents: |
+        [Unit]
+        ConditionPathExists=!/etc/NetworkManager/system-connections/wg0.nmconnection
+        Description=Import wireguard configuration to NetworkManager
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=nmcli connection import type wireguard file /etc/wireguard/wg0.conf
+        [Install]
+        WantedBy=multi-user.target
+----
+
+NOTE: NetworkManager will ignore `PostUp` and `PostDown` directives in the wiregaurd config.
+      If you have firewall configuration to apply, make sure to apply it with a separate unit, or manually.
+
+NOTE: If you need to make further changes to update Wireguard's configuration, delete the connection and re-import it from the updated configuration file.
+
+.Re-import updated Wireguard configuration on FCOS
+[source,bash]
+----
+[core@wireguard-demo ~]$ sudo nmcli con delete wg0 && sudo nmcli con import type wireguard file /etc/wireguard/wg0.conf
+Connection 'wg0' (1e4f869e-f95c-4221-b2b9-99726ffde92b) successfully deleted.
+Connection 'wg0' (18cd8e61-1cc2-43a2-9f2e-467b75cd99da) successfully added.
+----
+
+
+=== Using wg-quick
+
+[source,yaml,subs="attributes"]
+----
 systemd:
   units:
     - name: wg-quick@wg0.service
       enabled: true
 ----
+
+NOTE: If you need to make further changes to Wireguard's configuration, reload the service with `systemctl reload wg-quick@wg0.conf`.
 
 Boot FCOS and log in. When you run `sudo wg show` you should see this:
 
@@ -92,7 +142,7 @@ peer: <client_one_public_key>
   endpoint: <Client IP Address>:51821
   allowed ips: 192.168.71.0/24, fdc9:3c6b:21c7:e6bd::/64
 
-[root@wireguard-demo ~]# ip a s wg0
+[core@wireguard-demo ~]$ sudo ip a s wg0
 12: wg0: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1420 qdisc noqueue state UNKNOWN group default qlen 1000
     link/none
     inet 192.168.71.1/24 scope global wg0
@@ -124,12 +174,13 @@ AllowedIPs = 192.168.71.0/24,fdc9:3c6b:21c7:e6bd::/64
 
 NOTE: <FCOS IP address> is the IP or FQDN of the FCOS server.
 
-Write the above config to `/etc/wireguard/wg0.conf` and `chmod 0600 /etc/wireguard/wg0.conf` on your client. Run `sudo systemctl start wg-quick@wg0.service` and then check your configuration:
+Write the above config to `/etc/wireguard/wg0.conf` and `chmod 0600 /etc/wireguard/wg0.conf` on your client.
+Run `nmcli con import type wireguard file /etc/wireguard/wg0.conf` and then check your configuration:
 
 .Check WireGuard configuration on a client
 [source,bash]
 ----
-[root@wireguard-client ~]# wg show
+[core@wireguard-client ~]$ sudo wg show
 interface: wg0
   public key: <client_one_public_key>
   private key: (hidden)
@@ -139,7 +190,8 @@ peer: <fcos_public_key>
   preshared key: (hidden)
   endpoint: <FCOS IP address>:51820
   allowed ips: 192.168.71.0/24, fdc9:3c6b:21c7:e6bd::/64
-[root@wireguard-client ~]# ip a s wg0
+
+[core@wireguard-client ~]$ sudo ip addr show wg0
 21: wg0: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1420 qdisc noqueue state UNKNOWN group default qlen 1000
     link/none
     inet 192.168.71.2/24 scope global wg0
@@ -155,7 +207,7 @@ You can now ping the FCOS server's WireGuard IP address:
 .Ping the FCOS server over WireGuard from client
 [source,bash]
 ----
-[root@wireguard-client ~]# ping 192.168.71.1
+[core@wireguard-client ~]$ ping 192.168.71.1
 PING 192.168.71.1 (192.168.71.1) 56(84) bytes of data.
 64 bytes from 192.168.71.1: icmp_seq=1 ttl=64 time=0.439 ms
 64 bytes from 192.168.71.1: icmp_seq=2 ttl=64 time=0.422 ms
@@ -165,7 +217,7 @@ PING 192.168.71.1 (192.168.71.1) 56(84) bytes of data.
 3 packets transmitted, 3 received, 0% packet loss, time 2027ms
 rtt min/avg/max/mdev = 0.383/0.414/0.439/0.023 ms
 
-[root@wireguard-client ~]# ping6 fdc9:3c6b:21c7:e6bd::1
+[core@wireguard-client ~]$ ping6 fdc9:3c6b:21c7:e6bd::1
 PING fdc9:3c6b:21c7:e6bd::1(fdc9:3c6b:21c7:e6bd::1) 56 data bytes
 64 bytes from fdc9:3c6b:21c7:e6bd::1: icmp_seq=1 ttl=64 time=1.55 ms
 64 bytes from fdc9:3c6b:21c7:e6bd::1: icmp_seq=2 ttl=64 time=0.454 ms
@@ -182,7 +234,7 @@ When you run `sudo wg show` on your client you should see a recent handshake and
 .Verify handshake and transfer metrics
 [source,bash]
 ----
-[root@wireguard-client ~]# wg show
+[core@wireguard-client ~]$ sudo wg show
 interface: wg0
   public key: <client_one_public_key>
   private key: (hidden)
@@ -237,8 +289,18 @@ storage:
           AllowedIPs = 192.168.71.0/24,fdc9:3c6b:21c7:e6bd::/64
 systemd:
   units:
-    - name: wg-quick@wg0.service
+    - name: import-wireguard-config@wg0.service
       enabled: true
+      contents: |
+        [Unit]
+        ConditionPathExists=!/etc/NetworkManager/system-connections/%i.nmconnection
+        Description=Import wireguard configuration at %I to NetworkManager
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=nmcli connection import type wireguard file /etc/wireguard/%i.conf
+        [Install]
+        WantedBy=multi-user.target
 ----
 
 NOTE: FCOS uses https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/[predictable interface names] by https://lists.fedoraproject.org/archives/list/coreos-status@lists.fedoraproject.org/thread/6IPTZL57Z5NLBMPYMXNVSYAGLRFZBLIP/[default]. Please take care to use the correct interface name for your hardware in the above PostUp and PostDown commands!
