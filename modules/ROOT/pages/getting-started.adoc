@@ -19,7 +19,7 @@ Fedora CoreOS does not have a separate install disk. Instead, every instance sta
 
 Each platform has specific logic to retrieve and apply the first boot configuration. For cloud deployments, Ignition gathers the configuration via user-data mechanisms. In the case of bare metal, Ignition can fetch its configuration from the disk or from a remote source.
 
-For more information on configuration, refer to the documentation for xref:producing-ign.adoc[Producing an Ignition File].
+For more information on configuration, refer to the documentation for xref:producing-ign.adoc[Producing an Ignition File].  There is also the ability to derive from the container base image, see xref:deriving-container.adoc[Booting a derived container image].
 
 == Quickstart
 
