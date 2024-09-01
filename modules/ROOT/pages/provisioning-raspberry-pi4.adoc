@@ -70,7 +70,7 @@ Now mount the ESP partition and copy the files over:
 
 [source, bash]
 ----
-FCOSEFIPARTITION=$(lsblk $FCOSDISK -J -oLABEL,PATH  | jq -r '.blockdevices[] | select(.label == "EFI-SYSTEM")'.path)
+FCOSEFIPARTITION=$(lsblk $FCOSDISK -J -oLABEL,PATH  | jq -r '.blockdevices[] | select(.label == "EFI-SYSTEM").path')
 mkdir /tmp/FCOSEFIpart
 sudo mount $FCOSEFIPARTITION /tmp/FCOSEFIpart
 sudo rsync -avh --ignore-existing /tmp/RPi4boot/boot/efi/ /tmp/FCOSEFIpart/
