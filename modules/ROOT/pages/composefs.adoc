@@ -1,0 +1,53 @@
+= Composefs
+
+Fedora CoreOS introduced composefs enabled by default starting in Fedora 41. Composefs is an overlay filesystem where the data comes from the usual ostree deployement, and
+metadata are in the composefs file. The result is a truely read-only root (`/`) filesystem, increasing the system integrity and robustness,
+
+This is a first step towards a full verification of filesystem integrity, even at runtime.
+
+== What does it change ? 
+
+The main visible change will be that the root filesystem (/) is now small and full (a few MB, 100% used).
+
+== Known issues
+
+=== Kdump
+
+Right now, this prevents kdump from generating it's initramfs as it get confused by the read-only filesystem.
+If you want to use kdump and export kernels dumps to the local machine, composefs must be disabled.
+A workaround is to configure kdump with a remote target such as ssh or nfs.
+The kdump upstream developers are working on a fix. We will update this page when the workaround is no longer needed.
+
+See [https://github.com/rhkdump/kdump-utils/pull/28 rhkdump/kdump-utils#28].
+
+=== Top-level directories
+
+Another consequence is that it is now impossible to create top-level directories in `/`.
+A common use case for those top level directories is to use them as mount points.
+We recommend using sub directories in `/var` instead.
+Currently, the only way around that is to disable composefs as shown below.
+
+== Disable composefs
+
+Composefs can be disabled through a kernel argument: `ostree.prepare-root.composefs=0`.
+
+.Disabling composefs at provisionning
+[source,yaml,subs="attributes"]
+----
+variant: fcos
+version: {butane-latest-stable-spec}
+kernel_arguments:
+  should_exist:
+    - ostree.prepare-root.composefs=0
+----
+
+.Disabling composefs on a running FCOS system
+[source,bash]
+----
+$ sudo rpm-ostree kargs --append='ostree.prepare-root.composefs=0'
+----
+Note that a reboot is required for the change to take effect.
+
+== Links
+
+https://fedoraproject.org/wiki/Changes/ComposefsAtomicCoreOSIoT
