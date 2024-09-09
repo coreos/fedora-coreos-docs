@@ -13,12 +13,12 @@ The main visible change will be that the root filesystem (/) is now small and fu
 
 === Kdump
 
-Right now, this prevents kdump from generating it's initramfs as it get confused by the read-only filesystem.
+Right now, this prevents kdump from generating its initramfs as it gets confused by the read-only filesystem.
 If you want to use kdump and export kernels dumps to the local machine, composefs must be disabled.
 A workaround is to configure kdump with a remote target such as ssh or nfs.
 The kdump upstream developers are working on a fix. We will update this page when the workaround is no longer needed.
 
-See [https://github.com/rhkdump/kdump-utils/pull/28 rhkdump/kdump-utils#28].
+See https://github.com/rhkdump/kdump-utils/pull/28[rhkdump/kdump-utils#28].
 
 === Top-level directories
 
