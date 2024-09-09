@@ -47,7 +47,7 @@ NOTE: Currently, we don't support logging in using SSH through the GCP web conso
 ----
 STREAM='stable'
 NAME='fcos-node01'
-ZONE='us-central-1a'
+ZONE='us-central1-a'
 gcloud compute instances create              \
     --image-project "fedora-coreos-cloud"    \
     --image-family "fedora-coreos-${STREAM}" \
@@ -74,7 +74,7 @@ From the command-line, use `--metadata-from-file`:
 ----
 STREAM='stable'
 NAME='fcos-node01'
-ZONE='us-central-1a'
+ZONE='us-central1-a'
 CONFIG='example.ign'
 gcloud compute instances create                \
     --image-project "fedora-coreos-cloud"      \
