@@ -51,7 +51,7 @@ ZONE='us-central-1a'
 gcloud compute instances create              \
     --image-project "fedora-coreos-cloud"    \
     --image-family "fedora-coreos-${STREAM}" \
-    --zone "${ZONE} "${NAME}"
+    --zone "${ZONE}" "${NAME}"
 ----
 
 TIP: You can find out the instance's assigned IP by running `gcloud compute instances list`
