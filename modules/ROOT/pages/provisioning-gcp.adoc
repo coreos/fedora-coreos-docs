@@ -85,3 +85,32 @@ gcloud compute instances create                \
 
 NOTE: By design, https://cloud.google.com/compute/docs/startupscript[startup scripts] are not supported on FCOS. Instead, it is recommended to encode any startup logic as systemd service units in the Ignition configuration.
 Again, note you need to use the `user-data` key for Ignition; it will also not work to paste Ignition into this field in the web console.
+
+
+== Launch a confidential VM
+
+To launch a confidential FCOS instance, need to specify the confidential compute type, and related https://cloud.google.com/confidential-computing/confidential-vm/docs/supported-configurations[machine type] that supports the confidential compute type.
+
+From the command-line, use `--confidential-compute-type` and `--machine-type`:
+
+.Launching a confidential instance using confidential type `SEV_SNP`
+[source, bash]
+----
+STREAM='stable'
+NAME='fcos-cvm-node01'
+ZONE='us-central1-a'
+CONFIG='example.ign'
+MACHINE_TYPE='n2d-standard-2'
+gcloud compute instances create                \
+    --image-project "fedora-coreos-cloud"      \
+    --image-family "fedora-coreos-${STREAM}"   \
+    --metadata-from-file "user-data=${CONFIG}" \
+    --confidential-compute-type "SEV_SNP"      \
+    --machine-type "${MACHINE_TYPE}"           \
+    --maintenance-policy terminate             \
+    --zone "${ZONE} "${NAME}"
+----
+
+See https://cloud.google.com/confidential-computing/confidential-vm/docs/confidential-vm-overview[confidential type] to have an overview about confidential vm.
+
+NOTE: Currently, we don't support `--confidential-compute-type=TDX`.
