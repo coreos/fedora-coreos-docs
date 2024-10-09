@@ -85,3 +85,63 @@ gcloud compute instances create                \
 
 NOTE: By design, https://cloud.google.com/compute/docs/startupscript[startup scripts] are not supported on FCOS. Instead, it is recommended to encode any startup logic as systemd service units in the Ignition configuration.
 Again, note you need to use the `user-data` key for Ignition; it will also not work to paste Ignition into this field in the web console.
+
+
+== Launch a Confidential VM
+
+WARNING: Support for Confidential Computing is a work in progress in Fedora CoreOS. See the https://github.com/coreos/fedora-coreos-tracker/issues/1719[issue #1719].
+
+NOTE: For an overview about confidential VMs on GCP see https://cloud.google.com/confidential-computing/confidential-vm/docs/confidential-vm-overview[confidential VM overview].
+
+To launch a confidential FCOS instance, you need to specify the confidential compute type and use a https://cloud.google.com/confidential-computing/confidential-vm/docs/supported-configurations[machine type] that supports confidential compute.
+
+From the command-line, use `--confidential-compute-type` and `--machine-type`.
+
+.Launching a confidential instance using confidential type `AMD SEV_SNP`
+[source, bash]
+----
+STREAM='stable'
+NAME='fcos-cvm-node01'
+ZONE='us-central1-a'
+CONFIG='example.ign'
+MACHINE_TYPE='n2d-standard-2'
+gcloud compute instances create                \
+    --image-project "fedora-coreos-cloud"      \
+    --image-family "fedora-coreos-${STREAM}"   \
+    --metadata-from-file "user-data=${CONFIG}" \
+    --confidential-compute-type "SEV_SNP"      \
+    --machine-type "${MACHINE_TYPE}"           \
+    --maintenance-policy terminate             \
+    --zone "${ZONE} "${NAME}"
+----
+
+.Launching a confidential instance using confidential type `Intel TDX`
+[source, bash]
+----
+STREAM='stable'
+NAME='fcos-cvm-node01'
+ZONE='us-central1-a'
+CONFIG='example.ign'
+MACHINE_TYPE='c3-standard-4'
+gcloud compute instances create                \
+    --image-project "fedora-coreos-cloud"      \
+    --image-family "fedora-coreos-${STREAM}"   \
+    --metadata-from-file "user-data=${CONFIG}" \
+    --confidential-compute-type "TDX"      \
+    --machine-type "${MACHINE_TYPE}"           \
+    --maintenance-policy terminate             \
+    --zone "${ZONE} "${NAME}"
+----
+
+.Example Confidential VM Boot Verification
+[source, bash]
+----
+ssh core@<ip address>
+# Confirm the VM is using `AMD SEV-SNP` confidential type
+sudo systemd-detect-virt --cvm
+sev-snp
+
+# Confirm the VM is using `Intel TDX` confidential type
+sudo systemd-detect-virt --cvm
+tdx
+---
