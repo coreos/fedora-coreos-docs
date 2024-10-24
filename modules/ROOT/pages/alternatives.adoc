@@ -35,3 +35,45 @@ storage:
       overwrite: true
       hard: false
 ----
+
+== Using alternatives commands
+
+Starting with Fedora CoreOS based on Fedora 41, you can use `alternatives` commands to configure the default command.
+
+. Example Butane config using a systemd unit to configure the default iptables backend
+[source,yaml,subs="attributes"]
+----
+variant: fcos
+version: {butane-latest-stable-spec}
+systemd:
+  units:
+    - name: custom-iptables-default.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Set the default backend for iptables 
+        [Service]
+        ExecStart=/usr/sbin/alternatives --set iptables /usr/sbin/iptables-legacy
+        RemainAfterExit=yes
+        [Install]
+        WantedBy=multi-user.target
+----
+
+NOTE: We don't recommend configuring the default iptables backend to `iptables-legacy`. This is just an example.
+
+You can also manually run the `alternatives` commands to configure the default command runtime.
+
+. Example to manually configure the default iptables backend
+[source,bash]
+----
+# Check the link info
+alternatives --display iptables
+iptables --version
+
+# Configure iptables to point to iptables-nft
+sudo alternatives --set iptables /usr/sbin/iptables-nft
+
+# Verify iptables version is iptables-nft
+alternatives --display iptables
+iptables --version
+----
