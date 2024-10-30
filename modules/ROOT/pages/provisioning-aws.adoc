@@ -77,7 +77,7 @@ aws s3 mb s3://$NAME-infra
 ----
 NAME='instance1'
 CONFIG='/path/to/config.ign' # path to your Ignition config
-aws s3 cp CONFIG s3://$NAME-infra/bootstrap.ign
+aws s3 cp $CONFIG s3://$NAME-infra/bootstrap.ign
 ----
 
 You can verify the file have been correctly uploaded:
@@ -102,7 +102,70 @@ ignition:
       source: s3://instance1-infra/bootstrap.ign
 ----
 
-Then you can launch the instance using the same command as xref:#_customized_example[], passing the minimal configuration you just created.
+. Format the remote Ignition file to json format
+[source, bash]
+----
+butane -p config.bu -o config.ign
+----
+
+You need to create a role that includes `s3:GetObject` permission, and attach it to the instance profile. See https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html#roles-creatingrole-service-cli[role creation document] for more information.
+
+. Create the instance profile
+[source,bash]
+----
+cat <<EOF >trustpolicyforec2.json
+{
+  "Version": "2012-10-17",
+  "Statement": {
+    "Effect": "Allow",
+    "Principal": {"Service": "ec2.amazonaws.com"},
+    "Action": "sts:AssumeRole"
+  }
+}
+EOF
+
+# Create the role and attach the trust policy that allows EC2 to assume this role.
+ROLE_NAME="my-role"
+aws iam create-role --role-name ${ROLE_NAME} --assume-role-policy-document file://trustpolicyforec2.json
+
+# Attach the AWS managed policy named AmazonS3ReadOnlyAccess to the role
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess --role-name ${ROLE_NAME}
+
+# Create the instance profile required by EC2 to contain the role
+PROFILE="my-instance-profile"
+aws iam create-instance-profile --instance-profile-name ${PROFILE}
+
+# Finally, add the role to the instance profile
+aws iam add-role-to-instance-profile --instance-profile-name ${PROFILE} --role-name ${ROLE_NAME}
+----
+
+To launch the instance, need to attach the created profile. From the command-line, use `--iam-instance-profile`.
+
+. Launching and customizing a new instance with remote Ignition file from a S3 bucket
+[source,bash]
+----
+NAME='instance1'
+SSHKEY='my-key'          # the name of your SSH key: `aws ec2 describe-key-pairs`
+IMAGE='ami-xxx'          # the AMI ID found on the download page
+DISK='20'                # the size of the hard disk
+REGION='us-east-1'       # the target region
+TYPE='m5.large'          # the instance type
+SUBNET='subnet-xxx'      # the subnet: `aws ec2 describe-subnets`
+SECURITY_GROUPS='sg-xxx' # the security group `aws ec2 describe-security-groups`
+USERDATA='/path/to/config.ign' # path to your Ignition config
+PROFILE='xxx-profile'    # the name of an IAM instance profile `aws iam list-instance-profiles`
+aws ec2 run-instances                     \
+    --region $REGION                      \
+    --image-id $IMAGE                     \
+    --instance-type $TYPE                 \
+    --key-name $SSHKEY                    \
+    --subnet-id $SUBNET                   \
+    --security-group-ids $SECURITY_GROUPS \
+    --user-data "file://${USERDATA}"      \
+    --iam-instance-profile Name=${PROFILE}     \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${NAME}}]" \
+    --block-device-mappings "VirtualName=/dev/xvda,DeviceName=/dev/xvda,Ebs={VolumeSize=${DISK}}"
+----
 
 Once the first boot is completed, make sure to delete the configuration as it may contain sensitive data.
 See xref:#_configuration_cleanup[].
@@ -117,7 +180,7 @@ See the https://coreos.github.io/ignition/operator-notes/#secrets[Ignition docum
 [source,bash]
 ----
 NAME='instance1'
-aws s3 rm CONFIG s3://$NAME-infra/bootstrap.ign
+aws s3 rm s3://$NAME-infra/bootstrap.ign
 ----
 
 Optionnally, you can delete the whole bucket:
