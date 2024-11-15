@@ -9,6 +9,37 @@ This list is in reverse chronological order to keep recent changes at the top.
 
 // To add a new change here, see the template at the end of the file.
 
+== cgroups v1 support disabled
+
+In systemd v256, cgroups v1 support was disabled.
+If you’ve opted out of the cgroups v2 migration in the past, your system will fail to boot after upgrading.
+You must update your kernel arguments before the update.
+
+.Update an existing system from cgroupsv1 to cgroupsv2 and immediately reboot
+
+[source,bash]
+----
+$ sudo rpm-ostree kargs --delete=systemd.unified_cgroup_hierarchy --reboot
+----
+
+=== Planning
+
+This change has been rolled out as part of the rebase to Fedora 41.
+
+|===
+|Update Stream |Targeted release date
+
+|`next` | 41.20240916.1.0 (Sep 16, 2024)
+|`testing`| 41.20241027.2.0 (Oct 28, 2024)
+|`stable`| 41.20241027.3.0 (Nov 08, 2024)
+|===
+
+=== Notes
+
+See: https://github.com/coreos/fedora-coreos-tracker/issues/1715#issuecomment-2331986149[fedora-coreos-tracker/issues#1715].
+
+Detailed description of the change, the impacts, how to test, what manual actions are needed, etc.
+
 == Podman v5.0
 
 The Podman container runtime will be upgraded from v4 to v5. This is a https://blog.podman.io/2024/03/podman-5-0-has-been-released/[major release] that removes support for CNI networking in favor of Netavark.
