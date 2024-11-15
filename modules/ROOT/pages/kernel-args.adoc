@@ -4,19 +4,6 @@
 
 You can specify kernel arguments in a Butane config using the `kernel_arguments` section.
 
-=== Example: Staying on cgroups v1
-
-Starting from June 2021, cgroups v2 is the default on new installations of Fedora CoreOS. Here's an example `kernelArguments` section which adds the `systemd.unified_cgroup_hierarchy=0` kernel argument so that the machine keeps using cgroups v1:
-
-[source,yaml,subs="attributes"]
-----
-variant: fcos
-version: {butane-latest-stable-spec}
-kernel_arguments:
-  should_exist:
-    - systemd.unified_cgroup_hierarchy=0
-----
-
 === Example: Disabling all CPU vulnerability mitigations
 
 Here's an example `kernelArguments` section which switches `mitigations=auto,nosmt` to `mitigations=off` to disable all CPU vulnerability mitigations:
