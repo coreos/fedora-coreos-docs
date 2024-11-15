@@ -40,7 +40,7 @@ storage:
 
 Starting with Fedora CoreOS based on Fedora 41, you can use `alternatives` commands to configure the default command.
 
-. Example Butane config using a systemd unit to configure the default iptables backend
+.Example Butane config using a systemd unit to configure the default iptables backend
 [source,yaml,subs="attributes"]
 ----
 variant: fcos
@@ -63,7 +63,7 @@ NOTE: We don't recommend configuring the default iptables backend to `iptables-l
 
 You can also manually run the `alternatives` commands to configure the default command runtime.
 
-. Example to manually configure the default iptables backend
+.Example to manually configure the default iptables backend
 [source,bash]
 ----
 # Check the link info
