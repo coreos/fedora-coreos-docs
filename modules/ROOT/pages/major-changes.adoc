@@ -53,9 +53,9 @@ This change will be rolled out together with the rebase to Fedora 40.
 |===
 |Update Stream |Targeted release date
 
-|`next` | 40.20240322.1.0
-|`testing`| To Be Determined
-|`stable`| Will follow `testing` as usual
+|`next` | 40.20240322.1.0 (Mar 24, 2024)
+|`testing`| 40.20240416.2.0 (Apr 22, 2024)
+|`stable`| 40.20240416.3.1 (May 07, 2024)
 |===
 
 === Notes
