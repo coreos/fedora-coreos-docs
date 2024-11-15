@@ -102,7 +102,7 @@ ignition:
       source: s3://instance1-infra/bootstrap.ign
 ----
 
-. Format the remote Ignition file to json format
+.Format the remote Ignition file to json format
 [source, bash]
 ----
 butane -p config.bu -o config.ign
@@ -110,7 +110,7 @@ butane -p config.bu -o config.ign
 
 You need to create a role that includes `s3:GetObject` permission, and attach it to the instance profile. See https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html#roles-creatingrole-service-cli[role creation document] for more information.
 
-. Create the instance profile
+.Create the instance profile
 [source,bash]
 ----
 cat <<EOF >trustpolicyforec2.json
@@ -141,7 +141,7 @@ aws iam add-role-to-instance-profile --instance-profile-name ${PROFILE} --role-n
 
 To launch the instance, need to attach the created profile. From the command-line, use `--iam-instance-profile`.
 
-. Launching and customizing a new instance with remote Ignition file from a S3 bucket
+.Launching and customizing a new instance with remote Ignition file from a S3 bucket
 [source,bash]
 ----
 NAME='instance1'
