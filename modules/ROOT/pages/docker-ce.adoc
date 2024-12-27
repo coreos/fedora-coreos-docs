@@ -34,7 +34,7 @@ systemd:
         Type=oneshot
         RemainAfterExit=yes
         ExecStart=/usr/bin/curl --output-dir "/etc/yum.repos.d" --remote-name https://download.docker.com/linux/fedora/docker-ce.repo
-        ExecStart=/usr/bin/rpm-ostree override remove moby-engine containerd runc --install docker-ce
+        ExecStart=/usr/bin/rpm-ostree override remove moby-engine containerd runc docker-cli --install docker-ce
         ExecStart=/usr/bin/touch /var/lib/%N.stamp
         ExecStart=/usr/bin/systemctl --no-block reboot
 
@@ -52,7 +52,7 @@ Then you need to remove `moby-engine` and several other conflicting packages tha
 ----
 curl --remote-name https://download.docker.com/linux/fedora/docker-ce.repo
 sudo install --owner 0 --group 0 --mode 644 docker-ce.repo /etc/yum.repos.d/docker-ce.repo
-sudo rpm-ostree override remove moby-engine containerd runc --install docker-ce --reboot
+sudo rpm-ostree override remove moby-engine containerd runc docker-cli --install docker-ce --reboot
 ----
 
 === Upgrading Docker CE
