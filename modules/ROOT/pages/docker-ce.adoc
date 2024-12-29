@@ -68,4 +68,4 @@ To upgrade to Fedora CoreOS 41 you’ll need to reset the overrides and uninstal
 sudo rpm-ostree override reset containerd moby-engine runc --uninstall docker-ce
 ----
 
-You can then follow the instructions for xref:#_installing_docker_ce_on_a_running_system[Installing Docker CE on a running system].
+After upgrading to Fedora CoreOS 41, you can follow the instructions for xref:#_installing_docker_ce_on_a_running_system[Installing Docker CE on a running system].
