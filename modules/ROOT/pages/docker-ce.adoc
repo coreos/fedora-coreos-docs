@@ -58,3 +58,17 @@ sudo rpm-ostree override remove moby-engine containerd runc docker-cli --install
 === Upgrading Docker CE
 
 Docker CE should be upgraded automatically with each new release of Fedora CoreOS.
+
+[NOTE]
+====
+If you have Docker CE installed and are still using Fedora CoreOS 40, upgrading to Fedora CoreOS 41 will likely fail.
+This is due to the new `docker-cli` package added in Fedora CoreOS 41 and later.
+To upgrade to Fedora CoreOS 41 you’ll need to reset the overrides and uninstall layered Docker CE packages with the following command.
+
+[source, bash]
+----
+sudo rpm-ostree override reset containerd moby-engine runc --uninstall docker-ce
+----
+
+After upgrading to Fedora CoreOS 41, you can follow the instructions for xref:#_installing_docker_ce_on_a_running_system[Installing Docker CE on a running system].
+====
