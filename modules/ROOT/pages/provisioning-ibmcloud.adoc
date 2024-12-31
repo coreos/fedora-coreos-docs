@@ -66,7 +66,7 @@ ibmcloud iam authorization-policy-create is --source-resource-type image cloud-o
 FCOS_VERSION='...'
 FILE="fedora-coreos-${FCOS_VERSION}-ibmcloud.${ARCH}.qcow2"
 ibmcloud cos create-bucket --bucket $BUCKET --ibm-service-instance-id $SERVICE_INSTANCE_ID
-ibmcloud cos upload --bucket=$BUCKET --key=$FILE --file=$FILE
+ibmcloud cos upload --bucket=$BUCKET --key="${FILE}" --file="${FILE}"
 ----
 
 .Create the image from the storage object.
@@ -76,7 +76,7 @@ IMAGE=${FILE:0:-6}     # pull off .qcow2
 IMAGE=${IMAGE//[._]/-} # replace . and _ with -
 [ $ARCH == 'x86_64' ] && OSNAME='fedora-coreos-stable-amd64'
 [ $ARCH == 's390x' ] && OSNAME='red-8-s390x-byol'
-ibmcloud is image-create $IMAGE --file "cos://${REGION}/${BUCKET}/${FILE}" --os-name $OSNAME
+ibmcloud is image-create "${IMAGE}" --file "cos://${REGION}/${BUCKET}/${FILE}" --os-name $OSNAME
 ----
 
 NOTE: For `s390x` we use `--os-name=red-8-s390x-byol` (a RHEL 8 profile) here because there is not currently a `fedora-coreos-stable-s390x` profile to use.
@@ -105,10 +105,10 @@ VPC='r014-c9c65cc4-cfd3-44de-ad54-865aac182ea1'    # `ibmcloud is vpcs`
 IMAGE='r014-1823b4cf-9c63-499e-8a27-b771be714ad8'  # `ibmcloud is images --visibility private`
 SUBNET='0777-bf99cbf4-bc82-4c46-895a-5b7304201182' # `ibmcloud is subnets`
 SSHKEY='r014-b44c37d0-5c21-4c2b-aba2-438a5b0a228d' # `ibmcloud is keys`
-ibmcloud is instance-create $NAME $VPC $ZONE $PROFILE $SUBNET --image $IMAGE --keys $SSHKEY --user-data @example.ign
+ibmcloud is instance-create "${NAME}" $VPC $ZONE $PROFILE $SUBNET --image $IMAGE --keys $SSHKEY --user-data @example.ign
 ----
 
-TIP: If needed you may have to first create a subnet with a command like `'ibmcloud is subnet-create my-subnet $VPC --ipv4-address-count 256 --zone $ZONE'`.
+TIP: If needed you may have to first create a subnet with a command like `ibmcloud is subnet-create my-subnet $VPC --ipv4-address-count 256 --zone $ZONE`.
 
 WARNING: Make sure you choose an appropriate instance type based on your architecture. For example, you may want to use `bz2-2x8` instead of `bx2-2x8` above if you are targeting `s390x`.
 

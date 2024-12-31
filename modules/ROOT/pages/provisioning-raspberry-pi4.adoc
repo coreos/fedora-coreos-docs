@@ -159,7 +159,7 @@ First, run `coreos-installer` to install to the target disk:
 [source, bash]
 ----
 FCOSDISK=/dev/sdX
-STREAM=stable # or `next` or `testing`
+STREAM="stable" # or `next` or `testing`
 sudo coreos-installer install -a aarch64 -s $STREAM -i config.ign $FCOSDISK
 ----
 
