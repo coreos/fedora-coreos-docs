@@ -36,9 +36,9 @@ In this case we can grab these files from the `uboot-images-armv8`, `bcm2711-fir
 
 [source, bash]
 ----
-RELEASE=39 # The target Fedora Release. Use the same one that current FCOS is based on.
+RELEASE=41 # The target Fedora Release. Use the same one that current FCOS is based on.
 mkdir -p /tmp/RPi4boot/boot/efi/
-sudo dnf install -y --downloadonly --release=$RELEASE --forcearch=aarch64 --destdir=/tmp/RPi4boot/ uboot-images-armv8 bcm283x-firmware bcm283x-overlays
+sudo dnf4 install -y --downloadonly --release=$RELEASE --forcearch=aarch64 --destdir=/tmp/RPi4boot/ uboot-images-armv8 bcm283x-firmware bcm283x-overlays
 ----
 
 Now extract the contents of the RPMs and copy the proper `u-boot.bin` for the RPi4 into place:
