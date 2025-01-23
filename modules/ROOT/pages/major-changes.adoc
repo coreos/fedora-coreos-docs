@@ -9,6 +9,38 @@ This list is in reverse chronological order to keep recent changes at the top.
 
 // To add a new change here, see the template at the end of the file.
 
+== Switch to OCI updates
+
+Starting in Fedora 42, Fedora CoreOS will be updating through OCI images instead of the OSTree repo.
+Fedora Change request: https://fedoraproject.org/wiki/Changes/CoreOSOstree2OCIUpdates
+More discussion: https://github.com/coreos/fedora-coreos-tracker/issues/1823
+
+=== Planning
+
+This change has been introduced first in new disk images for the `next` stream, as part of the Fedora 42 rebase.
+The `testing` and `next` streams will follow when they rebase to Fedora 42.
+After a few releases we will migrate existing machines through a barrier release.
+
+|===
+|Update Stream |Release date
+
+|`next` 42.20250316.1.0 | 2025-03-18
+|`testing`| TBD
+|`stable`| Will follow `testing` as usual
+|===
+
+=== Notes
+
+Currently, Fedora CoreOS hosts pull updates from the OSTree repository.
+With this change, the hosts will pull updates from the Quay.io container registry instead.
+This should be a transparent change, altough proxied environnements require attention as the nodes will reach to a different address for updates.
+
+Note: Disk images will be updated first, so new installations of Fedora CoreOS based on Fedora 42 will use OCI images.
+After a few releases, we will migrate existing nodes.
+
+This change is only scoped to switching to OCI as the transport for Fedora CoreOS content.
+Derivation support is still a work in progress, see the tracking issue for more details : https://github.com/coreos/fedora-coreos-tracker/issues/1726
+
 == cgroups v1 support disabled
 
 In systemd v256, cgroups v1 support was disabled.
