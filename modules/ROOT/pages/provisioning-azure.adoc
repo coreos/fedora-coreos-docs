@@ -64,7 +64,7 @@ az image create -n "${az_image_name}" -g "${az_resource_group}" --source "https:
 az storage blob delete --connection-string "$cs" -c "${az_container}" -n "${az_image_blob}"
 ----
 
-== Launching a VM instance
+== Launching a VM instance using custom-data
 
 . Launch a VM. Your Ignition configuration can be passed to the VM as custom data, or you can skip passing custom data if you just want SSH access. Your SSH public key from `~/.ssh` will automatically be added to the VM. This provides an easy way to test out FCOS without first creating an Ignition config.
 +
@@ -82,4 +82,43 @@ az vm create -n "${az_vm_name}" -g "${az_resource_group}" --image "${az_image_na
 [source, bash]
 ----
 ssh core@<ip address>
+----
+
+== Launching a VM instance using custom-data and a private Azure blob
+
+. Define your variables.
+
+[source, bash]
+----
+az_vm_name=my-fcos-vm
+ignition_path="./config.ign"
+az_blob_ignition_path=./privateConfig.ign
+az_blob_ignition_file_name=privateConfig.ign
+----
+
+. Upload your ign file to Azure blob storage.
+
+[source, bash]
+----
+az storage blob upload --connection-string "${cs}" -c "${az_blob_ignition_file_name}" -f  "${az_blob_ignition_path}" -n "${ignition_file_name}"
+----
+
+. Create your remote ignition config to reference this new blob. Read about that here xref:remote-ign.adoc[Using a remote Ignition config]
+. Note: The source field should have a value similar to "https://${az_storage_account}.blob.core.windows.net/${az_image_blob}/${az_blob_ignition_file_name}
+
+. Create an identity and give it proper access to your storage account.
+
+[source, bash]
+----
+az identity create --name "${az_vm_name}-identity" --resource-group "${az_resource_group}"
+identity_principal_id=$(az identity show --name "${az_vm_name}-identity" --resource-group "${az_resource_group}" --query principalId -o tsv)
+identity_id=$(az identity show --name "${az_vm_name}-identity" --resource-group "${az_resource_group}" --query id -o tsv)
+az role assignment create --assignee "${identity_principal_id}" --role "Storage Blob Data Contributor" --scope /subscriptions/${subscription_id}/resourceGroups/${az_resource_group}/providers/Microsoft.Storage/storageAccounts/${az_storage_account}
+----
+
+. Create the VM passing the new identity.
+
+[source, bash]
+----
+az vm create -n "${az_vm_name}" -g "${az_resource_group}" --image "${az_image_name}" --admin-username core --custom-data "$(cat ${ignition_path})" --assign-identity "${identity_id}"
 ----
