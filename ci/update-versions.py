@@ -4,10 +4,12 @@
 import os
 import requests
 import sys
+import base64
 import yaml
 
 GITHUB_RELEASES = {
     'butane-version': 'coreos/butane',
+    'butane-latest-stable-spec': 'coreos/butane',
     'ignition-version': 'coreos/ignition',
 }
 FCOS_STREAMS = {
@@ -24,13 +26,21 @@ with open(os.path.join(basedir, 'antora.yml'), 'r+') as fh:
 
     for attr, repo in GITHUB_RELEASES.items():
         headers = {'Authorization': f'Bearer {github_token}'} if github_token else {}
-        resp = requests.get(
-            f'https://api.github.com/repos/{repo}/releases/latest',
-            headers=headers
-        )
-        resp.raise_for_status()
-        tag = resp.json()['tag_name']
-        attrs[attr] = tag.lstrip('v')
+        if attr == 'butane-version' or attr == 'ignition-version':
+            resp = requests.get(
+                f'https://api.github.com/repos/{repo}/releases/latest',
+                headers=headers
+            )
+            resp.raise_for_status()
+            tag = resp.json()['tag_name']
+            attrs[attr] = tag.lstrip('v')
+        elif attr == 'butane-latest-stable-spec':
+            resp = requests.get(
+                f'https://api.github.com/repos/{repo}/contents/docs/specs.md',
+                headers=headers
+            )
+            resp.raise_for_status()
+            attrs[attr] = ''.join(str(base64.b64decode(resp.json()['content'])).split('- ', 3)[2:3])[2:-26]
 
     for attr, stream in FCOS_STREAMS.items():
         resp = requests.get(f'https://builds.coreos.fedoraproject.org/streams/{stream}.json')
