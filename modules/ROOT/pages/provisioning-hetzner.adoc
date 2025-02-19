@@ -1,0 +1,123 @@
+= Provisioning Fedora CoreOS on Hetzner
+
+This guide shows how to provision new Fedora CoreOS (FCOS) nodes on Hetzner.
+Fedora CoreOS is currently not available as an option in the operating system selection on Hetzner.
+Thus you must first download the Fedora CoreOS disk image for Hetzner, then create a snapshot from it in your Hetzner account using the https://github.com/apricote/hcloud-upload-image[hcloud-upload-image] tool, and finally create your servers from this snapshot.
+
+IMPORTANT: Support for Fedora CoreOS on Hetzner is considered emerging, in that it does not yet offer an optimized user experience and relies on tools not officially supported by Hetzner.
+           See https://github.com/coreos/fedora-coreos-tracker/issues/1324[issue #1324] for more details.
+
+IMPORTANT: The https://github.com/apricote/hcloud-upload-image[hcloud-upload-image] tool is not an official Hetzner Cloud product and Hetzner Cloud does not provide support for it.
+           Alternatively, you can also use the official https://github.com/hetznercloud/packer-plugin-hcloud[packer-plugin-hcloud] to install the image via `coreos-installer`.
+
+IMPORTANT: In order to create a snapshot, the https://github.com/apricote/hcloud-upload-image[hcloud-upload-image] tool will provision a small server and boot it in rescue mode.
+           As this server is short lived, the cost should be very limited.
+           The resulting snapshots are charged per GB per month.
+           See https://docs.hetzner.com/cloud/servers/backups-snapshots/overview/[Backups/Snapshots] in the Hetzner Cloud documentation.
+           You may delete this snapshot once the server has been provisioned.
+
+== Prerequisites
+
+Before provisioning an FCOS machine, you must have an Ignition configuration file containing your customizations.
+If you do not have one, see xref:producing-ign.adoc[Producing an Ignition File].
+
+NOTE: Fedora CoreOS has a default `core` user that can be used to explore the OS.
+      If you want to use it, finalize its xref:authentication.adoc[configuration] by providing e.g. an SSH key.
+
+If you do not want to use Ignition to get started, you can make use of the https://coreos.github.io/afterburn/platforms/[Afterburn support] and only configure SSH keys.
+
+You also need to have access to a Hetzner account.
+The examples below use the https://github.com/hetznercloud/cli[hcloud] command-line tool, the https://github.com/apricote/hcloud-upload-image[hcloud-upload-image] tool and https://stedolan.github.io/jq/[jq] as a command-line JSON processor.
+
+== Creating a snapshot
+
+Fedora CoreOS is designed to be updated automatically, with different schedules per stream.
+
+. Once you have picked the relevant stream, download the latest Hetzner image from the https://fedoraproject.org/coreos/download/?stream=stable#baremetal[download page] or with podman (see https://coreos.github.io/coreos-installer/cmd/download/[documentation] for options):
++
+[source, bash]
+----
+arch="x86_64" # or aarch64
+stream="stable" # or testing, next
+
+podman run --security-opt label=disable --pull=always --rm -v .:/data -w /data \
+    quay.io/coreos/coreos-installer:release download -s "${stream}" -p metal -f raw.xz -a "${arch}"
+----
++
+Note this is just using `coreos-installer` as a tool to download the RAW disk image.
++
+NOTE: Both x86_64 and aarch64 architectures are supported on Hetzner.
++
+NOTE: The `hcloud-upload-image` tool uses different names for architectures (`x86_64` -> `x86`, `aarch64` -> `arm`).
++
+. Use the `hcloud-upload-image` to create a snapshot from this image:
++
+[source, bash]
+----
+image_name="fedora-coreos-41.20250213.0-hetzner.x86_64.raw.xz"
+export HCLOUD_TOKEN="<your token>"
+stream="stable" # or testing, next
+hetzner_arch="x86" # or arm
+
+hcloud-upload-image upload \
+    --architecture "${hetzner_arch}" \
+    --compression xz \
+    --image-path "${image_name}" \
+    --labels os=fedora-coreos,channel="${stream}" \
+    --description "Fedora CoreOS (${stream}, ${arch})"
+----
++
+. Wait for the process to complete and validate that you have a snapshot:
++
+[source, bash]
+----
+hcloud image list --type=snapshot --selector=os=fedora-coreos
+----
+
+== Launching a server
+
+. If you don't already have an SSH key uploaded to Hetzner, you may upload one:
++
+.Example uploading an SSH key to Hetzner
+[source, bash]
+----
+ssh_pubkey="ssh-ed25519 ..."
+ssh_key_name="fedora-coreos-hetzner"
+hcloud ssh-key create --name "${ssh_key_name}" --public-key "${ssh_pubkey}"
+----
++
+. Launch a server. Your Ignition configuration can be passed to the VM as its user data, or you can skip passing user data if you just want SSH access.
+  This provides an easy way to test out FCOS without first creating an Ignition config.
++
+.Example launching FCOS on Hetzner using an Ignition configuration file and SSH key
+[source, bash]
+----
+image_id="$(hcloud image list \
+    --type=snapshot \
+    --selector=os=fedora-coreos \
+    --output json \
+    | jq -r '.[0].id')"
+ssh_key_name="fedora-coreos-hetzner" # See: hcloud ssh-key list
+datacenter="fsn1-dc14"               # See: hcloud datacenter list
+type="cx22"                          # See: hcloud server-type list
+name="fedora-coreos-test"
+ignition_config="./config.ign"
+hcloud server create \
+    --name "${name}" \
+    --type "${type}" \
+    --datacenter "${datacenter}" \
+    --image "${image_id}" \
+    --ssh-key "${ssh_key_name}" \
+    --user-data-from-file "${ignition_config}"
+----
++
+NOTE: While the Hetzner documentation and website mentions `cloud-init` and "cloud config", FCOS does not support cloud-init.
+      It accepts only Ignition configuration files.
+
+. You now should be able to SSH into the instance using the associated IP address.
++
+.Example connecting
+[source, bash]
+----
+ssh core@"$(hcloud server ip "${name}")"
+----
