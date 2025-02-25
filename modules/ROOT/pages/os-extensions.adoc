@@ -1,10 +1,10 @@
 = Adding OS extensions to the host system
 
-Fedora CoreOS keeps the base image as simple and small as possible for security and maintainability reasons. That is why you should in general prefer the usage of `podman` containers over layering software.
+Fedora CoreOS keeps the base image as simple and small as possible for security and maintainability reasons. That is why you should in general prefer the usage of `podman` containers over layering software. However, in some cases it is necessary to add software to the base OS itself. For example, drivers or VPN software are potential candidates because they are harder to containerize and may be brought in as extensions to the OS.
 
-However, in some cases it is necessary to add software to the base OS itself. For example, drivers or VPN software are potential candidates because they are harder to containerize.
+NOTE: If you're making nontrivial changes to the base operating system, you may instead consider using https://docs.fedoraproject.org/en-US/bootc/[Fedora Bootc], which is oriented around custom OS builds derived from a starting base image. There is more information on the relationship between Fedora CoreOS and Fedora Bootc in xref:faq.adoc#_how_does_fedora_coreos_relate_to_fedora_bootc[our FAQ].
 
-To do this, you can use https://coreos.github.io/rpm-ostree/[`rpm-ostree install`]. Consider these packages as "extensions": they extend the functionality of the base OS rather than e.g. providing runtimes for user applications. That said, there are no restrictions on which packages one can actually install. By default, packages are downloaded from the https://docs.fedoraproject.org/en-US/quick-docs/repositories/[Fedora repositories].
+To add in additional software to a Fedora CoreOS system, you can use https://coreos.github.io/rpm-ostree/[`rpm-ostree install`]. Consider these packages as "extensions": they extend the functionality of the base OS rather than e.g. providing runtimes for user applications. That said, there are no restrictions on which packages one can actually install. By default, packages are downloaded from the https://docs.fedoraproject.org/en-US/quick-docs/repositories/[Fedora repositories].
 
 To start the layering of a package, you need to write a systemd unit that executes the `rpm-ostree` command to install the wanted package(s).
 Changes are applied to a new deployment and a reboot is necessary for those to take effect.
