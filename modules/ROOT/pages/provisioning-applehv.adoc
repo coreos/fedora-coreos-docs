@@ -1,0 +1,57 @@
+= Provisioning Fedora CoreOS on AppleHV
+
+This guide shows how to provision new Fedora CoreOS (FCOS) instances on macOS using https://github.com/crc-org/vfkit[vfkit].
+
+
+== Prerequisites
+
+Before provisioning an FCOS machine, you must have an Ignition configuration file containing your customizations. If you do not have one, see xref:producing-ign.adoc[Producing an Ignition File].
+
+You will also need to build or acquire https://github.com/crc-org/vfkit[vfkit].  Prebuilt binaries are also available from its https://github.com/crc-org/vfkit/releases/tag/v0.6.0[releases] page.  Vfkit, like QEMU, has many options which are outside the scope of this provisioning example.  Please consider reading their https://github.com/crc-org/vfkit/tree/main/doc[documentation].
+
+== Booting a new VM on macOS
+
+This section shows how to boot a new VM with vfkit. Vfkit is known to work with both Intel and Apple Silicon based Macs.
+
+=== Fetching the AppleHV image
+
+Fetch the latest image suitable for your target stream (or https://fedoraproject.org/coreos/download/[download and verify] it from the web).  Remember to download the appropriate image based on the architecture of your Mac.  Once downloaded, you will also need to decompress the image.
+
+=== Setting up a new VM
+
+Vfkit is not a stateful virtual machine framework. You simply need to run the vfkit binary to start a virtual machine. The following command line will launch a VM with:
+
+* 2 virtual CPUs
+* 2 GB of memory
+* a network device that will receive a IP address from Vfit
+* a GUI console with keyboard and mouse support
+
+.Launching FCOS with Vfkit
+[source, bash]
+----
+IGNITION_CONFIG="/path/to/example.ign"
+IMAGE="/path/to/image.qcow2"
+
+./vfkit --cpus 2 --memory 2048 \
+  --bootloader efi,variable-store=efi-variable-store,create \
+  --device virtio-blk,path=${IMAGE} \
+  --device virtio-net,nat \
+  --ignition ${IGNITION_CONFIG} \
+  --device virtio-input,keyboard \
+  --device virtio-input,pointing \
+  --device virtio-gpu,width=800,height=600 \
+  --gui
+----
+
+Note: The AppleHV hypervisor does not allow you to see early boot and kernel messages.  While you will see a GRUB boot menu, you will not see anything until later in the boot.
+
+=== Exploring the OS
+
+image::vfkit.png[Vfkit GUI]
+
+When FCOS is completed booting, you will see the IP address of the VM displayed in the GUI window.  Vfkit will lease an address in the `192.168.64.0/24` network.  At this point, you can either choose to login or SSH to the VM.  Unlike some other virtualization providers, you can SSH to the virtual machine from the host.
+
+[source, bash]
+----
+ssh core@192.168.64.5
+----
