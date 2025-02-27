@@ -23,6 +23,28 @@ variety of containerized use cases, RHEL CoreOS provides a
 focused OS for OpenShift, released and life-cycled in tandem
 with the platform.
 
+== How does Fedora CoreOS relate to Fedora Bootc?
+
+https://docs.fedoraproject.org/en-US/bootc/[Fedora Bootc] is
+a Fedora project aimed at building Fedora and CentOS-based
+https://containers.github.io/bootable/[bootable containers]. The goal is to
+eventually have Fedora CoreOS build on top of Fedora Bootc both literally and in
+the broader sense of being part of the same ecosystem. The roadmap for this can
+be found https://github.com/coreos/fedora-coreos-tracker/issues/1726[on GitHub].
+
+Fedora CoreOS adds
+https://docs.fedoraproject.org/en-US/fedora-coreos/update-streams/[a stream model],
+platform-specific integration and disk images, provisioning via Ignition, and
+more tooling around automatic updates. The goal is also to have Fedora CoreOS
+integrate more strongly with the Kubernetes ecosystem.
+
+If you find yourself needing to heavily customize Fedora CoreOS beyond what
+https://docs.fedoraproject.org/en-US/fedora-coreos/os-extensions/[OS extensions]
+provide, it might make more sense to instead build on top of Fedora Bootc
+directly. It will eventually be possible to layer Ignition and e.g. Zincati
+on top if desired. These tools are intended to be used generically and are not
+strictly tied to Fedora CoreOS.
+
 == What are the communication channels around Fedora CoreOS?
 
 We have the following new communication channels around Fedora CoreOS:
