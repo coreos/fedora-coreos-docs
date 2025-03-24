@@ -1,7 +1,7 @@
 = Debugging with Toolbx
 
 The FCOS image is kept minimal by design to reduce the image size and the attack surface.
-This means that it does not include every troubleshooting tools that a normal OS may include.
+This means that it does not include every troubleshooting tool that a normal OS may include.
 Instead, the recommended approach is to leverage containers with the https://containertoolbx.org/[toolbox] utility included in the image.
 
 == What is Toolbx?
@@ -13,7 +13,7 @@ These containers can then be used to install tools that you may need for trouble
 
 == Using Toolbx
 
-You can create a new toolbox by running the command below.
+You can create a new toolbox by running the command below. On the first run it will ask you if you want to download an image. Answer yes with `y`. 
 
 [source,sh]
 ----
