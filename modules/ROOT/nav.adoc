@@ -9,6 +9,7 @@
 ** xref:provisioning-digitalocean.adoc[Booting on DigitalOcean]
 ** xref:provisioning-exoscale.adoc[Booting on Exoscale]
 ** xref:provisioning-gcp.adoc[Booting on GCP]
+** xref:provisioning-hetzner.adoc[Booting on Hetzner]
 ** xref:provisioning-hyperv.adoc[Booting on Hyper-V]
 ** xref:provisioning-ibmcloud.adoc[Booting on IBM Cloud]
 ** xref:provisioning-applehv.adoc[Booting on macOS]
