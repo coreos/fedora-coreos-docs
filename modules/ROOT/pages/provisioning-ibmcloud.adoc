@@ -86,7 +86,7 @@ You'll have to wait for the image creation process to finish and go from `pendin
 .Monitor image creation progress by viewing the images in your account
 [source, bash]
 ----
-ibmcloud is images --visibility private
+ibmcloud is images --visibility private --status pending,available
 ----
 
 == Launching a VM instance
