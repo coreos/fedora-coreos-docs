@@ -72,7 +72,7 @@ storage:
 
           [Container]
           ContainerName=etcd
-          Image=quay.io/coreos/etcd:latest
+          Image=quay.io/coreos/etcd:v3.5.21
           Network=host
           Volume=etcd-data:/etcd-data
           Exec=/usr/local/bin/etcd                                \
@@ -193,22 +193,26 @@ CONTAINER ID  IMAGE                       COMMAND               CREATED        S
 And we can set a key/value pair in etcd. For now let’s set the key `fedora` to the value `fun`:
 
 ----
-[core@tutorial ~]$ curl -L -X PUT http://127.0.0.1:2379/v2/keys/fedora -d value="fun"
-{"action":"set","node":{"key":"/fedora","value":"fun","modifiedIndex":4,"createdIndex":4}}
-[core@tutorial ~]$ curl -L http://127.0.0.1:2379/v2/keys/ 2>/dev/null | jq .
+[core@tutorial ~]$ curl -L http://127.0.0.1:2379/v3/kv/put -X POST -d '{"key": "ZmVkb3Jh", "value": "ZnVu"}'
+{"header":{"cluster_id":"2037210783374497686","member_id":"13195394291058371180","revision":"4","raft_term":"2"}}
+[core@tutorial ~]$ curl -sL http://127.0.0.1:2379/v3/kv/range -X POST -d '{"key": "AA==", "range_end": "AA=="}' | jq
 {
-  "action": "get",
-  "node": {
-    "dir": true,
-    "nodes": [
-      {
-        "key": "/fedora",
-        "value": "fun",
-        "modifiedIndex": 4,
-        "createdIndex": 4
-      }
-    ]
-  }
+  "header": {
+    "cluster_id": "2037210783374497686",
+    "member_id": "13195394291058371180",
+    "revision": "4",
+    "raft_term": "2"
+  },
+  "kvs": [
+    {
+      "key": "ZmVkb3Jh",
+      "create_revision": "2",
+      "mod_revision": "4",
+      "version": "2",
+      "value": "ZnVu"
+    }
+  ],
+  "count": "2"
 }
 ----
 
