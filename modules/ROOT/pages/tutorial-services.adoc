@@ -11,7 +11,7 @@ In this tutorial, we will run a script on the first boot via a systemd service. 
 
 Let's write a small script that uses https://icanhazip.com/[icanhazip.com] to create an issue file to display as a prelogin message on the console and store it in `public-ipv4.sh`.
 
-NOTE: This is only an example and very risky on production systems because you have no control over what https://icanhazip.com/[icanhazip.com] returns, and runs as root on your server.
+NOTE: This is only an example to show how to run a service on boot. Do not use this if you don't trust the owners of https://icanhazip.com/[icanhazip.com].
 
 [source,bash]
 ----
