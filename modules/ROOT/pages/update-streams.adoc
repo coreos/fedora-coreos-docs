@@ -56,7 +56,7 @@ sudo systemctl stop zincati.service
 # Supported architectures: aarch64, ppc64le, s390x, x86_64
 # Available streams: "stable", "testing", and "next"
 STREAM="testing"
-sudo rpm-ostree rebase "ostree-remote-registry:fedora://quay.io/fedora/fedora-coreos:${STREAM}"
+sudo rpm-ostree rebase "ostree-remote-registry:fedora:quay.io/fedora/fedora-coreos:${STREAM}"
 ----
 
 After inspecting the package difference the user can reboot. After boot the system will be loaded into the latest release on the new stream and will follow that stream for future updates.
