@@ -86,8 +86,7 @@ ssh core@<ip address>
 
 == Launching a VM instance using custom-data and a private Azure blob
 
-. Define your variables.
-
+.Define your variables
 [source, bash]
 ----
 az_vm_name=my-fcos-vm
@@ -96,16 +95,18 @@ az_blob_ignition_path=./privateConfig.ign
 az_blob_ignition_file_name=privateConfig.ign
 ----
 
-. Upload your ign file to Azure blob storage.
-
+.Upload your ign file to Azure blob storage
 [source, bash]
 ----
 az storage blob upload --connection-string "${cs}" -c "${az_blob_ignition_file_name}" -f  "${az_blob_ignition_path}" -n "${ignition_file_name}"
 ----
 
++
 . Create your remote ignition config to reference this new blob. Read about that here xref:remote-ign.adoc[Using a remote Ignition config]
-. Note: The source field should have a value similar to "https://${az_storage_account}.blob.core.windows.net/${az_image_blob}/${az_blob_ignition_file_name}
 
+NOTE: The source field should have a value similar to `https://${az_storage_account}.blob.core.windows.net/${az_image_blob}/${az_blob_ignition_file_name}`
+
++
 . Create an identity and give it proper access to your storage account.
 
 [source, bash]
@@ -113,12 +114,118 @@ az storage blob upload --connection-string "${cs}" -c "${az_blob_ignition_file_n
 az identity create --name "${az_vm_name}-identity" --resource-group "${az_resource_group}"
 identity_principal_id=$(az identity show --name "${az_vm_name}-identity" --resource-group "${az_resource_group}" --query principalId -o tsv)
 identity_id=$(az identity show --name "${az_vm_name}-identity" --resource-group "${az_resource_group}" --query id -o tsv)
+
 az role assignment create --assignee "${identity_principal_id}" --role "Storage Blob Data Contributor" --scope /subscriptions/${subscription_id}/resourceGroups/${az_resource_group}/providers/Microsoft.Storage/storageAccounts/${az_storage_account}
 ----
 
-. Create the VM passing the new identity.
-
++
+.Create the VM passing the new identity
 [source, bash]
 ----
 az vm create -n "${az_vm_name}" -g "${az_resource_group}" --image "${az_image_name}" --admin-username core --custom-data "$(cat ${ignition_path})" --assign-identity "${identity_id}"
+----
+
+== Launching a Confidential VM instance
+
+WARNING: Support for Confidential Computing is a work in progress in Fedora CoreOS. See the https://github.com/coreos/fedora-coreos-tracker/issues/1719[issue #1719].
+
+NOTE: For an overview about confidential VMs on Azure see https://learn.microsoft.com/en-us/azure/confidential-computing/confidential-vm-overview[confidential VM overview].
+
+To launch a confidential VM, we need to create an image that supports confidential computing in an https://learn.microsoft.com/en-us/azure/virtual-machines/azure-compute-gallery[Azure Compute Gallery].
+
+.Example creating a gallery image that supports confidential computing
+[source, bash]
+----
+# Create an image gallery
+gallery_name="mygallery"
+az sig create --resource-group "${az_resource_group}" --gallery-name "${gallery_name}"
+
+# Create a gallery image definition
+gallery_image_definition="mygallery-def"
+az sig image-definition create \
+    --resource-group "${az_resource_group}" \
+    --gallery-name "${gallery_name}" \
+    --gallery-image-definition "${gallery_image_definition}" \
+    --publisher azure \
+    --offer example \
+    --sku standard \
+    --features SecurityType=ConfidentialVmSupported \
+    --os-type Linux \
+    --hyper-v-generation V2
+
+# Get the source VHD URI of OS disk
+os_vhd_storage_account=$(az storage account list -g ${az_resource_group} | jq -r .[].id)
+
+# Create a new image version
+gallery_image_version="1.0.0"
+az sig image-version create \
+    --resource-group "${az_resource_group}" \
+    --gallery-name "${gallery_name}" \
+    --gallery-image-definition "${gallery_image_definition}" \
+    --gallery-image-version "${gallery_image_version}" \
+    --os-vhd-storage-account "${os_vhd_storage_account}" \
+    --os-vhd-uri https://${az_storage_account}.blob.core.windows.net/${az_container}/${az_image_blob}
+----
+
+To launch a confidential FCOS instance, you need to specify the confidential compute type and use a https://learn.microsoft.com/en-us/azure/confidential-computing/virtual-machine-options[machine type] that supports confidential computing.
+
+From the command-line, use `--security-type ConfidentialVM` and `--size`. 
+
+.Example launching a Confidential VM instance
+[source, bash]
+----
+vm_name="my-fcos-cvm"
+ignition_path="./config.ign"
+
+# Specify a size that supports confidential computing (using AMD SEV-SNP for example)
+vm_size="Standard_DC2as_v5"
+
+# Get gallery image id
+gallery_image_id=$(az sig image-version show --gallery-image-definition "${gallery_image_definition}" --gallery-image-version "${gallery_image_version}" --gallery-name "${gallery_name}" --resource-group $az_resource_group | jq -r .id)
+
+# Create a VM with confidential computing enabled using the gallery image and an ignition config as custom-data
+az vm create \
+    --name "${vm_name}" \
+    --resource-group $az_resource_group \
+    --size "${vm_size}" \
+    --image "${gallery_image_id}" \
+    --admin-username core \
+    --generate-ssh-keys \
+    --custom-data "$(cat ${ignition_path})" \
+    --enable-vtpm true \
+    --public-ip-sku Standard \
+    --security-type ConfidentialVM \
+    --os-disk-security-encryption-type VMGuestStateOnly \
+    --enable-secure-boot true
+----
+
+NOTE: We pass parameter `--enable-secure-boot true` to enable Secure Boot. Use `false` to disable secure boot.
+
+NOTE: To get the full console log, append the parameter `--boot-diagnostics-storage ${az_storage_account}`.
+
+.Example Confidential VM Boot Verification
+[source, bash]
+----
+ssh core@<ip address>
+# Confirm the VM is using `AMD SEV-SNP` confidential type
+sudo systemd-detect-virt --cvm
+sev-snp
+
+# Confirm the VM is using `Intel TDX` confidential type
+sudo systemd-detect-virt --cvm
+tdx
+----
+
+Note: Another way to confirm is looking at "Group B" and see that it ends with 2 (`HV_ISOLATION_TYPE_SNP`), or ends with 3 (`HV_ISOLATION_TYPE_TDX`).
+
+.Example Confidential VM Boot Verification by checking dmesg log
+[source, bash]
+----
+# `AMD SEV-SNP` confidential type
+dmesg | grep "Hyper-V: Isolation Config"
+[    0.000000] Hyper-V: Isolation Config: Group A 0x1, Group B 0xba2
+
+# `Intel TDX` confidential type
+dmesg | grep "Hyper-V: Isolation Config"
+[    0.000000] Hyper-V: Isolation Config: Group A 0x1, Group B 0xbe3
 ----
