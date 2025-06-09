@@ -5,6 +5,7 @@ import os
 import requests
 import sys
 import yaml
+import base64
 
 GITHUB_RELEASES = {
     'butane-version': 'coreos/butane',
@@ -12,6 +13,11 @@ GITHUB_RELEASES = {
 }
 FCOS_STREAMS = {
     'stable-version': 'stable',
+}
+
+STABLE_SPECS = {
+    'butane-latest-stable-spec': 'coreos/butane',
+    'ignition-latest-stable-spec': 'coreos/ignition',
 }
 
 basedir = os.path.normpath(os.path.join(os.path.dirname(sys.argv[0]), '..'))
@@ -38,6 +44,18 @@ with open(os.path.join(basedir, 'antora.yml'), 'r+') as fh:
         # to be rigorous, we should have a separate attribute for each
         # artifact type, but the website doesn't do that either
         attrs[attr] = resp.json()['architectures']['x86_64']['artifacts']['metal']['release']
+
+    for attr, repo in STABLE_SPECS.items():
+        headers = {'Authorization': f'Bearer {github_token}'} if github_token else {}
+        resp = requests.get(
+            f'https://api.github.com/repos/{repo}/contents/docs/specs.md',
+            headers=headers
+        )
+        resp.raise_for_status()
+        if attr == 'butane-latest-stable-spec':
+            attrs[attr] = ''.join(str(base64.b64decode(resp.json()['content'])).split('- ', 3)[2:3])[2:-26]
+        elif attr == 'ignition-latest-stable-spec':
+            attrs[attr] = ''.join(str(base64.b64decode(resp.json()['content'])).split('- ', 3)[1:2])[2:-26]
 
     if attrs != orig_attrs:
         fh.seek(0)
