@@ -66,7 +66,10 @@ az storage blob delete --connection-string "$cs" -c "${az_container}" -n "${az_i
 
 == Launching a VM instance using custom-data
 
-. Launch a VM. Your Ignition configuration can be passed to the VM as custom data, or you can skip passing custom data if you just want SSH access. Your SSH public key from `~/.ssh` will automatically be added to the VM. This provides an easy way to test out FCOS without first creating an Ignition config.
+. Launch a VM.
+  Your Ignition configuration can be passed to the VM as custom data, or you can skip passing custom data if you just want SSH access.
+  Your SSH public key from `~/.ssh` will automatically be added to the VM.
+  This provides an easy way to test out FCOS without first creating an Ignition config.
 +
 .Example launching Azure image
 [source, bash]
@@ -86,6 +89,8 @@ ssh core@<ip address>
 
 == Launching a VM instance using custom-data and a private Azure blob
 
+. Define variables for the VM name and Ignition configs:
++
 .Define your variables
 [source, bash]
 ----
@@ -94,21 +99,20 @@ ignition_path="./config.ign"
 az_blob_ignition_path=./privateConfig.ign
 az_blob_ignition_file_name=privateConfig.ign
 ----
-
++
 .Upload your ign file to Azure blob storage
 [source, bash]
 ----
 az storage blob upload --connection-string "${cs}" -c "${az_blob_ignition_file_name}" -f  "${az_blob_ignition_path}" -n "${ignition_file_name}"
 ----
-
 +
-. Create your remote ignition config to reference this new blob. Read about that here xref:remote-ign.adoc[Using a remote Ignition config]
-
+. Create your remote ignition config to reference this new blob.
+  Read about that here xref:remote-ign.adoc[Using a remote Ignition config]
++
 NOTE: The source field should have a value similar to `https://${az_storage_account}.blob.core.windows.net/${az_image_blob}/${az_blob_ignition_file_name}`
-
 +
-. Create an identity and give it proper access to your storage account.
-
+. Create an identity and give it proper access to your storage account:
++
 [source, bash]
 ----
 az identity create --name "${az_vm_name}-identity" --resource-group "${az_resource_group}"
@@ -117,7 +121,6 @@ identity_id=$(az identity show --name "${az_vm_name}-identity" --resource-group 
 
 az role assignment create --assignee "${identity_principal_id}" --role "Storage Blob Data Contributor" --scope /subscriptions/${subscription_id}/resourceGroups/${az_resource_group}/providers/Microsoft.Storage/storageAccounts/${az_storage_account}
 ----
-
 +
 .Create the VM passing the new identity
 [source, bash]
@@ -127,7 +130,8 @@ az vm create -n "${az_vm_name}" -g "${az_resource_group}" --image "${az_image_na
 
 == Launching a Confidential VM instance
 
-WARNING: Support for Confidential Computing is a work in progress in Fedora CoreOS. See the https://github.com/coreos/fedora-coreos-tracker/issues/1719[issue #1719].
+WARNING: Support for Confidential Computing is a work in progress in Fedora CoreOS.
+         See the https://github.com/coreos/fedora-coreos-tracker/issues/1719[issue #1719].
 
 NOTE: For an overview about confidential VMs on Azure see https://learn.microsoft.com/en-us/azure/confidential-computing/confidential-vm-overview[confidential VM overview].
 
@@ -169,7 +173,7 @@ az sig image-version create \
 
 To launch a confidential FCOS instance, you need to specify the confidential compute type and use a https://learn.microsoft.com/en-us/azure/confidential-computing/virtual-machine-options[machine type] that supports confidential computing.
 
-From the command-line, use `--security-type ConfidentialVM` and `--size`. 
+From the command-line, use `--security-type ConfidentialVM` and `--size`.
 
 .Example launching a Confidential VM instance
 [source, bash]
