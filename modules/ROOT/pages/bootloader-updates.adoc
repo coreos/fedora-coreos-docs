@@ -33,25 +33,15 @@ Updated: grub2-efi-x64-1:2.04-31.fc33.x86_64,shim-x64-15-8.x86_64
 #
 ----
 
-.Example systemd unit to automate bootupd updates
+.Example enable bootloader-update.service to automate bootupd updates
 [source,yaml,subs="attributes"]
 ----
 variant: fcos
 version: {butane-latest-stable-spec}
 systemd:
   units:
-    - name: custom-bootupd-auto.service
+    - name: bootloader-update.service
       enabled: true
-      contents: |
-        [Unit]
-        Description=Bootupd automatic update
-
-        [Service]
-        ExecStart=/usr/bin/bootupctl update
-        RemainAfterExit=yes
-
-        [Install]
-        WantedBy=multi-user.target
 ----
 
 === Using images that predate bootupd
