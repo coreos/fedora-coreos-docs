@@ -30,7 +30,7 @@ Vfkit is not a stateful virtual machine framework. You simply need to run the vf
 [source, bash]
 ----
 IGNITION_CONFIG="/path/to/example.ign"
-IMAGE="/path/to/image.qcow2"
+IMAGE="/path/to/image.raw"
 
 ./vfkit --cpus 2 --memory 2048 \
   --bootloader efi,variable-store=efi-variable-store,create \
