@@ -5,7 +5,7 @@ import os
 import requests
 import sys
 import yaml
-import base64
+import re
 
 GITHUB_RELEASES = {
     'butane-version': 'coreos/butane',
@@ -48,17 +48,19 @@ with open(os.path.join(basedir, 'antora.yml'), 'r+') as fh:
     for attr, repo in STABLE_SPECS.items():
         headers = {'Authorization': f'Bearer {github_token}'} if github_token else {}
         resp = requests.get(
-            f'https://api.github.com/repos/{repo}/contents/docs/specs.md',
+            f'https://raw.githubusercontent.com/{repo}/refs/heads/main/docs/specs.md',
             headers=headers
         )
         resp.raise_for_status()
         if attr == 'butane-latest-stable-spec':
-            attrs[attr] = ''.join(str(base64.b64decode(resp.json()['content'])).split('- ', 3)[2:3])[2:-26]
+            line_match = re.search(r'\s*-.+\(config-fcos.+\)', resp.text, re.MULTILINE)
+            attrs[attr] = re.search(r'(\d\.){2}\d', line_match[0])[0]
         elif attr == 'ignition-latest-stable-spec':
-            attrs[attr] = ''.join(str(base64.b64decode(resp.json()['content'])).split('- ', 3)[1:2])[2:-26]
+            line_match = re.search(r'\s*-.+\(configuration.+\)', resp.text, re.MULTILINE)
+            attrs[attr] = re.search(r'(\d\.){2}\d', line_match[0])[0]
 
     if attrs != orig_attrs:
         fh.seek(0)
         fh.truncate()
-        fh.write("# Automatically modified by update-versions.py; comments will not be preserved\n\n")
+        fh.write('# Automatically modified by update-versions.py; comments will not be preserved\n\n')
         yaml.safe_dump(config, fh, sort_keys=False)
