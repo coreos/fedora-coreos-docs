@@ -2,14 +2,10 @@
 
 This guide shows how to provision new Fedora CoreOS (FCOS) nodes on Oracle Cloud Infrastructure.
 Fedora CoreOS images are currently not published directly on Oracle Cloud Infrastructure.
-Thus you must first download a Fedora CoreOS QEMU (QCOW2) image, then convert it to an Oracle Cloud Infrastructure image and finally upload it to your Oracle Cloud Infrastructure account as a https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/importingcustomimagelinux.htm[custom image].
+Thus you must first download the Fedora CoreOS image for Oracle Cloud Infrastructure, then upload it to your account as a https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/importingcustomimagelinux.htm[custom image].
 
 IMPORTANT: Support for Fedora CoreOS on Oracle Cloud Infrastructure is considered emerging, in that it does not yet offer an optimized user experience.
            See https://github.com/coreos/fedora-coreos-tracker/issues/414[issue #414] for more details.
-
-IMPORTANT: Support in Fedora CoreOS currently uses the legacy, OpenStack compatible, Instance Metadata Service in OCI to re-use existing OpenStack support in Ignition and Afterburn.
-           For more information about the security implications, see https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/gettingmetadata.htm[Instance Metadata Service v2].
-           This is temporary until support for OCI is added to Ignition and Afterburn.
 
 == Prerequisites
 
@@ -19,7 +15,7 @@ If you do not have one, see xref:producing-ign.adoc[Producing an Ignition File].
 NOTE: Fedora CoreOS has a default `core` user that can be used to explore the OS.
       If you want to use it, finalize its xref:authentication.adoc[configuration] by providing e.g. an SSH key.
 
-// If you do not want to use Ignition to get started, you can make use of the https://coreos.github.io/afterburn/platforms/[Afterburn support].
+If you do not want to use Ignition to get started, you can make use of the https://coreos.github.io/afterburn/platforms/[Afterburn support].
 
 You also need to have access to an Oracle Cloud Infrastructure account.
 The examples below use the https://docs.oracle.com/en-us/iaas/Content/API/Concepts/cliconcepts.htm[oci] command-line tool and https://stedolan.github.io/jq/[jq] as a command-line JSON processor.
@@ -27,84 +23,25 @@ The examples below use the https://docs.oracle.com/en-us/iaas/Content/API/Concep
 IMPORTANT: This guide currently only covers Virtual Machine shapes and not Bare Metal ones.
            See https://github.com/coreos/fedora-coreos-tracker/issues/414#issuecomment-1795808614[issue #414] for details.
 
-== Creating an Oracle Cloud Infrastructure custom image
+== Downloading an Oracle Cloud Infrastructure image
 
 Fedora CoreOS is designed to be updated automatically, with different schedules per stream.
+Once you have picked the relevant stream, download, verify and decompress the latest Oracle Cloud Infrastructure image:
 
-. Once you have picked the relevant stream, download the latest QEMU image from the https://fedoraproject.org/coreos/download/?stream=stable#baremetal[download page] or with podman (see https://coreos.github.io/coreos-installer/cmd/download/[documentation] for options):
-+
 [source, bash]
 ----
-arch="x86_64" # or aarch64
+ARCH="x86_64"    # or "aarch64"
+STREAM="stable"  # or "testing", "next"
 podman run --security-opt label=disable --pull=always --rm -v .:/data -w /data \
-    quay.io/coreos/coreos-installer:release download -s stable -p qemu -f qcwo2 -a "${arch}"
+    quay.io/coreos/coreos-installer:release download -s $STREAM -p oraclecloud -f qcow2.xz -a $ARCH --decompress
 ----
-+
-Note this is just using `coreos-installer` as a tool to download the QCOW2 disk image.
-+
+
 NOTE: Both x86_64 and aarch64 architectures are supported on Oracle Cloud Infrastructure.
 
-. Copy paste the following Bash script into a file name `convert-image.sh`:
-+
-.QEMU to Oracle Cloud Infrastructure image conversion script
-[source, bash]
-----
-#!/bin/bash
+Alternatively, you can manually download an Oracle Cloud Infrastructure image from the https://fedoraproject.org/coreos/download/?stream=stable#cloud_images[download page].
 
-set -euo pipefail
+== Uploading the image to Oracle Cloud Infrastructure
 
-if [[ ${#} -ne 3 ]]; then
-    echo "Usage: <source image> <dest image> <platform>"
-    echo ""
-    echo "Example:"
-    echo "./$(basename "${0}") fedora-coreos-40.20240616.3.0-{qemu,oraclecloud}.x86_64.qcow2 openstack"
-    exit 1
-fi
-
-source="${1}"
-dest="${2}"
-platform="${3}"
-
-if [[ ! -f "${source}" ]]; then
-    echo "Source image ${source} does not exists"
-    exit 1
-fi
-
-if [[ -f "${dest}" ]]; then
-    echo "Destination image ${dest} already exists"
-    exit 1
-fi
-
-if [[ -z "$(command -v guestfish)" ]]; then
-    echo "Could not find 'guestfish' command"
-    exit 1
-fi
-
-cp --reflink=auto "${source}" "${dest}"
-guestfish -a "${dest}" <<EOF
-run
-mount /dev/sda3 /
-download /loader/entries/ostree-1.conf tmp.loader.entries.ostree-1.conf
-<! sed -i "s/ignition.platform.id=qemu/ignition.platform.id=${platform}/" tmp.loader.entries.ostree-1.conf
-upload tmp.loader.entries.ostree-1.conf /loader/entries/ostree-1.conf
-EOF
-
-rm -v ./tmp.loader.entries.ostree-1.conf
-
-echo "Done"
-----
-+
-. Make sure that you have `guestfish` installed on your system and convert the QCOW2 image to an Oracle Cloud Infrastructure one:
-+
-[source, bash, subs="attributes"]
-----
-source_image"fedora-coreos-{stable-version}-qemu.x86_64.qcow2"
-image_name="fedora-coreos-{stable-version}-oraclecloud.x86_64.qcow2"
-./covert-image.sh "${source_image}" "${image_name} openstack
-----
-+
-IMPORTANT: The use of the `openstack` platform is explained in a note at the top of this page.
-+
 . Figure out your Compartment. To list the compartments in your tenancy:
 +
 [source, bash]
@@ -118,10 +55,12 @@ oci iam compartment list
 ----
 compartment_ocid="$(oci iam compartment create \
     --name fedora-coreos-test \
-    --compartment-id <root_compartment_id>
-    --description "Fedora CoreOS test compartment
+    --compartment-id <root_compartment_ocid> \
+    --description "Fedora CoreOS test compartment" \
     | jq -r '.data.id')"
 ----
++
+NOTE: The root compartment OCID is the same as your tenancy OCID. You can find this information in your CLI configuration at `~/.oci/config` or in the https://cloud.oracle.com/tenancy[Cloud Console].
 +
 . Create a bucket:
 +
@@ -132,11 +71,11 @@ bucket_name="fedora-coreos"
 oci os bucket create --compartment-id "${compartment_ocid}" --name "${bucket_name}"
 ----
 +
-. Upload the converted image to a bucket:
+. Upload the image to a bucket:
 +
 [source, bash]
 ----
-oci os object put --bucket-name "${bucket_name}" --file ${image_name}
+oci os object put --bucket-name "${bucket_name}" --file "${image_name}"
 ----
 +
 . Import the image as a custom image and remember its ID:
@@ -163,39 +102,89 @@ image_id="$(oci compute image import from-object \
 oci compute image list --compartment-id "${compartment_ocid}" --display-name "Fedora CoreOS"
 ----
 +
+. Configure image capabilities
++
+[source, bash]
+----
+global_cap_id="$(oci compute global-image-capability-schema list | jq -r '.data[0].id')"
+global_cap_version_name="$(oci compute global-image-capability-schema-version list \
+    --global-image-capability-schema-id ${global_cap_id} \
+    --display-name 1.2 \
+    | jq -r '.data[0].name')"
+
+oci compute image-capability-schema create \
+    --compartment-id "${compartment_ocid}" \
+    --image-id "${image_id}" \
+    --global-image-capability-schema-version-name "${global_cap_version_name}" \
+    --schema-data '{
+    "Compute.AMD_SecureEncryptedVirtualization": {
+        "default-value": true,
+        "descriptor-type": "boolean",
+        "source": "IMAGE"
+    },
+    "Compute.Firmware": {
+        "default-value": "UEFI_64",
+        "descriptor-type": "enumstring",
+        "source": "IMAGE",
+        "values": [
+            "BIOS",
+            "UEFI_64"
+        ]
+    },
+    "Compute.SecureBoot": {
+        "default-value": true,
+        "descriptor-type": "boolean",
+        "source": "IMAGE"
+    },
+    "Storage.Iscsi.MultipathDeviceSupported": {
+        "default-value": true,
+        "descriptor-type": "boolean",
+        "source": "IMAGE"
+    }
+}'
+----
++
 . Mark the image as compatible with all https://docs.oracle.com/en-us/iaas/Content/Compute/References/computeshapes.htm[shapes].
 +
-.Mark as compatible with all x86_64 shapes
+.Remove default compatible shapes
+[source, bash]
+----
+for shape in $(oci compute image-shape-compatibility-entry list --image-id "${image_id}" | jq -r '.data[].shape' | grep -v '.Generic'); do
+    echo "Removing ${shape}"
+    oci compute image-shape-compatibility-entry remove --force --image-id "${image_id}" --shape-name "${shape}"
+done
+----
++
+.Mark as compatible with x86_64 VM shapes
 [source, bash]
 ----
 shapes_amd64=(
-"VM.Standard3"
-"VM.Standard3.Flex"
-"VM.Standard.E2.1.Micro"
-"VM.Standard.E4"
-"VM.Standard.E4.Flex"
-"VM.Standard.E5"
-"VM.Standard.E5.Flex"
-"VM.DenseIO.E4"
-"VM.DenseIO.E4.Flex"
-"VM.DenseIO.E5"
-"VM.GPU"
-"VM.GPU3"
-"VM.GPU.A10"
-"VM.Optimized3"
-"VM.Optimized3.Flex"
+    "VM.Standard3.Flex"
+    "VM.Standard.E2.1.Micro"
+    "VM.Standard.E4.Flex"
+    "VM.Standard.E5.Flex"
+    "VM.Standard.E6.Flex"
+    "VM.DenseIO.E4.Flex"
+    "VM.DenseIO.E5.Flex"
+    "VM.GPU2.1"
+    "VM.GPU3.1"
+    "VM.GPU3.2"
+    "VM.GPU3.4"
+    "VM.GPU.A10.1"
+    "VM.GPU.A10.2"
+    "VM.Optimized3.Flex"
 )
 for shape in "${shapes_amd64[@]}"; do
     oci compute image-shape-compatibility-entry add --image-id "${image_id}" --shape-name "${shape}"
 done
 ----
 +
-.Mark as compatible with all aarch64 shapes
+.Mark as compatible with aarch64 VM shapes
 [source, bash]
 ----
 shapes_aarch64=(
-"VM.Standard.A1"
-"VM.Standard.A1.Flex"
+    "VM.Standard.A1.Flex"
+    "VM.Standard.A2.Flex"
 )
 for shape in "${shapes_aarch64[@]}"; do
     oci compute image-shape-compatibility-entry add --image-id "${image_id}" --shape-name "${shape}"
@@ -217,19 +206,11 @@ oci compute image-shape-compatibility-entry list --image-id "${image_id}"
 ----
 vcn_id="$(oci network vcn create \
     --compartment-id "${compartment_ocid}" \
-    --cidr-blocks "[\"10.0.0.0/16\"]" \
+    --cidr-blocks '["10.0.0.0/16"]' \
     --display-name "fedora-coreos-vcn" \
     --dns-label "fcos.example.com" \
     --wait-for-state AVAILABLE \
     | jq -r '.data.id')"
-----
-+
-// Add a Security List Ingress Rule? oci network security-list create -h
-. Pick an availability domain:
-+
-[source, bash]
-----
-availability_domain="$(oci iam availability-domain list | jq -r '.data[0].id')"
 ----
 +
 . Add a subnet:
@@ -240,22 +221,21 @@ subnet_id="$(oci network subnet create \
     --cidr-block "10.0.0.0/24" \
     --compartment-id "${compartment_ocid}" \
     --vcn-id "${vcn_id}" \
-    --availability-domain "${availability_domain}" \
     --display-name "fedora-coreos-subnet" \
-    --dns-label "fcos.example.com"
+    --dns-label "main" \
+    --wait-for-state AVAILABLE \
     | jq -r '.data.id')"
 ----
-// --security-list-ids "["<default_security_list_id>","<new_security_list_id>"]"
 +
 . Create an Internet Gateway:
 +
 [source, bash]
 ----
-getway_id="$(oci network internet-gateway create \
+gateway_id="$(oci network internet-gateway create \
     --compartment-id "${compartment_ocid}" \
     --vcn-id "${vcn_id}" \
     --is-enabled true \
-    --display-name "fedora-coreos-gateway"
+    --display-name "fedora-coreos-gateway" \
     | jq -r '.data.id')"
 ----
 +
@@ -265,41 +245,73 @@ getway_id="$(oci network internet-gateway create \
 ----
 route_table="$(oci network route-table list \
     --compartment-id "${compartment_ocid}" \
-    --vcn-id "${vcn_id}"
+    --vcn-id "${vcn_id}" \
     | jq -r '.data[0].id')"
 
 oci network route-table update \
     --rt-id "${route_table}" \
-    --route-rules "[{"cidrBlock":"0.0.0.0/0","networkEntityId":"${getway_id}"}] \
+    --route-rules '[{"cidrBlock":"0.0.0.0/0","networkEntityId":"'"${gateway_id}"'"}]' \
     --force
 ----
 +
-// TODO: Set boot volume size
-// TODO: Add setup for SSH keys with Afterburn support
-. Launch an instance. Your Ignition configuration must be passed to the VM as its user data.
-//, or you can skip passing user data if you just want SSH access. This provides an easy way to test out FCOS without first creating an Ignition config.
+. Pick an availability domain:
 +
-.Example launching FCOS on Oracle Cloud Infrastructure using an Ignition configuration file
 [source, bash]
 ----
-ignition_config="oraclecloud.ign"
+availability_domain="$(oci iam availability-domain list | jq -r '.data[0].name')"
+----
++
+. Launch an instance. Your Ignition configuration must be passed to the VM as its user data, or you can skip passing user data if you just want SSH access. This provides an easy way to test out FCOS without first creating an Ignition config.
++
+.Example launching with only SSH keys configured
+[source, bash]
+----
+NAME=fedora-coreos
+SHAPE=VM.Standard.E2.1.Micro
+SSHKEYS="/path/to/authorized_keys" # path to authorized_keys file
 
 oci compute instance launch \
     --compartment-id "${compartment_ocid}" \
     --availability-domain "${availability_domain}" \
-    --display-name "fedora-coreos" \
+    --display-name "${NAME}" \
     --image-id "${image_id}" \
-    --instance-options "{\"areLegacyImdsEndpointsDisabled\": false}" \
-    --shape "VM.Standard.E2.1.Micro" \
+    --shape "${SHAPE}" \
+    --subnet-id "${subnet_id}" \
     --assign-public-ip true \
-    --user-data-file "${ignition_config}" \
-    --subnet-id "${vcn_id}"
+    --ssh-authorized-keys-file "${SSHKEYS}"
+----
++
+.Example launching customized Ampere instance
+[source, bash]
+----
+NAME=fedora-coreos
+SHAPE=VM.Standard.A1.Flex
+DISK=50                            # size of boot volume in GBs
+OCPUS=1                            # number of allocated OCPUs
+MEMORY=4                           # size of memory in GBs
+INSTHOSTNAME=mycoreos              # hostname for the instance
+SSHKEYS="/path/to/authorized_keys" # path to authorized_keys file
+USERDATA="/path/to/config.ign"     # path to your Ignition config
+
+oci compute instance launch \
+    --compartment-id "${compartment_ocid}" \
+    --availability-domain "${availability_domain}" \
+    --display-name "${NAME}" \
+    --hostname-label "${INSTHOSTNAME}" \
+    --image-id "${image_id}" \
+    --shape "$SHAPE" \
+    --shape-config '{"ocpus": '$OCPUS', "memoryInGBs": '$MEMORY'}' \
+    --boot-volume-size-in-gbs "${DISK}" \
+    --subnet-id "${subnet_id}" \
+    --assign-public-ip true \
+    --ssh-authorized-keys-file "${SSHKEYS}" \
+    --user-data-file "${USERDATA}"
 ----
 +
 NOTE: While the Oracle Cloud Infrastructure documentation mentions `cloud-init`, FCOS does not support cloud-init.
-      It accepts only Ignition configuration files.
+      It accepts only Ignition configuration files. When using the https://cloud.oracle.com[Cloud Console], an Ignition configuration can be placed into "Cloud-init script" field.
 +
-. Get the public IP adress of your instance:
+. Get the public IP address of your instance:
 +
 ----
 oci compute instance list-vnics --instance-id <instance_id>
