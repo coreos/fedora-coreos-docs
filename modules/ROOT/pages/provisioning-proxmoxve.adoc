@@ -25,10 +25,10 @@ Add the new directory as a Proxmox VE storage location that can hold both VM ima
 
 [source,bash]
 ----
-pvesm add dir fcos --path /var/coreos --content images,snippets
+pvesm add dir coreos --path /var/coreos --content images,snippets
 ----
 
-This command creates a new storage location named `fcos` that Proxmox VE can use for storing disk images and configuration snippets (including Ignition files). For more details on Proxmox VE storage configuration, see the https://pve.proxmox.com/wiki/Storage[Proxmox VE Storage documentation].
+This command creates a new storage location named `coreos` that Proxmox VE can use for storing disk images and configuration snippets (including Ignition files). For more details on Proxmox VE storage configuration, see the https://pve.proxmox.com/wiki/Storage[Proxmox VE Storage documentation].
 
 == Downloading Fedora CoreOS Images
 
@@ -117,7 +117,7 @@ qm set ${VM_ID} --boot order=scsi0
 qm set ${VM_ID} --serial0 socket --vga serial0
 
 # Configure Ignition file delivery via cloud-init
-qm set ${VM_ID} --cicustom vendor=fcos:snippets/${IGN}
+qm set ${VM_ID} --cicustom vendor=coreos:snippets/${IGN}
 
 # Disable automatic upgrades during provisioning
 qm set ${VM_ID} --ciupgrade 0
