@@ -16,7 +16,7 @@ First, create a directory structure for Fedora CoreOS resources:
 
 [source,bash]
 ----
-mkdir -p /var/fcos
+mkdir -p /var/coreos
 ----
 
 === Adding Storage to Proxmox VE
