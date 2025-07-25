@@ -60,8 +60,6 @@ Upload your Ignition configuration file to the snippets directory:
 scp /path/to/your/config.ign root@proxmoxve-host:/var/fcos/config.ign
 ----
 
-Ensure your Ignition file is properly formatted and contains all necessary configuration for your use case, including user accounts, SSH keys, and any required system modifications.
-
 == Setting up a new VM
 
 The following example demonstrates how to create and configure a Fedora CoreOS VM using Proxmox VE command-line tools.
