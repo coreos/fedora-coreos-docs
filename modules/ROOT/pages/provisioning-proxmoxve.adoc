@@ -1,0 +1,196 @@
+= Provisioning Fedora CoreOS on Proxmox VE
+
+== Prerequisites
+
+Before provisioning an FCOS machine on Proxmox VE, you must have an Ignition configuration file containing your customizations. If you do not have one, see xref:producing-ign.adoc[Producing an Ignition File].
+
+Fedora CoreOS has a default `core` user that can be used to explore the OS. If you want to use it, finalize its configuration by providing SSH keys or a password hash in your Ignition configuration.
+
+You also need to have access to a https://www.proxmox.com[Proxmox Virtual Environment] (VE) cluster or standalone server with administrative privileges to create VMs and storage configurations. All of the commands will be run as the `root` user on the Proxmox VE host.
+
+== Setting up Proxmox VE Storage
+
+Before provisioning Fedora CoreOS VMs, you need to create a dedicated storage location for FCOS images and Ignition configuration snippets.
+
+=== Creating the Storage Directory
+
+First, create a directory structure for Fedora CoreOS resources:
+
+[source,bash]
+----
+mkdir -p /var/fcos
+----
+
+=== Adding Storage to Proxmox VE
+
+Add the new directory as a Proxmox VE storage location that can hold both VM images and configuration snippets:
+
+[source,bash]
+----
+pvesm add dir fcos --path /var/fcos --content images,snippets
+----
+
+This command creates a new storage location named `fcos` that Proxmox VE can use for storing disk images and configuration snippets (including Ignition files). For more details on Proxmox VE storage configuration, see the https://pve.proxmox.com/wiki/Storage[Proxmox VE Storage documentation].
+
+== Downloading Fedora CoreOS Images
+
+Fedora CoreOS provides pre-built images specifically optimized for Proxmox VE. You can download these images using either the `coreos-installer` binary or via a container.
+
+=== Fetching the QCOW2 image
+
+Fetch the latest image suitable for your target stream (or https://fedoraproject.org/coreos/download/[download and verify] it from the web).
+
+[source,bash]
+----
+STREAM="stable"
+# as an installed binary:
+coreos-installer download -s $STREAM -p proxmoxve -f qcow2.xz --decompress -C /var/fcos
+# or as a container:
+docker run --pull=always --rm -v "/var/fcos/images:/data" -w /data \
+    quay.io/coreos/coreos-installer:release download -s $STREAM -p proxmoxve -f qcow2.xz --decompress
+----
+
+Both methods will download the latest Fedora CoreOS image for the specified stream (`stable`, `testing`, or `next`) in QCOW2 format, optimized for Proxmox VE. It will store the image in the `/var/fcos/images` directory.
+
+== Preparing Ignition Configuration
+
+Upload your Ignition configuration file to the snippets directory:
+
+[source,bash]
+----
+# Upload your ignition to /var/fcos/fcos.ign
+scp /path/to/your/testing.ign root@proxmoxve-host:/var/fcos/testing.ign
+----
+
+Ensure your Ignition file is properly formatted and contains all necessary configuration for your use case, including user accounts, SSH keys, and any required system modifications.
+
+== Setting up a new VM
+
+The following example demonstrates how to create and configure a Fedora CoreOS VM using Proxmox VE command-line tools.
+
+=== Setting Configuration Variables
+
+Define the VM parameters:
+
+[source,bash]
+----
+VM_ID=101
+NAME=fedora-coreos-stable
+QCOW=fedora-coreos-42.20250705.3.0-proxmoxve.x86_64.qcow2
+IGN=testing.ign
+STORAGE=local-lvm
+CPU=2
+MEMORY=2048
+DISK_SIZE=90G
+----
+
+Adjust these variables according to your requirements:
+
+* `VM_ID`: Unique VM identifier in Proxmox VE
+* `NAME`: The name for the VM
+* `QCOW`: Filename of the downloaded FCOS image
+* `IGN`: Filename of your Ignition configuration
+* `STORAGE`: Target storage pool for the VM disk
+* `CPU`: Number of CPU cores to allocate
+* `MEMORY`: RAM allocation in MB
+* `DISK_SIZE`: Additional disk space to allocate
+
+=== Creating and Configuring the VM
+
+Create the VM with the specified configuration:
+
+[source,bash]
+----
+# Create the initial VM configuration
+qm create ${VM_ID} --name ${NAME} --cores ${CPU} --memory ${MEMORY} \
+    --net0 virtio,bridge=vmbr0 --scsihw virtio-scsi-pci
+
+# Import the FCOS image as the primary disk
+qm set ${VM_ID} --scsi0 "${STORAGE}:0,import-from=/var/fcos/images/${QCOW}"
+
+# Resize the disk to provide additional space
+qm resize ${VM_ID} scsi0 +${DISK_SIZE}
+
+# Add cloud-init drive for configuration delivery
+qm set ${VM_ID} --ide2 ${STORAGE}:cloudinit
+
+# Set boot order to use the imported disk
+qm set ${VM_ID} --boot order=scsi0
+
+# Configure serial console for better compatibility
+qm set ${VM_ID} --serial0 socket --vga serial0
+
+# Configure Ignition file delivery via cloud-init
+qm set ${VM_ID} --cicustom vendor=fcos:snippets/${IGN}
+
+# Disable automatic upgrades during provisioning
+qm set ${VM_ID} --ciupgrade 0
+----
+
+== Network Configuration
+
+=== DHCP Configuration
+
+The basic VM creation above uses DHCP for network configuration, which is suitable for most environments where dynamic IP assignment is acceptable.
+
+=== Static IP Configuration
+
+For environments requiring static IP addresses, configure the network settings:
+
+[source,bash]
+----
+# For static IP address
+IP="192.168.1.100"
+IP_CIDR="${IP}/24"
+GATEWAY="192.168.1.1"
+qm set ${VM_ID} --ipconfig0 ip=${IP_CIDR},gw=${GATEWAY}
+----
+
+Replace the IP addresses with values appropriate for your network configuration.
+
+== Booting and Accessing the VM
+
+=== Starting the VM
+
+Start the VM and access its console:
+
+[source,bash]
+----
+# Start and wait for the VM to start
+qm start ${VM_ID}
+----
+
+=== Exploring the OS
+
+You log into the VM from the host with the following command:
+
+[source,bash]
+----
+# Access the VM console from the host
+qm terminal ${VM_ID}
+----
+
+If you set up an xref:authentication.adoc[SSH key] for the default `core` user, you can SSH into the VM via the IP address:
+
+[source, bash]
+----
+ssh core@<ip address>
+----
+
+== Clean up
+
+For testing purposes, you can easily clean up the VM:
+
+[source,bash]
+----
+# Stop the VM
+qm stop ${VM_ID}
+
+# Remove the VM and its associated storage
+qm destroy ${VM_ID}
+----
+
+== Links
+
+* Consider using Proxmox VE's built-in https://pve.proxmox.com/wiki/Backup_and_Restore[backup functionality] for important VMs
+* Monitor VM performance and resource usage through https://pve.proxmox.com/wiki/Proxmox_VE_Administration_Guide[Proxmox VE monitoring tools]
