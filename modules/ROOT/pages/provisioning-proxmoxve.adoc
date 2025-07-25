@@ -4,8 +4,6 @@
 
 Before provisioning an FCOS machine on Proxmox VE, you must have an Ignition configuration file containing your customizations. If you do not have one, see xref:producing-ign.adoc[Producing an Ignition File].
 
-Fedora CoreOS has a default `core` user that can be used to explore the OS. If you want to use it, finalize its configuration by providing SSH keys or a password hash in your Ignition configuration.
-
 You also need to have access to a https://www.proxmox.com[Proxmox Virtual Environment] (VE) cluster or standalone server with administrative privileges to create VMs and storage configurations. All of the commands will be run as the `root` user on the Proxmox VE host.
 
 == Setting up Proxmox VE Storage
