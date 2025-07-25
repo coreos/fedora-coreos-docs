@@ -72,7 +72,7 @@ Define the VM parameters:
 ----
 VM_ID=101
 NAME=fedora-coreos-stable
-QCOW=fedora-coreos-42.20250705.3.0-proxmoxve.x86_64.qcow2
+QCOW=fedora-coreos-{stable-version}-proxmoxve.x86_64.qcow2
 IGN=testing.ign
 STORAGE=local-lvm
 CPU=2
