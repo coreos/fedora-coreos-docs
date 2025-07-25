@@ -25,7 +25,7 @@ Add the new directory as a Proxmox VE storage location that can hold both VM ima
 
 [source,bash]
 ----
-pvesm add dir fcos --path /var/fcos --content images,snippets
+pvesm add dir fcos --path /var/coreos --content images,snippets
 ----
 
 This command creates a new storage location named `fcos` that Proxmox VE can use for storing disk images and configuration snippets (including Ignition files). For more details on Proxmox VE storage configuration, see the https://pve.proxmox.com/wiki/Storage[Proxmox VE Storage documentation].
@@ -42,13 +42,13 @@ Fetch the latest image suitable for your target stream (or https://fedoraproject
 ----
 STREAM="stable"
 # as an installed binary:
-coreos-installer download -s $STREAM -p proxmoxve -f qcow2.xz --decompress -C /var/fcos
+coreos-installer download -s $STREAM -p proxmoxve -f qcow2.xz --decompress -C /var/coreos
 # or as a container:
-docker run --pull=always --rm -v "/var/fcos/images:/data" -w /data \
+docker run --pull=always --rm -v "/var/coreos/images:/data" -w /data \
     quay.io/coreos/coreos-installer:release download -s $STREAM -p proxmoxve -f qcow2.xz --decompress
 ----
 
-Both methods will download the latest Fedora CoreOS image for the specified stream (`stable`, `testing`, or `next`) in QCOW2 format, optimized for Proxmox VE. It will store the image in the `/var/fcos/images` directory.
+Both methods will download the latest Fedora CoreOS image for the specified stream (`stable`, `testing`, or `next`) in QCOW2 format, optimized for Proxmox VE. It will store the image in the `/var/coreos/images` directory.
 
 == Preparing Ignition Configuration
 
@@ -56,8 +56,8 @@ Upload your Ignition configuration file to the snippets directory:
 
 [source,bash]
 ----
-# Upload your ignition to /var/fcos/config.ign
-scp /path/to/your/config.ign root@proxmoxve-host:/var/fcos/config.ign
+# Upload your ignition to /var/coreos/config.ign
+scp /path/to/your/config.ign root@proxmoxve-host:/var/coreos/config.ign
 ----
 
 == Setting up a new VM
@@ -102,7 +102,7 @@ qm create ${VM_ID} --name ${NAME} --cores ${CPU} --memory ${MEMORY} \
     --net0 virtio,bridge=vmbr0 --scsihw virtio-scsi-pci
 
 # Import the FCOS image as the primary disk
-qm set ${VM_ID} --scsi0 "${STORAGE}:0,import-from=/var/fcos/images/${QCOW}"
+qm set ${VM_ID} --scsi0 "${STORAGE}:0,import-from=/var/coreos/images/${QCOW}"
 
 # Resize the disk to provide additional space
 qm resize ${VM_ID} scsi0 +${DISK_SIZE}
