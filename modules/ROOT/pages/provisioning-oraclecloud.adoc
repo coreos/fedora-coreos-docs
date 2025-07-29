@@ -4,9 +4,6 @@ This guide shows how to provision new Fedora CoreOS (FCOS) nodes on Oracle Cloud
 Fedora CoreOS images are currently not published directly on Oracle Cloud Infrastructure.
 Thus you must first download the Fedora CoreOS image for Oracle Cloud Infrastructure, then upload it to your account as a https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/importingcustomimagelinux.htm[custom image].
 
-IMPORTANT: Support for Fedora CoreOS on Oracle Cloud Infrastructure is considered emerging, in that it does not yet offer an optimized user experience.
-           See https://github.com/coreos/fedora-coreos-tracker/issues/414[issue #414] for more details.
-
 == Prerequisites
 
 Before provisioning an FCOS machine, you must have an Ignition configuration file containing your customizations.
