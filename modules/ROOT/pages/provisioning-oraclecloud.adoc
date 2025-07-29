@@ -155,22 +155,10 @@ done
 .Mark as compatible with x86_64 VM shapes
 [source, bash]
 ----
-shapes_amd64=(
-    "VM.Standard3.Flex"
-    "VM.Standard.E2.1.Micro"
-    "VM.Standard.E4.Flex"
-    "VM.Standard.E5.Flex"
-    "VM.Standard.E6.Flex"
-    "VM.DenseIO.E4.Flex"
-    "VM.DenseIO.E5.Flex"
-    "VM.GPU2.1"
-    "VM.GPU3.1"
-    "VM.GPU3.2"
-    "VM.GPU3.4"
-    "VM.GPU.A10.1"
-    "VM.GPU.A10.2"
-    "VM.Optimized3.Flex"
-)
+readarray -t shapes_amd64 < <(oci compute shape list \
+    --compartment-id "${compartment_ocid}" \
+    | jq -r '.data[] | select(."processor-description" | contains("AMD", "Intel")) | .shape | select(startswith("VM"))')
+
 for shape in "${shapes_amd64[@]}"; do
     oci compute image-shape-compatibility-entry add --image-id "${image_id}" --shape-name "${shape}"
 done
@@ -179,10 +167,10 @@ done
 .Mark as compatible with aarch64 VM shapes
 [source, bash]
 ----
-shapes_aarch64=(
-    "VM.Standard.A1.Flex"
-    "VM.Standard.A2.Flex"
-)
+readarray -t shapes_aarch64 < <(oci compute shape list \
+    --compartment-id "${compartment_ocid}" \
+    | jq -r '.data[] | select(."processor-description" | contains("Ampere")) | .shape | select(startswith("VM"))')
+
 for shape in "${shapes_aarch64[@]}"; do
     oci compute image-shape-compatibility-entry add --image-id "${image_id}" --shape-name "${shape}"
 done
