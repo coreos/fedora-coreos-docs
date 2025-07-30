@@ -57,7 +57,7 @@ Upload your Ignition configuration file to the snippets directory:
 [source,bash]
 ----
 # Upload your ignition to /var/coreos/config.ign
-scp /path/to/your/config.ign root@proxmoxve-host:/var/coreos/config.ign
+scp /path/to/your/config.ign root@proxmoxve-host:/var/coreos/snippets/config.ign
 ----
 
 == Setting up a new VM
