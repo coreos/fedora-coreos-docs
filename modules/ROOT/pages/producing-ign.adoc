@@ -205,6 +205,8 @@ TIP: YAML files must have consistent indentation. Although Butane checks for syn
 
 TIP: If you use VScode with the https://github.com/redhat-developer/vscode-yaml[Red Hat Yaml extension] you can associate `*.bu` files to `yaml` in the `files.associations` setting and get help/auto completion.
 
+TIP: You may also set a login password for the console (password authentication over SSH is disabled). See https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_using_password_authentication[Using Password Authentication].
+
 === Using Butane
 
 . Run Butane on the Butane config:
