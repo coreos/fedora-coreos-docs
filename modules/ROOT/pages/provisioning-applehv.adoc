@@ -9,6 +9,24 @@ Before provisioning an FCOS machine, you must have an Ignition configuration fil
 
 You will also need to build or acquire https://github.com/crc-org/vfkit[vfkit].  Prebuilt binaries are also available from its https://github.com/crc-org/vfkit/releases/tag/v0.6.0[releases] page.  Vfkit, like QEMU, has many options which are outside the scope of this provisioning example.  Please consider reading their https://github.com/crc-org/vfkit/tree/main/doc[documentation].
 
+==== Installing via Homebrew
+
+vfkit is available as a https://brew.sh[Homebrew] package:
+
+[source,bash]
+----
+brew install vfkit
+----
+
+==== Installing via MacPorts
+
+vfkit is available as a https://www.macports.org/[MacPorts] package:
+
+[source,bash]
+----
+sudo port install vfkit
+----
+
 == Booting a new VM on macOS
 
 This section shows how to boot a new VM with vfkit. Vfkit is known to work with both Intel and Apple Silicon based Macs.
