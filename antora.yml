@@ -9,7 +9,7 @@ nav:
 asciidoc:
   attributes:
     stable-version: 42.20250818.3.0
-    ignition-version: 2.22.0
+    ignition-version: 2.23.0
     butane-version: 0.25.0
     butane-latest-stable-spec: 1.6.0
     ignition-latest-stable-spec: 3.5.0
