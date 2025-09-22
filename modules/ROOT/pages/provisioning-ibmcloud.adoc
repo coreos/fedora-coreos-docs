@@ -98,14 +98,14 @@ You'll also need the Ignition config you created earlier. Here it is represented
 .Launching a VM instance
 [source, bash]
 ----
-NAME='instance1'
+INSTANCE_NAME='instance1'
 ZONE="${REGION}-1" # view more with `ibmcloud is zones`
 PROFILE='bx2-2x8' # view more with `ibmcloud is instance-profiles`
 VPC='r014-c9c65cc4-cfd3-44de-ad54-865aac182ea1'    # `ibmcloud is vpcs`
 IMAGE='r014-1823b4cf-9c63-499e-8a27-b771be714ad8'  # `ibmcloud is images --visibility private`
 SUBNET='0777-bf99cbf4-bc82-4c46-895a-5b7304201182' # `ibmcloud is subnets`
 SSHKEY='r014-b44c37d0-5c21-4c2b-aba2-438a5b0a228d' # `ibmcloud is keys`
-ibmcloud is instance-create "${NAME}" $VPC $ZONE $PROFILE $SUBNET \
+ibmcloud is instance-create $INSTANCE_NAME $VPC $ZONE $PROFILE $SUBNET \
    --allow-ip-spoofing=true --image $IMAGE --keys $SSHKEY --user-data @example.ign
 ----
 
@@ -118,10 +118,11 @@ Next, if you'd like to SSH into the instance from outside IBM Cloud, you can ass
 .Create and Assign a Floating IP
 [source, bash]
 ----
-ibmcloud is floating-ip-reserve floating-ip-1 --zone=$ZONE
-FIP='72251a2e-d6c5-42b4-97b0-b5f8e8d1f479'
-NIC='0777-dd174c80-dbd9-41b1-b221-39bbcef8a481' # find from `ibmcloud is instance` output
-ibmcloud is floating-ip-update $FIP --nic $NIC
+FIP_NAME='floating-ip-1'
+ibmcloud is floating-ip-reserve $FIP_NAME --zone=$ZONE
+VNIC=$(ibmcloud is instance $INSTANCE_NAME --output json |
+       jq --raw-output .primary_network_attachment.virtual_network_interface.id)
+ibmcloud is virtual-network-interface-floating-ip-add $VNIC $FIP_NAME
 ----
 
 And you now should be able to SSH into the instance using the IP address associated with the floating IP.
