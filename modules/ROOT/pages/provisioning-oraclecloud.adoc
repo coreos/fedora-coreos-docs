@@ -184,7 +184,7 @@ vcn_id="$(oci network vcn create \
     --compartment-id "${compartment_ocid}" \
     --cidr-blocks '["10.0.0.0/16"]' \
     --display-name "fedora-coreos-vcn" \
-    --dns-label "fcos.example.com" \
+    --dns-label "myfcos" \
     --wait-for-state AVAILABLE \
     | jq -r '.data.id')"
 ----
@@ -198,7 +198,7 @@ subnet_id="$(oci network subnet create \
     --compartment-id "${compartment_ocid}" \
     --vcn-id "${vcn_id}" \
     --display-name "fedora-coreos-subnet" \
-    --dns-label "main" \
+    --dns-label "subnet1" \
     --wait-for-state AVAILABLE \
     | jq -r '.data.id')"
 ----
