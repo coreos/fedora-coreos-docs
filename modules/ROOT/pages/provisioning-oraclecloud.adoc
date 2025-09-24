@@ -119,15 +119,6 @@ oci compute image-capability-schema create \
         "descriptor-type": "boolean",
         "source": "IMAGE"
     },
-    "Compute.Firmware": {
-        "default-value": "UEFI_64",
-        "descriptor-type": "enumstring",
-        "source": "IMAGE",
-        "values": [
-            "BIOS",
-            "UEFI_64"
-        ]
-    },
     "Compute.SecureBoot": {
         "default-value": true,
         "descriptor-type": "boolean",
