@@ -272,7 +272,7 @@ skip providing an Ignition configuration to the instance.
 [source, bash]
 ----
 NAME=fedora-coreos
-SHAPE=VM.Standard.E2.1.Micro
+SHAPE=VM.Standard.E5.Flex # or VM.Standard.A1.Flex for aarch64
 SSHKEYS="/path/to/authorized_keys" # path to authorized_keys file
 
 INSTANCE_ID=$(oci compute instance launch               \
@@ -281,6 +281,7 @@ INSTANCE_ID=$(oci compute instance launch               \
     --display-name $NAME                                \
     --image-id $IMAGE_ID                                \
     --shape $SHAPE                                      \
+    --shape-config '{"ocpus": '2', "memoryInGBs": '4'}' \
     --subnet-id $SUBNET_ID                              \
     --assign-public-ip true                             \
     --ssh-authorized-keys-file $SSHKEYS                 \
@@ -288,11 +289,16 @@ INSTANCE_ID=$(oci compute instance launch               \
     --wait-for-state RUNNING | jq -r '.data.id')
 ----
 
+NOTE: The free tier eligible `VM.Standard.E2.1.Micro` shape has less
+      than the recommended amount of memory for Fedora CoreOS to run.
+      For a free tier eligible instance it is recommended to use the ARM
+      based `VM.Standard.A1.Flex` shape.
+
 .Launching an instance with customizations and an Ignition configuration.
 [source, bash]
 ----
 NAME=fedora-coreos
-SHAPE=VM.Standard.A1.Flex
+SHAPE=VM.Standard.E5.Flex      # or VM.Standard.A1.Flex for aarch64
 DISK=50                        # size of boot volume in GBs
 OCPUS=2                        # number of allocated OCPUs
 MEMORY=4                       # size of memory in GBs
