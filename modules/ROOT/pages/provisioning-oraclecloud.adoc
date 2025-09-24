@@ -29,8 +29,7 @@ Once you have picked the relevant stream, download, verify and decompress the la
 ----
 ARCH="x86_64"    # or "aarch64"
 STREAM="stable"  # or "testing", "next"
-podman run --security-opt label=disable --pull=always --rm -v .:/data -w /data \
-    quay.io/coreos/coreos-installer:release download -s $STREAM -p oraclecloud -f qcow2.xz -a $ARCH --decompress
+coreos-installer download -s $STREAM -a $ARCH -p oraclecloud -f qcow2.xz --decompress
 ----
 
 NOTE: Both x86_64 and aarch64 architectures are supported on Oracle Cloud Infrastructure.
