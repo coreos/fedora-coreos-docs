@@ -103,8 +103,8 @@ oci compute image list --compartment-id "${compartment_ocid}" --display-name "Fe
 +
 [source, bash]
 ----
-global_cap_id="$(oci compute global-image-capability-schema list | jq -r '.data[0].id')"
-global_cap_version_name="$(oci compute global-image-capability-schema-version list \
+global_cap_id="$(oci compute global-image-capability-schema list --all | jq -r '.data[0].id')"
+global_cap_version_name="$(oci compute global-image-capability-schema-version list --all \
     --global-image-capability-schema-id ${global_cap_id} \
     --display-name 1.2 \
     | jq -r '.data[0].name')"
