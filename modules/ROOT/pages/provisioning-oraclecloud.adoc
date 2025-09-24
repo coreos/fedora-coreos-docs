@@ -44,17 +44,18 @@ Alternatively, you can manually download an Oracle Cloud Infrastructure image fr
 [source, bash]
 ----
 oci iam compartment list
+ROOT_COMPARTMENT_ID=<root_compartment_id>
 ----
 +
 . Create one if needed:
 +
 [source, bash]
 ----
-compartment_ocid="$(oci iam compartment create \
-    --name fedora-coreos-test \
-    --compartment-id <root_compartment_ocid> \
-    --description "Fedora CoreOS test compartment" \
-    | jq -r '.data.id')"
+COMPARTMENT_ID=$(oci iam compartment create                \
+                 --name fedora-coreos-test                 \
+                 --compartment-id $ROOT_COMPARTMENT_ID     \
+                 --description "Fedora CoreOS compartment" \
+                 | jq -r '.data.id')
 ----
 +
 NOTE: The root compartment OCID is the same as your tenancy OCID. You can find this information in your CLI configuration at `~/.oci/config` or in the https://cloud.oracle.com/tenancy[Cloud Console].
@@ -63,57 +64,63 @@ NOTE: The root compartment OCID is the same as your tenancy OCID. You can find t
 +
 [source, bash]
 ----
-compartment_ocid="ocid1.compartment.oc1..."
-bucket_name="fedora-coreos"
-oci os bucket create --compartment-id "${compartment_ocid}" --name "${bucket_name}"
+BUCKET_NAME="fedora-coreos"
+oci os bucket create --compartment-id $COMPARTMENT_ID --name $BUCKET_NAME
 ----
 +
 . Upload the image to a bucket:
 +
 [source, bash]
 ----
-oci os object put --bucket-name "${bucket_name}" --file "${image_name}"
+FCOS_VERSION='...'
+IMAGE_NAME="fedora-coreos-${FCOS_VERSION}-oraclecloud.${ARCH}.qcow2"
+FILE_PATH="./${IMAGE_NAME}"
+oci os object put --bucket-name $BUCKET_NAME --file $FILE_PATH
 ----
 +
 . Import the image as a custom image and remember its ID:
 +
 [source, bash]
 ----
-namespace="$(oci os ns get | jq -r '.data')"
-image_id="$(oci compute image import from-object \
-    --compartment-id "${compartment_ocid}" \
-    --namespace "${namespace}" \
-    --bucket-name "${bucket_name}" \
-    --name "${image_name}" \
-    --display-name "Fedora CoreOS" \
-    --launch-mode PARAVIRTUALIZED \
-    --source-image-type QCOW2 \
-    --operating-system "Linux" \
-    | jq -r '.data.id')"
+NAMESPACE=$(oci os ns get | jq -r '.data')
+IMAGE_ID=$(oci compute image import from-object               \
+           --compartment-id $COMPARTMENT_ID                   \
+           --namespace $NAMESPACE                             \
+           --bucket-name $BUCKET_NAME                         \
+           --name $IMAGE_NAME                                 \
+           --display-name "Fedora CoreOS $FCOS_VERSION $ARCH" \
+           --launch-mode PARAVIRTUALIZED                      \
+           --source-image-type QCOW2                          \
+           --operating-system "Linux"                         \
+           | jq -r '.data.id')
 ----
 +
-. Wait until the import is completed. To list all imported FCOS images:
+. Wait until the import is completed.
 +
 [source, bash]
 ----
-oci compute image list --compartment-id "${compartment_ocid}" --display-name "Fedora CoreOS"
+while true; do
+    state=$(oci compute image get --image-id $IMAGE_ID |
+            jq -r '.data."lifecycle-state"')
+    echo "$(date): $state"
+    [ "$state" == "AVAILABLE" ] && break || sleep 30
+done
 ----
 +
 . Configure image capabilities
 +
 [source, bash]
 ----
-global_cap_id="$(oci compute global-image-capability-schema list --all | jq -r '.data[0].id')"
-global_cap_version_name="$(oci compute global-image-capability-schema-version list --all \
-    --global-image-capability-schema-id ${global_cap_id} \
-    --display-name 1.2 \
-    | jq -r '.data[0].name')"
+GLOBAL_CAP_ID=$(
+    oci compute global-image-capability-schema list --all | jq -r '.data[0].id')
+GLOBAL_CAP_VERSION_NAME=$(
+    oci compute global-image-capability-schema-version list --all \
+    --global-image-capability-schema-id $GLOBAL_CAP_ID            \
+    --display-name 1.2 | jq -r '.data[0].name')
 
 oci compute image-capability-schema create \
-    --compartment-id "${compartment_ocid}" \
-    --image-id "${image_id}" \
-    --global-image-capability-schema-version-name "${global_cap_version_name}" \
-    --schema-data '{
+    --global-image-capability-schema-version-name $GLOBAL_CAP_VERSION_NAME \
+    --compartment-id $COMPARTMENT_ID --image-id $IMAGE_ID --schema-data '{
     "Compute.AMD_SecureEncryptedVirtualization": {
         "default-value": true,
         "descriptor-type": "boolean",
@@ -138,19 +145,19 @@ oci compute image-capability-schema create \
 [source, bash]
 ----
 oci compute image-shape-compatibility-entry \
-    list --image-id "${image_id}" | jq -r '.data[].shape' |
+    list --image-id $IMAGE_ID | jq -r '.data[].shape' |
 while read shape; do
     [[ "$shape" =~ Generic ]] && continue # Can't remove Generic shapes
     echo "Removing $shape from $IMAGE_ID"
     oci compute image-shape-compatibility-entry remove \
-        --force --image-id "${image_id}" --shape-name "${shape}"
+        --force --image-id $IMAGE_ID --shape-name "${shape}"
 done
 ----
 +
 .Mark as compatible with appropriate VM shapes
 [source, bash]
 ----
-shapes_info=$(oci compute shape list --compartment-id  "${compartment_ocid}" | jq -r '.data[]')
+shapes_info=$(oci compute shape list --compartment-id $COMPARTMENT_ID | jq -r '.data[]')
 
 # Limit to VM shapes only
 # https://github.com/coreos/fedora-coreos-tracker/issues/414#issuecomment-1795808614
@@ -169,7 +176,7 @@ arm64_shape_ids=$(jq -r 'select(."processor-description" |
 [ "$ARCH" == "aarch64" ] && shape_ids="$arm64_shape_ids"
 for shape in $shape_ids; do
     oci compute image-shape-compatibility-entry add \
-        --image-id "${image_id}" --shape-name "${shape}"
+        --image-id $IMAGE_ID --shape-name "${shape}"
 done
 ----
 +
@@ -177,7 +184,7 @@ done
 +
 [source, bash]
 ----
-oci compute image-shape-compatibility-entry list --image-id "${image_id}"
+oci compute image-shape-compatibility-entry list --image-id $IMAGE_ID | jq -r '.data[].shape'
 ----
 
 == Launching an instance
@@ -186,61 +193,57 @@ oci compute image-shape-compatibility-entry list --image-id "${image_id}"
 +
 [source, bash]
 ----
-vcn_id="$(oci network vcn create \
-    --compartment-id "${compartment_ocid}" \
-    --cidr-blocks '["10.0.0.0/16"]' \
-    --display-name "fedora-coreos-vcn" \
-    --dns-label "myfcos" \
-    --wait-for-state AVAILABLE \
-    | jq -r '.data.id')"
+NETWORK_ID=$(oci network vcn create        \
+    --compartment-id $COMPARTMENT_ID       \
+    --display-name "fedora-coreos-network" \
+    --cidr-blocks '["10.0.0.0/16"]'        \
+    --dns-label "myfcos"                   \
+    --wait-for-state AVAILABLE | jq -r '.data.id')
 ----
 +
 . Add a subnet:
 +
 [source, bash]
 ----
-subnet_id="$(oci network subnet create \
-    --cidr-block "10.0.0.0/24" \
-    --compartment-id "${compartment_ocid}" \
-    --vcn-id "${vcn_id}" \
+SUBNET_ID=$(oci network subnet create     \
+    --compartment-id $COMPARTMENT_ID      \
     --display-name "fedora-coreos-subnet" \
-    --dns-label "subnet1" \
-    --wait-for-state AVAILABLE \
-    | jq -r '.data.id')"
+    --cidr-block "10.0.0.0/24"            \
+    --vcn-id $NETWORK_ID                  \
+    --dns-label "subnet1"                 \
+    --wait-for-state AVAILABLE | jq -r '.data.id')
 ----
 +
 . Create an Internet Gateway:
 +
 [source, bash]
 ----
-gateway_id="$(oci network internet-gateway create \
-    --compartment-id "${compartment_ocid}" \
-    --vcn-id "${vcn_id}" \
-    --is-enabled true \
-    --display-name "fedora-coreos-gateway" \
-    | jq -r '.data.id')"
+GATEWAY_ID=$(oci network internet-gateway create \
+    --compartment-id $COMPARTMENT_ID             \
+    --display-name "fedora-coreos-gateway"       \
+    --vcn-id $NETWORK_ID                         \
+    --is-enabled true | jq -r '.data.id')
 ----
 +
 . Add a Rule to the Route Table:
 +
 [source, bash]
 ----
-route_table="$(oci network route-table list \
-    --compartment-id "${compartment_ocid}" \
-    --vcn-id "${vcn_id}" \
-    | jq -r '.data[0].id')"
+ROUTE_TABLE_ID=$(oci network route-table list \
+    --compartment-id $COMPARTMENT_ID          \
+    --vcn-id $NETWORK_ID | jq -r '.data[0].id')
 
 oci network route-table update \
-    --rt-id "${route_table}" \
-    --route-rules '[{"cidrBlock":"0.0.0.0/0","networkEntityId":"'"${gateway_id}"'"}]' \
-    --force
+    --rt-id $ROUTE_TABLE_ID    \
+    --force --route-rules      \
+    '[{"cidrBlock":"0.0.0.0/0","networkEntityId":"'"${GATEWAY_ID}"'"}]'
 ----
 +
 . Pick an availability domain:
 +
 [source, bash]
 ----
-availability_domain="$(oci iam availability-domain list | jq -r '.data[0].name')"
+AVAILABILITY_DOMAIN=$(oci iam availability-domain list | jq -r '.data[0].name')
 ----
 +
 . Launch an instance. Your Ignition configuration must be passed to the VM as its user data, or you can skip passing user data if you just want SSH access. This provides an easy way to test out FCOS without first creating an Ignition config.
@@ -252,15 +255,17 @@ NAME=fedora-coreos
 SHAPE=VM.Standard.E2.1.Micro
 SSHKEYS="/path/to/authorized_keys" # path to authorized_keys file
 
-oci compute instance launch \
-    --compartment-id "${compartment_ocid}" \
-    --availability-domain "${availability_domain}" \
-    --display-name "${NAME}" \
-    --image-id "${image_id}" \
-    --shape "${SHAPE}" \
-    --subnet-id "${subnet_id}" \
-    --assign-public-ip true \
-    --ssh-authorized-keys-file "${SSHKEYS}"
+INSTANCE_ID=$(oci compute instance launch               \
+    --compartment-id $COMPARTMENT_ID                    \
+    --availability-domain $AVAILABILITY_DOMAIN          \
+    --display-name $NAME                                \
+    --image-id $IMAGE_ID                                \
+    --shape $SHAPE                                      \
+    --subnet-id $SUBNET_ID                              \
+    --assign-public-ip true                             \
+    --ssh-authorized-keys-file $SSHKEYS                 \
+    --wait-for-state TERMINATED                         \
+    --wait-for-state RUNNING | jq -r '.data.id')
 ----
 +
 .Example launching customized Ampere instance
@@ -268,26 +273,28 @@ oci compute instance launch \
 ----
 NAME=fedora-coreos
 SHAPE=VM.Standard.A1.Flex
-DISK=50                            # size of boot volume in GBs
-OCPUS=2                            # number of allocated OCPUs
-MEMORY=4                           # size of memory in GBs
-INSTHOSTNAME=mycoreos              # hostname for the instance
-SSHKEYS="/path/to/authorized_keys" # path to authorized_keys file
-USERDATA="/path/to/config.ign"     # path to your Ignition config
+DISK=50                        # size of boot volume in GBs
+OCPUS=2                        # number of allocated OCPUs
+MEMORY=4                       # size of memory in GBs
+INSTANCE_HOSTNAME=mycoreos     # hostname for the instance
+USERDATA="/path/to/config.ign" # path to your Ignition config
+                               # that sets a ssh key
 
-oci compute instance launch \
-    --compartment-id "${compartment_ocid}" \
-    --availability-domain "${availability_domain}" \
-    --display-name "${NAME}" \
-    --hostname-label "${INSTHOSTNAME}" \
-    --image-id "${image_id}" \
-    --shape "${SHAPE}" \
-    --shape-config '{"ocpus": '${OCPUS}', "memoryInGBs": '${MEMORY}'}' \
-    --boot-volume-size-in-gbs "${DISK}" \
-    --subnet-id "${subnet_id}" \
-    --assign-public-ip true \
-    --ssh-authorized-keys-file "${SSHKEYS}" \
-    --user-data-file "${USERDATA}"
+INSTANCE_ID=$(oci compute instance launch               \
+    --compartment-id $COMPARTMENT_ID                    \
+    --availability-domain $AVAILABILITY_DOMAIN          \
+    --display-name $NAME                                \
+    --image-id $IMAGE_ID                                \
+    --shape $SHAPE                                      \
+    --shape-config                                      \
+    '{"ocpus": '${OCPUS}', "memoryInGBs": '${MEMORY}'}' \
+    --subnet-id $SUBNET_ID                              \
+    --assign-public-ip true                             \
+    --hostname-label $INSTANCE_HOSTNAME                 \
+    --boot-volume-size-in-gbs $DISK                     \
+    --user-data-file $USERDATA                          \
+    --wait-for-state TERMINATED                         \
+    --wait-for-state RUNNING | jq -r '.data.id')
 ----
 +
 NOTE: While the Oracle Cloud Infrastructure documentation mentions `cloud-init`, FCOS does not support cloud-init.
@@ -296,7 +303,9 @@ NOTE: While the Oracle Cloud Infrastructure documentation mentions `cloud-init`,
 . Get the public IP address of your instance:
 +
 ----
-oci compute instance list-vnics --instance-id <instance_id>
+PUBLIC_IP=$(oci compute instance list-vnics --instance-id $INSTANCE_ID |
+            jq -r '.data[0]."public-ip"')
+echo "The instance public IPV4 is: $PUBLIC_IP"
 ----
 +
 . You now should be able to SSH into the instance using the associated IP address.
@@ -304,5 +313,5 @@ oci compute instance list-vnics --instance-id <instance_id>
 .Example connecting
 [source, bash]
 ----
-ssh core@<ip address>
+ssh "core@${PUBLIC_IP}"
 ----
