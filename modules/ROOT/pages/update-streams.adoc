@@ -53,7 +53,6 @@ Switching between streams may introduce regressions or bugs due to skipping upda
 sudo systemctl stop zincati.service
 
 # Perform the rebase to a different stream
-# Supported architectures: aarch64, ppc64le, s390x, x86_64
 # Available streams: "stable", "testing", and "next"
 STREAM="testing"
 sudo rpm-ostree rebase "ostree-remote-registry:fedora:quay.io/fedora/fedora-coreos:${STREAM}"
