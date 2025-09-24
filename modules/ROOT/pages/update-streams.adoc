@@ -59,4 +59,12 @@ STREAM="testing"
 sudo rpm-ostree rebase "ostree-remote-registry:fedora:quay.io/fedora/fedora-coreos:${STREAM}"
 ----
 
+[IMPORTANT]
+====
+We are currently in a https://github.com/coreos/fedora-coreos-tracker/issues/2029[transition period].
+When switching to the `next` stream you'll need to
+use `sudo rpm-ostree rebase "ostree-image-signed:docker://quay.io/fedora/fedora-coreos:{stream}"`
+in the above instructions.
+====
+
 After inspecting the package difference the user can reboot. After boot the system will be loaded into the latest release on the new stream and will follow that stream for future updates.
