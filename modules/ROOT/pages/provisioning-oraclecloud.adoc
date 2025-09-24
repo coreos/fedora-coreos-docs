@@ -328,6 +328,12 @@ NOTE: While the Oracle Cloud Infrastructure documentation mentions `cloud-init`,
       files. When using the https://cloud.oracle.com[Cloud Console], an Ignition
       configuration can be placed into "Cloud-init script" field.
 
+NOTE: To enable SecureBoot you can pass additional config via
+      `--platform-config '{"type": "AMD_VM", "isSecureBootEnabled": true}'` or
+      `--platform-config '{"type": "INTEL_VM", "isSecureBootEnabled": true}'` or
+      depending on the processor type of your instance. Enabling Secureboot
+      isn't currently possible for ARM instances.
+
 .Get the public IP address of the instance.
 [source, bash]
 ----
