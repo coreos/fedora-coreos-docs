@@ -38,16 +38,29 @@ Alternatively, you can manually download an Oracle Cloud Infrastructure image fr
 
 == Uploading the image to Oracle Cloud Infrastructure
 
-. Figure out your Compartment. To list the compartments in your tenancy:
-+
+Identify the ID of your root compartment.
+
+.Listing the compartments in your tenancy.
 [source, bash]
 ----
 oci iam compartment list
 ROOT_COMPARTMENT_ID=<root_compartment_id>
 ----
-+
-. Create one if needed:
-+
+
+NOTE: The root compartment OCID is the same as your tenancy OCID. You can find
+      this information in your CLI configuration at `~/.oci/config` or in the
+      https://cloud.oracle.com/tenancy[Cloud Console].
+
+If you only have one tenant/root compartment you can use the following command to get that information more easily.
+
+.Set root compartment id based on the first compartment in list.
+[source, bash]
+----
+ROOT_COMPARTMENT_ID=$(oci iam compartment list |
+                      jq --raw-output '.data[0]."compartment-id"')
+----
+
+.Create a new compartment for testing.
 [source, bash]
 ----
 COMPARTMENT_ID=$(oci iam compartment create                \
@@ -56,19 +69,15 @@ COMPARTMENT_ID=$(oci iam compartment create                \
                  --description "Fedora CoreOS compartment" \
                  | jq -r '.data.id')
 ----
-+
-NOTE: The root compartment OCID is the same as your tenancy OCID. You can find this information in your CLI configuration at `~/.oci/config` or in the https://cloud.oracle.com/tenancy[Cloud Console].
-+
-. Create a bucket:
-+
+
+.Create a storage bucket for the image upload.
 [source, bash]
 ----
 BUCKET_NAME="fedora-coreos"
 oci os bucket create --compartment-id $COMPARTMENT_ID --name $BUCKET_NAME
 ----
-+
-. Upload the image to a bucket:
-+
+
+.Upload the image to the storage bucket.
 [source, bash]
 ----
 FCOS_VERSION='...'
@@ -76,9 +85,14 @@ IMAGE_NAME="fedora-coreos-${FCOS_VERSION}-oraclecloud.${ARCH}.qcow2"
 FILE_PATH="./${IMAGE_NAME}"
 oci os object put --bucket-name $BUCKET_NAME --file $FILE_PATH
 ----
-+
-. Import the image as a custom image and remember its ID:
-+
+
+.View the object in the bucket.
+[source, bash]
+----
+oci os object list -bn $BUCKET_NAME
+----
+
+.Import the image as a custom image and remember its ID.
 [source, bash]
 ----
 NAMESPACE=$(oci os ns get | jq -r '.data')
@@ -93,9 +107,10 @@ IMAGE_ID=$(oci compute image import from-object               \
            --operating-system "Linux"                         \
            | jq -r '.data.id')
 ----
-+
-. Wait until the import is completed.
-+
+
+Wait until the import is completed.
+
+.Loop until the image becomes available.
 [source, bash]
 ----
 while true; do
@@ -105,9 +120,14 @@ while true; do
     [ "$state" == "AVAILABLE" ] && break || sleep 30
 done
 ----
-+
-. Configure image capabilities
-+
+
+The image needs to be configured so the platform knows what it is
+capable of. Here we'll pull the default version `1.2` capability set
+and configure some additional ones. Note that some of these are
+architecture specific, but don't hurt because they also have to be
+opted in at runtime anyway.
+
+.Configure additional image capabilities.
 [source, bash]
 ----
 GLOBAL_CAP_ID=$(
@@ -137,10 +157,11 @@ oci compute image-capability-schema create \
     }
 }'
 ----
-+
-. Mark the image as compatible with all https://docs.oracle.com/en-us/iaas/Content/Compute/References/computeshapes.htm[shapes].
-+
-.Remove default compatible shapes
+
+
+Now we can mark the image as compatible with appropriate VM https://docs.oracle.com/en-us/iaas/Content/Compute/References/computeshapes.htm[shapes].
+
+.Remove default compatible shapes.
 [source, bash]
 ----
 oci compute image-shape-compatibility-entry \
@@ -152,8 +173,8 @@ while read shape; do
         --force --image-id $IMAGE_ID --shape-name "${shape}"
 done
 ----
-+
-.Mark as compatible with appropriate VM shapes
+
+.Mark as compatible with appropriate VM shapes.
 [source, bash]
 ----
 shapes_info=$(oci compute shape list --compartment-id $COMPARTMENT_ID | jq -r '.data[]')
@@ -178,9 +199,8 @@ for shape in $shape_ids; do
         --image-id $IMAGE_ID --shape-name "${shape}"
 done
 ----
-+
-. To list all the compatible shapes for an image:
-+
+
+.List all the compatible shapes for an image.
 [source, bash]
 ----
 oci compute image-shape-compatibility-entry list --image-id $IMAGE_ID | jq -r '.data[].shape'
@@ -188,8 +208,7 @@ oci compute image-shape-compatibility-entry list --image-id $IMAGE_ID | jq -r '.
 
 == Launching an instance
 
-. Create a Virtual Cloud Network:
-+
+.Create a Virtual Cloud Network.
 [source, bash]
 ----
 NETWORK_ID=$(oci network vcn create        \
@@ -199,9 +218,8 @@ NETWORK_ID=$(oci network vcn create        \
     --dns-label "myfcos"                   \
     --wait-for-state AVAILABLE | jq -r '.data.id')
 ----
-+
-. Add a subnet:
-+
+
+.Create a Subnet.
 [source, bash]
 ----
 SUBNET_ID=$(oci network subnet create     \
@@ -212,9 +230,8 @@ SUBNET_ID=$(oci network subnet create     \
     --dns-label "subnet1"                 \
     --wait-for-state AVAILABLE | jq -r '.data.id')
 ----
-+
-. Create an Internet Gateway:
-+
+
+.Create an Internet Gateway.
 [source, bash]
 ----
 GATEWAY_ID=$(oci network internet-gateway create \
@@ -223,9 +240,8 @@ GATEWAY_ID=$(oci network internet-gateway create \
     --vcn-id $NETWORK_ID                         \
     --is-enabled true | jq -r '.data.id')
 ----
-+
-. Add a Rule to the Route Table:
-+
+
+.Add a Rule to the Route Table.
 [source, bash]
 ----
 ROUTE_TABLE_ID=$(oci network route-table list \
@@ -237,17 +253,22 @@ oci network route-table update \
     --force --route-rules      \
     '[{"cidrBlock":"0.0.0.0/0","networkEntityId":"'"${GATEWAY_ID}"'"}]'
 ----
-+
-. Pick an availability domain:
-+
+
+You can now choose an availability domain or just set it to be the
+first one in the region.
+
+.Pick an availability domain.
 [source, bash]
 ----
 AVAILABILITY_DOMAIN=$(oci iam availability-domain list | jq -r '.data[0].name')
 ----
-+
-. Launch an instance. Your Ignition configuration must be passed to the VM as its user data, or you can skip passing user data if you just want SSH access. This provides an easy way to test out FCOS without first creating an Ignition config.
-+
-.Example launching with only SSH keys configured
+
+NOTE: View all possible domains with `oci iam availability-domain list`.
+
+Now we can launch an instance. If you just want SSH access you can
+skip providing an Ignition configuration to the instance.
+
+.Launching an instance without an Ignition configuration.
 [source, bash]
 ----
 NAME=fedora-coreos
@@ -266,8 +287,8 @@ INSTANCE_ID=$(oci compute instance launch               \
     --wait-for-state TERMINATED                         \
     --wait-for-state RUNNING | jq -r '.data.id')
 ----
-+
-.Example launching customized Ampere instance
+
+.Launching an instance with customizations and an Ignition configuration.
 [source, bash]
 ----
 NAME=fedora-coreos
@@ -295,21 +316,23 @@ INSTANCE_ID=$(oci compute instance launch               \
     --wait-for-state TERMINATED                         \
     --wait-for-state RUNNING | jq -r '.data.id')
 ----
-+
-NOTE: While the Oracle Cloud Infrastructure documentation mentions `cloud-init`, FCOS does not support cloud-init.
-      It accepts only Ignition configuration files. When using the https://cloud.oracle.com[Cloud Console], an Ignition configuration can be placed into "Cloud-init script" field.
-+
-. Get the public IP address of your instance:
-+
+
+NOTE: While the Oracle Cloud Infrastructure documentation mentions `cloud-init`,
+      Fedora CoreOS does not support cloud-init. It accepts only Ignition configuration
+      files. When using the https://cloud.oracle.com[Cloud Console], an Ignition
+      configuration can be placed into "Cloud-init script" field.
+
+.Get the public IP address of the instance.
+[source, bash]
 ----
 PUBLIC_IP=$(oci compute instance list-vnics --instance-id $INSTANCE_ID |
             jq -r '.data[0]."public-ip"')
 echo "The instance public IPV4 is: $PUBLIC_IP"
 ----
-+
-. You now should be able to SSH into the instance using the associated IP address.
-+
-.Example connecting
+
+You now should be able to SSH into the instance using the associated IP address.
+
+.SSH into the running instance.
 [source, bash]
 ----
 ssh "core@${PUBLIC_IP}"
