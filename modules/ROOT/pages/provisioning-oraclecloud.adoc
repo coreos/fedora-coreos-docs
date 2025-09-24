@@ -137,33 +137,39 @@ oci compute image-capability-schema create \
 .Remove default compatible shapes
 [source, bash]
 ----
-for shape in $(oci compute image-shape-compatibility-entry list --image-id "${image_id}" | jq -r '.data[].shape' | grep -v '.Generic'); do
-    echo "Removing ${shape}"
-    oci compute image-shape-compatibility-entry remove --force --image-id "${image_id}" --shape-name "${shape}"
+oci compute image-shape-compatibility-entry \
+    list --image-id "${image_id}" | jq -r '.data[].shape' |
+while read shape; do
+    [[ "$shape" =~ Generic ]] && continue # Can't remove Generic shapes
+    echo "Removing $shape from $IMAGE_ID"
+    oci compute image-shape-compatibility-entry remove \
+        --force --image-id "${image_id}" --shape-name "${shape}"
 done
 ----
 +
-.Mark as compatible with x86_64 VM shapes
+.Mark as compatible with appropriate VM shapes
 [source, bash]
 ----
-readarray -t shapes_amd64 < <(oci compute shape list \
-    --compartment-id "${compartment_ocid}" \
-    | jq -r '.data[] | select(."processor-description" | contains("AMD", "Intel")) | .shape | select(startswith("VM"))')
+shapes_info=$(oci compute shape list --compartment-id  "${compartment_ocid}" | jq -r '.data[]')
 
-for shape in "${shapes_amd64[@]}"; do
-    oci compute image-shape-compatibility-entry add --image-id "${image_id}" --shape-name "${shape}"
-done
-----
-+
-.Mark as compatible with aarch64 VM shapes
-[source, bash]
-----
-readarray -t shapes_aarch64 < <(oci compute shape list \
-    --compartment-id "${compartment_ocid}" \
-    | jq -r '.data[] | select(."processor-description" | contains("Ampere")) | .shape | select(startswith("VM"))')
+# Limit to VM shapes only
+# https://github.com/coreos/fedora-coreos-tracker/issues/414#issuecomment-1795808614
+vm_shapes_info=$(jq -r 'select(.shape | select(startswith("VM")))' <<< "$shapes_info")
 
-for shape in "${shapes_aarch64[@]}"; do
-    oci compute image-shape-compatibility-entry add --image-id "${image_id}" --shape-name "${shape}"
+# Determine x86_64 and aarch64 shapes
+amd64_shape_ids=$(jq -r 'select(."processor-description"  |
+                                contains("AMD", "Intel")) |
+                                .shape' <<< "$vm_shapes_info")
+arm64_shape_ids=$(jq -r 'select(."processor-description" |
+                                contains("Ampere"))      |
+                                .shape' <<< "$vm_shapes_info")
+
+# Apply the appropriate shapes to the IMAGE
+[ "$ARCH" == "x86_64" ] && shape_ids="$amd64_shape_ids"
+[ "$ARCH" == "aarch64" ] && shape_ids="$arm64_shape_ids"
+for shape in $shape_ids; do
+    oci compute image-shape-compatibility-entry add \
+        --image-id "${image_id}" --shape-name "${shape}"
 done
 ----
 +
