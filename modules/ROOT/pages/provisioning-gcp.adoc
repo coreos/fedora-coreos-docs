@@ -80,7 +80,7 @@ gcloud compute instances create                \
     --image-project "fedora-coreos-cloud"      \
     --image-family "fedora-coreos-${STREAM}"   \
     --metadata-from-file "user-data=${CONFIG}" \
-    --zone "${ZONE} "${NAME}"
+    --zone "${ZONE}" "${NAME}"
 ----
 
 NOTE: By design, https://cloud.google.com/compute/docs/startupscript[startup scripts] are not supported on FCOS. Instead, it is recommended to encode any startup logic as systemd service units in the Ignition configuration.
@@ -112,7 +112,7 @@ gcloud compute instances create                \
     --confidential-compute-type "SEV_SNP"      \
     --machine-type "${MACHINE_TYPE}"           \
     --maintenance-policy terminate             \
-    --zone "${ZONE} "${NAME}"
+    --zone "${ZONE}" "${NAME}"
 ----
 
 .Launching a confidential instance using confidential type `Intel TDX`
@@ -130,7 +130,7 @@ gcloud compute instances create                \
     --confidential-compute-type "TDX"      \
     --machine-type "${MACHINE_TYPE}"           \
     --maintenance-policy terminate             \
-    --zone "${ZONE} "${NAME}"
+    --zone "${ZONE}" "${NAME}"
 ----
 
 .Example Confidential VM Boot Verification
