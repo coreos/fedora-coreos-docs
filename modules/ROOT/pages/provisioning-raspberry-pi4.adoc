@@ -47,8 +47,8 @@ WARNING: The following commands to extract the contents of the RPMs, the use of 
 
 [source, bash]
 ----
-for rpm in /tmp/RPi4boot/*rpm; do rpm2cpio $rpm | sudo cpio -idv -D /tmp/RPi4boot/; done
-sudo mv /tmp/RPi4boot/usr/share/uboot/rpi_arm64/u-boot.bin /tmp/RPi4boot/boot/efi/rpi-u-boot.bin
+for rpm in /tmp/RPi4boot/*rpm; do rpm2cpio $rpm | cpio -idv -D /tmp/RPi4boot/; done
+mv /tmp/RPi4boot/usr/share/uboot/rpi_arm64/u-boot.bin /tmp/RPi4boot/boot/efi/rpi-u-boot.bin
 ----
 
 Run `coreos-installer` to install to the target disk. There are https://coreos.github.io/coreos-installer/getting-started/[various ways] to run `coreos-installer` and install to a target disk. We won't cover them all here, but this workflow most closely mirrors the xref:bare-metal.adoc#_installing_from_the_container["Installing from the container"] documentation.
@@ -71,7 +71,8 @@ Now mount the ESP partition and copy the files over:
 FCOSEFIPARTITION=$(lsblk $FCOSDISK -J -oLABEL,PATH  | jq -r '.blockdevices[] | select(.label == "EFI-SYSTEM").path')
 mkdir /tmp/FCOSEFIpart
 sudo mount $FCOSEFIPARTITION /tmp/FCOSEFIpart
-sudo rsync -avh --ignore-existing /tmp/RPi4boot/boot/efi/ /tmp/FCOSEFIpart/
+sudo rsync -avh --ignore-existing --chown 0:0 \
+        /tmp/RPi4boot/boot/efi/ /tmp/FCOSEFIpart/
 sudo umount $FCOSEFIPARTITION
 ----
 
