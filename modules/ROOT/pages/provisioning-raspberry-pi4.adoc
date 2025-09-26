@@ -68,7 +68,8 @@ Now mount the ESP partition and copy the files over:
 
 [source, bash]
 ----
-FCOSEFIPARTITION=$(lsblk $FCOSDISK -J -oLABEL,PATH  | jq -r '.blockdevices[] | select(.label == "EFI-SYSTEM").path')
+FCOSEFIPARTITION=$(lsblk $FCOSDISK -J -oLABEL,PATH |
+                   jq -r '.blockdevices[] | select(.label == "EFI-SYSTEM") | .path')
 mkdir /tmp/FCOSEFIpart
 sudo mount $FCOSEFIPARTITION /tmp/FCOSEFIpart
 sudo rsync -avh --ignore-existing --chown 0:0 \
@@ -137,7 +138,8 @@ When performing a direct install, meaning you boot (via the EDK2 firmware) into 
 ----
 UEFIDISK=/dev/mmcblkX or /dev/sdX
 FCOSDISK=/dev/sdY
-FCOSEFIPARTITION=$(lsblk $FCOSDISK -J -oLABEL,PATH  | jq -r '.blockdevices[] | select(.label == "EFI-SYSTEM")'.path)
+FCOSEFIPARTITION=$(lsblk $FCOSDISK -J -oLABEL,PATH |
+                   jq -r '.blockdevices[] | select(.label == "EFI-SYSTEM") | .path')
 mkdir /tmp/mnt{1,2}
 sudo mount $UEFIDISK /tmp/mnt1
 sudo mount $FCOSEFIPARTITION /tmp/mnt2
@@ -166,7 +168,8 @@ Now you can mount the 2nd partition and pull down the EDK2 firmware files:
 
 [source, bash]
 ----
-FCOSEFIPARTITION=$(lsblk $FCOSDISK -J -oLABEL,PATH  | jq -r '.blockdevices[] | select(.label == "EFI-SYSTEM")'.path)
+FCOSEFIPARTITION=$(lsblk $FCOSDISK -J -oLABEL,PATH |
+                   jq -r '.blockdevices[] | select(.label == "EFI-SYSTEM") | .path')
 mkdir /tmp/FCOSEFIpart
 sudo mount $FCOSEFIPARTITION /tmp/FCOSEFIpart
 pushd /tmp/FCOSEFIpart
