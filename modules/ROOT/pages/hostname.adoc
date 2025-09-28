@@ -10,8 +10,12 @@ storage:
   files:
     - path: /etc/hostname
       mode: 0644
+      overwrite: true
       contents:
         inline: myhostname
 ----
 
 Once booted, you can also verify that the desired hostname has been set using `hostnamectl`.
+
+NOTE: We use `overwrite: true` to make sure that we overwrite the hostname that is set up by Afterburn on some platforms.
+      If Afterburn does not support setting the hostname on your platform, you can remove it.
