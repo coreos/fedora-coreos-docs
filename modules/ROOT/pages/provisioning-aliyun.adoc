@@ -165,6 +165,8 @@ INSTANCE_ID=$(aliyun ecs CreateInstance \
     | jq --raw-output .InstanceId)
 ----
 
+NOTE: If the command fails with the error message "The specified parameter SystemDisk.Category is not valid.", resolve this issue by adding the parameter `--SystemDisk.Category=cloud_essd` to the command.
+
 . Allocate a public IPv4 address for the previously created instance
 +
 .Example allocating a public IP address
