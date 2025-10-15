@@ -55,15 +55,7 @@ sudo systemctl stop zincati.service
 # Perform the rebase to a different stream
 # Available streams: "stable", "testing", and "next"
 STREAM="testing"
-sudo rpm-ostree rebase "ostree-remote-registry:fedora:quay.io/fedora/fedora-coreos:${STREAM}"
+sudo rpm-ostree rebase "ostree-image-signed:docker://quay.io/fedora/fedora-coreos:${STREAM}"
 ----
-
-[WARNING]
-====
-We are currently in a https://github.com/coreos/fedora-coreos-tracker/issues/2029[transition period].
-Switching between streams may error while we migrate to signature verification
-on container pulls. If you experience this please stay on your current stream
-or start a new instance on the desired stream.
-====
 
 After inspecting the package difference the user can reboot. After boot the system will be loaded into the latest release on the new stream and will follow that stream for future updates.
