@@ -131,7 +131,6 @@ spec:
           - name: cloudinitdisk
             disk:
               bus: virtio
-            name: cloudinitdisk
           rng: {}
         resources:
           requests:
