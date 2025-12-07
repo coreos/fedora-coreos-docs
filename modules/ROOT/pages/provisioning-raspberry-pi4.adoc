@@ -45,6 +45,8 @@ Now extract the contents of the RPMs and copy the proper `u-boot.bin` for the RP
 
 WARNING: The following commands to extract the contents of the RPMs, the use of `coreos-installer`, and copying of the files to the ESP partition should be done from outside a Toolbx container. The `root` user in the container maps to a different user ID (UID) than the `root` (`UID=0`) user on the host. Attempting to run some of these commands in the container and some of these commands on the host can result in permission errors or ownership errors and may impact your ability to successfully install Fedora CoreOS.
 
+NOTE: On Arch Linux it's recommended to install `rpm-tools` instead of `rpmextract`, so RPMs are decompressed automatically. If you don't want to or can't do that, you have to pipe the output of `rpm2cpio` through the correct decompressor, e.g. `zstd -d`.
+
 [source, bash]
 ----
 for rpm in /tmp/RPi4boot/*rpm; do rpm2cpio $rpm | cpio -idv -D /tmp/RPi4boot/; done
