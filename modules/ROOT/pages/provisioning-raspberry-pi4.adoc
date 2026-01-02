@@ -104,7 +104,7 @@ To create a disk (SD or USB) with the firmware on it you can do something like:
 
 [source, bash]
 ----
-VERSION=v1.42  # use latest one from https://github.com/pftf/RPi4/releases
+VERSION=v1.50  # use latest one from https://github.com/pftf/RPi4/releases
 UEFIDISK=/dev/sdX
 sudo mkfs.vfat $UEFIDISK
 mkdir /tmp/UEFIdisk
@@ -175,7 +175,7 @@ FCOSEFIPARTITION=$(lsblk $FCOSDISK -J -oLABEL,PATH |
 mkdir /tmp/FCOSEFIpart
 sudo mount $FCOSEFIPARTITION /tmp/FCOSEFIpart
 pushd /tmp/FCOSEFIpart
-VERSION=v1.42  # use latest one from https://github.com/pftf/RPi4/releases
+VERSION=v1.50  # use latest one from https://github.com/pftf/RPi4/releases
 sudo curl -LO https://github.com/pftf/RPi4/releases/download/${VERSION}/RPi4_UEFI_Firmware_${VERSION}.zip
 sudo unzip RPi4_UEFI_Firmware_${VERSION}.zip
 sudo rm RPi4_UEFI_Firmware_${VERSION}.zip
