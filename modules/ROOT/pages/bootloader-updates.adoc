@@ -9,7 +9,7 @@ This is usually only relevant on bare metal scenarios, or virtualized
 hypervisors that support Secure Boot. An example reason to update the
 bootloader is for https://eclypsium.com/2020/07/29/theres-a-hole-in-the-boot/[the BootHole vulnerability].
 
-At the moment, only the EFI system partition (i.e. not the BIOS MBR) can be updated by bootupd.
+Both the EFI system partition and BIOS MBR can be updated by bootupd.
 
 Inspect the system status:
 
@@ -21,8 +21,8 @@ Component EFI
   Update: At latest version
 ----
 
-If an update is available, use `bootupctl update` to apply it; the
-change will take effect for the next reboot.
+If an update is available, use `bootupctl update` to apply it manually;
+the change will take effect for the next reboot.
 
 [source,bash]
 ----
