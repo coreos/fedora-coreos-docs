@@ -10,6 +10,8 @@ hypervisors that support Secure Boot. An example reason to update the
 bootloader is for https://eclypsium.com/2020/07/29/theres-a-hole-in-the-boot/[the BootHole vulnerability].
 
 Both the EFI system partition and BIOS MBR can be updated by bootupd.
+Bootloader updates are performed automatically by `bootloader-update.service`.
+Use `journalctl -u bootloader-update` to inspect its logs.
 
 Inspect the system status:
 
