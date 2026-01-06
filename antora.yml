@@ -8,7 +8,7 @@ nav:
 - modules/ROOT/nav.adoc
 asciidoc:
   attributes:
-    stable-version: 43.20251120.3.0
+    stable-version: 43.20251214.3.0
     ignition-version: 2.24.0
     butane-version: 0.25.1
     butane-latest-stable-spec: 1.6.0
