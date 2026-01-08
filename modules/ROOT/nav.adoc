@@ -61,6 +61,7 @@
 ** xref:emergency-shell.adoc[Emergency Console Access]
 ** xref:debugging-with-toolbox.adoc[Debugging with Toolbx]
 ** xref:debugging-kernel-crashes.adoc[Debugging Kernel Crashes]
+** xref:selinux.adoc[SELinux]
 * Tutorials
 ** xref:tutorial-setup.adoc[Prerequisites for the tutorials]
 ** xref:tutorial-autologin.adoc[Enabling autologin and custom hostname]
