@@ -1,0 +1,118 @@
+= SELinux
+
+Fedora CoreOS comes with SELinux enabled in enforcing mode.
+
+== Policy changes
+
+Changing policy booleans and adding SELinux modules is supported on Fedora CoreOS.
+However, we do not include `semanage` and there is no sugar in Butane or direct support in Ignition for doing those operations.
+See https://github.com/coreos/fedora-coreos-tracker/issues/701[fedora-coreos-tracker#701] for more details.
+
+Here is an example to set an SELinux boolean via a systemd unit that executes on every boot:
+
+.Example Butane config for dynamically applying SELinux boolean
+[source,yaml,subs="attributes"]
+----
+variant: fcos
+version: {butane-latest-stable-spec}
+systemd:
+  units:
+    - name: setsebool.service
+      enabled: true
+      contents: |
+        [Service]
+        Type=oneshot
+        ExecStart=setsebool container_manage_cgroup true
+        RemainAfterExit=yes
+        [Install]
+        WantedBy=multi-user.target
+----
+
+== Resetting the SELinux policy to the default
+
+If you encounter unexpected SELinux issue, it may be due to local policy modifications.
+
+.Example SELinux denial
+[source, text]
+----
+systemd-resolved[755]: Failed to symlink /run/systemd/resolve/stub-resolv.conf: Permission denied
+audit[755]: AVC avc:  denied  { create } for  pid=755 comm="systemd-resolve" name=".#stub-resolv.confc418434d59d7d93a" scontext=system_u:system_r:systemd_resolved_t:s0 tcontext=system_u:object_r:systemd_resolved_var_run_t:s0 tclass=lnk_file permissive=0
+----
+
+You can check the state of the SELinux policy with:
+
+[source,console]
+----
+$ sudo ostree admin config-diff | grep -E 'selinux/.*/policy'
+M    selinux/targeted/active/policy.linked
+M    selinux/targeted/active/policy.kern
+M    selinux/targeted/policy/policy.31
+A    selinux/targeted/policy/policy.30
+----
+
+If this command returns a list of entries then your SELinux policy has been modified from the default.
+
+You have two options to reset the SELinux policy to the default one:
+
+* Re-deploy the system from the latest Fedora CoreOS artifacts.
+* Manually restore the default policy
+
+To restore the default policy:
+
+. Make a backup of you current policy:
++
+[source,bash]
+----
+sudo cp -al /etc/selinux{,.bak}
+----
++
+. Restore the default SELinux policy:
++
+[source,bash]
+----
+sudo rsync --archive --links --verbose --delete /usr/etc/selinux/ /etc/selinux/
+----
++
+After this command, the output from `sudo ostree admin config-diff | grep -E 'selinux/.*/policy'` should no longer indicate the policy is modified.
++
+. Finally, reload the SELinux policy or restart your system:
++
+[source,bash]
+----
+sudo semodule -R
+----
+
+== Disabling SELinux
+
+We do not support disabling SELinux in Fedora CoreOS.
+See https://github.com/coreos/rpm-ostree/issues/971[rpm-ostree#971].
+See also the discussion in https://github.com/coreos/fedora-coreos-docs/issues/439[fedora-coreos-docs#439].
+
+== Setting SELinux in permissive mode
+
+We do not recommend setting the entire system in permissive mode (i.e. `set enforce 0`).
+Instead, you can set SELinux to permissive for a single application by creating a https://github.com/SELinuxProject/selinux-notebook/blob/main/src/cil_overview.md[CIL policy module].
+
+For example for the `wireguard_t` domain:
+
+[source,console]
+----
+$ cat permissive-wireguard.cil
+(typepermissive wireguard_t)
+----
+
+You can then load this module with:
+
+[source,bash]
+----
+sudo semodule -i permissive-wireguard.cil
+----
+
+And remove it once it is no longer needed with:
+
+[source,bash]
+----
+sudo semodule -r permissive-wireguard
+----
+
+See also the discussion in https://github.com/coreos/fedora-coreos-docs/issues/439[fedora-coreos-docs#439].
