@@ -24,9 +24,9 @@ After a few releases we will migrate existing machines through a barrier release
 |===
 |Update Stream |Release date
 
-|`next` 42.20250316.1.0 | 2025-03-18
-|`testing`| TBD
-|`stable`| Will follow `testing` as usual
+|`next` | 42.20250316.1.0 (2025-03-18)
+|`testing`| 42.20250705.2.0 (2025-07-06)
+|`stable`| 42.20250803.3.0 (2025-08-19)
 |===
 
 === Notes
