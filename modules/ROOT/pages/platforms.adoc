@@ -36,14 +36,14 @@ The currently supported platforms and their identifiers are listed below.
 * Amazon Web Services (`aws`): Cloud platform. See xref:provisioning-aws.adoc[Booting on AWS].
 * Bare metal (`metal`): With UEFI or network boot, with standard or 4k Native disks. See xref:bare-metal.adoc[Installing on Bare Metal] or xref:live-booting-ipxe.adoc[Live-booting via iPXE] and xref:provisioning-raspberry-pi4.adoc[Booting on the Raspberry Pi 4].
 * QEMU (`qemu`): Hypervisor. See xref:provisioning-libvirt.adoc[Booting on libvirt]
-* OpenStack (cloud platform): `openstack`): Cloud platform. See xref:provisioning-openstack.adoc[Booting on OpenStack].
+* OpenStack (`openstack`): Cloud platform. See xref:provisioning-openstack.adoc[Booting on OpenStack].
 
 === s390x
 
 * IBM Cloud (`ibmcloud`): Cloud platform. See xref:provisioning-ibmcloud.adoc[Booting on IBM Cloud].
 * Bare metal (`metal`): From disk or network boot. See xref:bare-metal.adoc[Installing on Bare Metal] or xref:live-booting-ipxe.adoc[Live-booting via iPXE].
 * QEMU (`qemu`): Hypervisor. See xref:provisioning-libvirt.adoc[Booting on libvirt]
-* OpenStack (cloud platform): `openstack`): Cloud platform. See xref:provisioning-openstack.adoc[Booting on OpenStack].
+* OpenStack (`openstack`): Cloud platform. See xref:provisioning-openstack.adoc[Booting on OpenStack].
 
 == Runtime introspection of platform IDs
 

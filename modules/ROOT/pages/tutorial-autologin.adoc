@@ -32,7 +32,7 @@ systemd:
           [Service]
           # Override Execstart in main unit
           ExecStart=
-          # Add new Execstart with `-` prefix to ignore failure`
+          # Add new Execstart with `-` prefix to ignore failure
           ExecStart=-/usr/sbin/agetty --autologin core --noclear %I $TERM
 storage:
   files:
@@ -89,7 +89,7 @@ The resulting Ignition configuration produced by Butane as `autologin.ign` has t
       {
         "dropins": [
           {
-            "contents": "[Service]\n# Override Execstart in main unit\nExecStart=\n# Add new Execstart with `-` prefix to ignore failure`\nExecStart=-/usr/sbin/agetty --autologin core --noclear %I $TERM\n",
+            "contents": "[Service]\n# Override Execstart in main unit\nExecStart=\n# Add new Execstart with `-` prefix to ignore failure\nExecStart=-/usr/sbin/agetty --autologin core --noclear %I $TERM\n",
             "name": "autologin-core.conf"
           }
         ],
@@ -161,7 +161,7 @@ Let's verify that our configuration has been correctly applied. As we were autom
 [Service]
 # Override Execstart in main unit
 ExecStart=
-# Add new Execstart with `-` prefix to ignore failure`
+# Add new Execstart with `-` prefix to ignore failure
 ExecStart=-/usr/sbin/agetty --autologin core --noclear %I $TERM
 ----
 

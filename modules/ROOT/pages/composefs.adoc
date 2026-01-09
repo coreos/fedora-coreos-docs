@@ -1,8 +1,8 @@
 = Composefs
 
 Fedora CoreOS introduced composefs enabled by default starting in Fedora 41.
-Composefs is an overlay filesystem where the data comes from the usual ostree deployement, and metadata are in the composefs file.
-The result is a truely read-only root (`/`) filesystem, increasing the system integrity and robustness.
+Composefs is an overlay filesystem where the data comes from the usual ostree deployment, and metadata is in the composefs file.
+The result is a truly read-only root (`/`) filesystem, increasing the system integrity and robustness.
 
 This is a first step towards a full verification of filesystem integrity, even at runtime.
 
@@ -23,7 +23,7 @@ Currently, the only way around that is to disable composefs as shown below.
 
 Composefs can be disabled through a kernel argument: `ostree.prepare-root.composefs=0`.
 
-.Disabling composefs at provisionning
+.Disabling composefs at provisioning
 [source,yaml,subs="attributes"]
 ----
 variant: fcos

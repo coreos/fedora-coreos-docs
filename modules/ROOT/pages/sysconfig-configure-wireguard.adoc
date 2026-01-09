@@ -198,7 +198,7 @@ peer: <fcos_public_key>
 
 == Route all traffic over WireGuard
 
-If you plan on forwarding all of your client's traffic through the FCOS instance you will need to enable IP Forwarding and you need to set and set some PostUp and PostDown directives:
+If you plan on forwarding all of your client's traffic through the FCOS instance you will need to enable IP Forwarding and set some PostUp and PostDown directives:
 
 .Example FCOS WireGuard configuration with IP forwarding
 [source,yaml,subs="attributes"]

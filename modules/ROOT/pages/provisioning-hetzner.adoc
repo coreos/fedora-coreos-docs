@@ -29,7 +29,7 @@ If you do not want to use Ignition to get started, you can make use of the https
 You also need to have access to a Hetzner account.
 The examples below use the https://github.com/hetznercloud/cli[hcloud] command-line tool, the https://github.com/apricote/hcloud-upload-image[hcloud-upload-image] tool and https://stedolan.github.io/jq/[jq] as a command-line JSON processor.
 
-== Downloading an Hetzner image
+== Downloading a Hetzner image
 
 Fedora CoreOS is designed to be updated automatically, with different schedules per stream. Once you have picked the relevant stream, download and verify the latest Hetzner image:
 

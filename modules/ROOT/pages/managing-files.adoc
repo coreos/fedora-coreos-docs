@@ -45,7 +45,7 @@ content is checked against the hash value specified in the config. The format
 is `sha512-` followed by the 128 hex characters given by the sha512sum command.
 The resulting file is made readable and executable by all.
 
-.Example to create a files from a remote source
+.Example to create a file from a remote source
 [source,yaml,subs="attributes"]
 ----
 variant: fcos
