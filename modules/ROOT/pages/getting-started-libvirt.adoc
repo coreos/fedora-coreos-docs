@@ -41,7 +41,7 @@ virt-install --connect="qemu:///system" --name="${VM_NAME}" --vcpus="${VCPUS}" -
 
 NOTE: `virt-install` requires both the OS image and Ignition file to be specified as absolute paths.
 
-NOTE: Depending on your version of `virt-install`, you may not be able to use `--os-variant=fedora-coreos-*` and will get an error. In this case, you should pick an older Fedora variant (`--os-variant=fedora31` for example). You can find the variants that are supported by you current version of `virt-install` with `osinfo-query os | grep '^\s*fedora'`.
+NOTE: Depending on your version of `virt-install`, you may not be able to use `--os-variant=fedora-coreos-*` and will get an error. In this case, you should pick an older Fedora variant (`--os-variant=fedora31` for example). You can find the variants that are supported by your current version of `virt-install` with `osinfo-query os | grep '^\s*fedora'`.
 
 NOTE: `DISK_GB` should be at least as big as the default size of the image. For Fedora CoreOS, this is currently 10 GB.
 

@@ -2,7 +2,7 @@
 
 Starting with the first release based on Fedora 39, Fedora CoreOS includes the audit daemon (`auditd`) to load and manage audit rules.
 
-Like all system daemons on Fedora CoreOS, the audit daemon is managed by systemd but with an exception: it can not be stopped or restarted via `systemctl stop auditd` or `systemctl restart auditd` for compliance reasons.
+Like all system daemons on Fedora CoreOS, the audit daemon is managed by systemd but with an exception: it cannot be stopped or restarted via `systemctl stop auditd` or `systemctl restart auditd` for compliance reasons.
 
 From https://access.redhat.com/solutions/2664811[Unable to restart/stop auditd service using systemctl command in RHEL]:
 

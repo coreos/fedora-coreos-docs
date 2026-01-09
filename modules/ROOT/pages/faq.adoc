@@ -1,6 +1,6 @@
 = Fedora CoreOS Frequently Asked Questions
 
-If you have other questions than are mentioned here or want to discuss
+If you have questions other than those mentioned here or want to discuss
 further, join us in our Matrix room,
 link:https://chat.fedoraproject.org/#/room/#coreos:fedoraproject.org[#coreos:fedoraproject.org],
 or on our https://discussion.fedoraproject.org/tag/coreos[discussion board].
@@ -110,7 +110,7 @@ For more about this, please refer to xref:running-containers.adoc[documentation]
 
 == Where is my preferred tool for troubleshooting?
 
-The FCOS image is kept minimal by design. Not every troubleshooting tool are
+The FCOS image is kept minimal by design. Not every troubleshooting tool is
 included by default. Instead, it is recommended to use the `toolbox` utility.
 
 xref:debugging-with-toolbox.adoc[Debugging with Toolbx].
@@ -320,7 +320,7 @@ If your system is in this state you have two options:
 
 == Why is the `systemd-repart.service` systemd unit masked?
 
-https://www.freedesktop.org/software/systemd/man/systemd-repart.html[system-repart]
+https://www.freedesktop.org/software/systemd/man/systemd-repart.html[systemd-repart]
 is a tool to grow and add partitions to a partition table. On Fedora CoreOS, we
 only support using Ignition to create partitions, filesystems and mount points,
 thus systemd-repart is masked by default.
@@ -336,7 +336,7 @@ entry for an example config to unmask this unit.
 [#wifi-fw]
 == How do I keep dropped wireless firmware?
 
-Some Wi-Fi firmwares were split into subpackages in Fedora 39 and Fedora 40. Fedora CoresOS will keep them in until Fedora 41, but display a warning message in the console if `NetworkManager-wifi` is layered without any other Wi-Fi firmware packages layered.
+Some Wi-Fi firmwares were split into subpackages in Fedora 39 and Fedora 40. Fedora CoreOS will keep them in until Fedora 41, but display a warning message in the console if `NetworkManager-wifi` is layered without any other Wi-Fi firmware packages layered.
 
 To request the Wi-Fi firmware stay installed even when Fedora CoreOS drops these packages please follow the xref:sysconfig-enabling-wifi.adoc#_on_an_existing_fedora_coreos_system[steps to perform Wi-Fi enablement on an existing system].
 

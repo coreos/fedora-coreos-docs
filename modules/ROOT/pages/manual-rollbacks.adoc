@@ -15,7 +15,7 @@ To permanently revert to the previous OS deployment, log into the target node an
 # Stop the service that performs automatic updates
 sudo systemctl stop zincati.service
 
-# Mark the previous OS deployment as the default, and immediately reboots into it
+# Mark the previous OS deployment as the default and immediately reboot into it
 sudo rpm-ostree rollback -r
 ----
 

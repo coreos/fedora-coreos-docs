@@ -8,7 +8,7 @@ Before provisioning an FCOS machine, it is recommended to have an Ignition confi
 
 NOTE: Fedora CoreOS has a default `core` user that can be used to explore the OS. If you want to use it, finalize its xref:authentication.adoc[configuration] by providing e.g. an SSH key.
 
-If you do not want to use Ignition to get started, you can make use of the https://coreos.github.io/afterburn/platforms/[Afterburn support]..
+If you do not want to use Ignition to get started, you can make use of the https://coreos.github.io/afterburn/platforms/[Afterburn support].
 
 You also need to have access to an Exoscale account. https://portal.exoscale.com/register[Register] if you don't have one.
 
@@ -32,7 +32,7 @@ Next you can https://community.exoscale.com/documentation/compute/custom-templat
 .Upload to Object Storage and create Custom Template
 [source, bash]
 ----
-# Set the version and calcuate the checksum
+# Set the version and calculate the checksum
 FCOS_VERSION='...'
 FILE="fedora-coreos-${FCOS_VERSION}-exoscale.x86_64.qcow2"
 CHECKSUM=$(md5sum "${FILE}" | cut -d " " -f 1)

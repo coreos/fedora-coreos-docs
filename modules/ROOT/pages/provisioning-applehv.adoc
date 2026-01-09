@@ -41,7 +41,7 @@ Vfkit is not a stateful virtual machine framework. You simply need to run the vf
 
 * 2 virtual CPUs
 * 2 GB of memory
-* a network device that will receive a IP address from Vfit
+* a network device that will receive an IP address from vfkit
 * a GUI console with keyboard and mouse support
 
 .Launching FCOS with Vfkit

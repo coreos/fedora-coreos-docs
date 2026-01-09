@@ -80,7 +80,7 @@ CONFIG='/path/to/config.ign' # path to your Ignition config
 aws s3 cp $CONFIG s3://$NAME-infra/bootstrap.ign
 ----
 
-You can verify the file have been correctly uploaded:
+You can verify the file has been correctly uploaded:
 
 .List files in the bucket
 [source, bash]
@@ -183,7 +183,7 @@ NAME='instance1'
 aws s3 rm s3://$NAME-infra/bootstrap.ign
 ----
 
-Optionnally, you can delete the whole bucket:
+Optionally, you can delete the whole bucket:
 
 .Deleting the s3 bucket
 [source,bash]

@@ -67,7 +67,7 @@ systemd:
           [Service]
           # Override Execstart in main unit
           ExecStart=
-          # Add new Execstart with `-` prefix to ignore failure`
+          # Add new Execstart with `-` prefix to ignore failure
           ExecStart=-/usr/sbin/agetty --autologin core --noclear %I $TERM
     - name: issuegen-public-ipv4.service
       enabled: true

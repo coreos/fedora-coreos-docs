@@ -158,7 +158,7 @@ qm start ${VM_ID}
 
 === Exploring the OS
 
-You log into the VM from the host with the following command:
+You can log into the VM from the host with the following command:
 
 [source,bash]
 ----

@@ -10,7 +10,7 @@ You can then install and update Docker CE from this repository.
 
 == Installing Docker CE on first boot
 
-On provisioning, you can install Docker CE during the first boot of the system via ignition configuration.
+On provisioning, you can install Docker CE during the first boot of the system via Ignition configuration.
 
 .Example Butane config for setting up Docker CE
 [source,yaml,subs="attributes"]

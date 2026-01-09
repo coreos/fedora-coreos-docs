@@ -102,7 +102,7 @@ And replaced it with a pointer to my fork:
 ...
 ```
 
-I could also point to a local repository, using `HEAD` as a branch to preview the what's changed without the need of making a commit.
+I could also point to a local repository, using `HEAD` as a branch to preview what's changed without the need of making a commit.
 
 **Note:** I would need to move the repository under the `docs-fp-o` directory, because the builder won't see anything above.
 So I would need to create a `repositories` directory in `docs-fp-o` and copy my repository into it.
@@ -120,6 +120,6 @@ To build the whole site, I would run the following in the `docs-fp-o` directory.
 ```
 $ ./docsbuilder.sh -p
 ```
-# License
+## License
 
 SPDX-License-Identifier: CC-BY-SA-4.0

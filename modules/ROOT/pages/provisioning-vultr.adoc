@@ -16,7 +16,7 @@ You also need to have access to a Vultr account. The examples below use the http
 
 Vultr supports creating custom snapshots from public raw images.
 
-These steps show how to download a FCOS image and upload it to an existing storage bucket, in order to create a snapshot from that.
+These steps show how to download an FCOS image and upload it to an existing storage bucket, in order to create a snapshot from that.
 
 See https://www.vultr.com/docs/vultr-object-storage[Vultr documentation] for further details on how to create a bucket and configure `s3cmd` to use it.
 
@@ -54,7 +54,7 @@ NOTE: You'll need to wait for the snapshot to finish processing before using it.
 
 === Launching an instance from a snapshot
 
-You can now create a FCOS Vultr instance using the snapshot ID above.
+You can now create an FCOS Vultr instance using the snapshot ID above.
 
 This example creates a 2 vCPU, 4GB RAM instance named `instance1` in the New Jersey region. Use `vultr-cli regions list` and `vultr-cli plans list` for other options.
 
