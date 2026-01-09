@@ -86,7 +86,7 @@ virtctl ssh core@my-fcos
 
 == Launching a virtual machine with persistent storage
 
-The above example will give you a VM that will lose any changes made to it if it is stopped and started again. You can instruct the cluster to import a containerdisk into a Physical Volume when provisioning in order to have virtual machine will have persistence of the OS disk across stop/start operations.
+The above example will give you a VM that will lose any changes made to it if it is stopped and started again. You can instruct the cluster to import a containerdisk into a Physical Volume when provisioning in order for the virtual machine to have persistence of the OS disk across stop/start operations.
 
 The positive to this approach is that the machine behaves much more like a traditional virtual machine. The drawback is that the cluster needs to offer Block PV storage and not all clusters may do that.
 

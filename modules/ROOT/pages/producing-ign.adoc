@@ -203,7 +203,7 @@ passwd:
 
 TIP: YAML files must have consistent indentation. Although Butane checks for syntax errors, ensure that the indentation matches the above example. Overall, the Butane configs must conform to Butane's https://coreos.github.io/butane/specs/[configuration specification] format.
 
-TIP: If you use VScode with the https://github.com/redhat-developer/vscode-yaml[Red Hat Yaml extension] you can associate `*.bu` files to `yaml` in the `files.associations` setting and get help/auto completion.
+TIP: If you use VS Code with the https://github.com/redhat-developer/vscode-yaml[Red Hat Yaml extension] you can associate `*.bu` files to `yaml` in the `files.associations` setting and get help/auto completion.
 
 TIP: You may also set a login password for the console (password authentication over SSH is disabled). See https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_using_password_authentication[Using Password Authentication].
 

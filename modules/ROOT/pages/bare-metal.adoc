@@ -123,7 +123,7 @@ To download the 4kn native metal image with `coreos-installer download`, use the
 
 NOTE: The metal image uses a hybrid partition layout which supports both BIOS and UEFI booting.
 
-When you're finally ready to install FCOS, you can point it at your downloaded image using `coreos-installer install --image-url <LOCAL_MIRROR>` or `coreos-install --image-file <PATH>`.
+When you're finally ready to install FCOS, you can point it at your downloaded image using `coreos-installer install --image-url <LOCAL_MIRROR>` or `coreos-installer --image-file <PATH>`.
 
 == Customizing installation
 
@@ -177,7 +177,7 @@ Alternatively, instead of generating per-machine ISOs, you can have a `--pre-ins
 === Installing on iSCSI
 
 To install CoreOS on an iSCSI boot device, follow the same
-steps as described above to get the live environnement, and add the iSCSI-related kernel arguments.
+steps as described above to get the live environment, and add the iSCSI-related kernel arguments.
 
 
 - Mount the iSCSI target from the live environment:
@@ -195,32 +195,32 @@ On a completely diskless machine, the iscsi target and initiator values can be p
 These could be supplied with an iPXE boot script for example:
 
 [source, bash]
----
+----
 #!ipxe
 set initiator-iqn iqn.2023-11.coreos.diskless:testsetup
 sanboot iscsi:10.0.0.1::::iqn.2023-10.coreos.target.vm:coreos
----
+----
 
 [source, bash]
----
+----
 sudo coreos-installer install \
     /dev/disk/by-path/ip-10.0.0.1\:3260-iscsi-iqn.2023-10.coreos.target.vm\:coreos-lun-0 \
     --append-karg rd.iscsi.firmware=1 --append-karg ip=ibft \
     --console ttyS0 \
     --ignition-url https://example.com/example.ign
----
+----
 
 
 .Installing to an iSCSI target with manual configuration
 [source, bash]
----
+----
 sudo coreos-installer install \
     /dev/disk/by-path/ip-10.0.0.1\:3260-iscsi-iqn.2023-10.coreos.target.vm\:coreos-lun-0 \
     --append-karg rd.iscsi.initiator=iqn.2024-02.com.yourorg.name:lun0 \
-    --append-karg netroot=iscsi:iqn.2023-10.coreos.target.vm:coreos` \
+    --append-karg netroot=iscsi:iqn.2023-10.coreos.target.vm:coreos \
     --console ttyS0 \
     --ignition-url https://example.com/example.ign
----
+----
 
 
 All this can also be set using `coreos-installer iso customize` or `coreos-installer pxe customize`. (See "Customizing installation" section above).

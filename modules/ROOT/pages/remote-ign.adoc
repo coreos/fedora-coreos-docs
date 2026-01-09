@@ -34,7 +34,7 @@ ignition:
 
 NOTE: The certificate authorities listed here are not automatically added to the host filesystem. They are solely used by Ignition itself when fetching over `https`. If you'd like to also install them on the host filesystem, include them as usual under the `storage.files` array.
 
-In some cases, if you need to merge a local configuration and one or several remote ones, you can use the `merge` rather than `replace` in a Butane config.
+In some cases, if you need to merge a local configuration and one or several remote ones, you can use `merge` rather than `replace` in a Butane config.
 
 .Retrieving a remote Ignition file via HTTPS and merging it with the current config
 [source,yaml,subs="attributes"]

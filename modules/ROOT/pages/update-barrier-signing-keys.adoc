@@ -6,7 +6,7 @@ All binary artifacts, ostree commits, and OS images belonging to Fedora and Fedo
 
 At the beginning of every new Fedora major release cycle, a new signing key is generated and its public portion published on the Fedora website. The new key will be later used to sign new artifacts, replacing the currently used one. This is done in order to establish an automatic chain of trust from an older release to a more recent one, which can be possibly signed by a different newer key.
 
-In order to make automatic updates of Fedora CoreOS work across major Fedora releases, the above set of embedded signing key is refreshed at least once per Fedora release cycle. When that happens, an update barrier is put in place in the FCOS update graph.
+In order to make automatic updates of Fedora CoreOS work across major Fedora releases, the above set of embedded signing keys is refreshed at least once per Fedora release cycle. When that happens, an update barrier is put in place in the FCOS update graph.
 
 The primary reason for such update barrier is to make sure that older (and possibly stale) instances automatically receive and trust newly generated keys. This is achieved by forcing such machines to progressively catch up on intermediate updates (signed by an already trusted key) before jumping to the latest published release.
 

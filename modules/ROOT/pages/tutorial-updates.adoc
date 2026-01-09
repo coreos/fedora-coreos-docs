@@ -108,7 +108,7 @@ Disconnect from the serial console by pressing `CTRL` + `]` and then use the rep
 
 As the system is not up to date, Zincati will notice this and will start updating the system. You should see the update process happening right away:
 
-NOTE: All necessary network services may not be up and running during the initial check. In such case Zincati will check for updates again in about 5 minutes.
+NOTE: All necessary network services may not be up and running during the initial check. In such a case, Zincati will check for updates again in about 5 minutes.
 
 ----
 [core@localhost ~]$ systemctl status --full zincati.service
@@ -268,7 +268,7 @@ Deployments:
              GPGSignature: Valid signature by 6A51BBABBA3D5467B6171221809A8D7CEB10B464
 ----
 
-And you can also verify that Zincati will not try to update to the new version we just rollbacked from:
+And you can also verify that Zincati will not try to update to the new version we just rolled back from:
 
 ----
 [core@localhost ~]$ systemctl status --full zincati.service

@@ -33,7 +33,7 @@ After a few releases we will migrate existing machines through a barrier release
 
 Currently, Fedora CoreOS hosts pull updates from the OSTree repository.
 With this change, the hosts will pull updates from the Quay.io container registry instead.
-This should be a transparent change, altough proxied environnements require attention as the nodes will reach to a different address for updates.
+This should be a transparent change, although proxied environments require attention as the nodes will reach to a different address for updates.
 
 Note: Disk images will be updated first, so new installations of Fedora CoreOS based on Fedora 42 will use OCI images.
 After a few releases, we will migrate existing nodes.
@@ -100,7 +100,7 @@ The full release notes for Podman v5 are available https://github.com/containers
 
 - In the (unlikely) case that you were using podman machine inside of Fedora CoreOS, you will have to delete and re-create your podman machine. See https://blog.podman.io/2024/03/migration-of-podman-4-to-podman-5-machines/[Migration of Podman 4 to Podman 5 machines] for more details.
 
-- Support for cgroups v1 is deprecated and will removed in a future version.
+- Support for cgroups v1 is deprecated and will be removed in a future version.
 
 - Rollbacks to a previous version with Podman v4.x will likely require manual action.
 
