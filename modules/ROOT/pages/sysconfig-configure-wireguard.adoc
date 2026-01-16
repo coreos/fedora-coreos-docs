@@ -1,63 +1,65 @@
-= Configuring FCOS to use WireGuard
+= Configuring WireGuard
 
-== Introduction
+From https://www.wireguard.com/[wireguard.com]:
 
-https://www.wireguard.com/[WireGuard] is a novel VPN that runs inside the Linux Kernel and uses state-of-the-art cryptography. It aims to be faster, simpler, leaner, and more useful than IPSec, while avoiding the massive headache. It intends to be considerably more performant than OpenVPN. WireGuard is designed as a general purpose VPN for running on embedded interfaces and super computers alike, fit for many different circumstances. It runs over UDP.
+> WireGuard is a novel VPN that runs inside the Linux Kernel and uses state-of-the-art cryptography.
+> It aims to be faster, simpler, leaner, and more useful than IPSec, while avoiding the massive headache.
+> It intends to be considerably more performant than OpenVPN.
+> WireGuard is designed as a general purpose VPN for running on embedded interfaces and super computers alike, fit for many different circumstances.
+> It runs over UDP.
 
-- https://www.wireguard.com/[Conceptual Overview]
-- https://www.wireguard.com/quickstart/[Quickstart]
-- https://www.wireguard.com/papers/wireguard.pdf[Whitepaper]
+You might also want to read the https://www.wireguard.com/[Conceptual Overview], the https://www.wireguard.com/quickstart/[Quickstart] and the https://www.wireguard.com/papers/wireguard.pdf[Whitepaper].
 
-FCOS has full support for WireGuard out of the box. This guide is going to demonstrate how to set up a single connection between a FCOS server and one client computer. It goes over the basic client configuration, but it does not cover installing WireGuard on your clients.
+Fedora CoreOS has full support for WireGuard out of the box.
+This page shows how to set up a single connection between a Fedora CoreOS server and another computer.
+It goes over the basic client configuration, but it does not cover installing WireGuard on your client.
 
-There are two options to set up wireguard on FCOS:
- * Using [wg-quick](https://www.man7.org/linux/man-pages/man8/wg-quick.8.html).
- * Importing the Wireguard configuration in NetworkManager.
+There are two options to set up WireGuard on Fedora CoreOS:
 
-== Generate Keys
+- Importing the WireGuard configuration in NetworkManager
+- Using https://www.man7.org/linux/man-pages/man8/wg-quick.8.html[`wg-quick`]
 
-You will need to generate some keys to configure WireGuard.
-You can generate the keys on your workstation or a running FCOS system.
+== Generating Keys
 
-First, let's create the FCOS WireGuard keys:
+You will need to generate keys to configure WireGuard.
+You can generate the keys on your workstation or a running Fedora CoreOS system.
 
-.Generate FCOS WireGuard keys
+First, let's create the WireGuard keys for the Fedora CoreOS system:
+
+.Generate WireGuard keys for the Fedora CoreOS system
 [source,bash]
 ----
-$ umask 077
-$ wg genkey | tee privatekey | wg pubkey > publickey
+umask 077
+wg genkey | tee fcos_private_key | wg pubkey > fcos_public_key
 ----
 
-These keys will be referenced as `fcos_public_key` and `fcos_private_key` from here on out in this guide.
+Now let's generate the WireGuard keys for the client:
 
-Now let's generate the client keys:
-
-.Generate Client One WireGuard keys
+.Generate WireGuard keys for the client
 [source,bash]
 ----
-$ umask 077
-$ wg genkey | tee privatekey | wg pubkey > publickey
+umask 077
+wg genkey | tee client_private_key | wg pubkey > client_public_key
 ----
-
-These keys will be referenced as `client_one_public_key` and `client_one_private_key` from here on out in this guide.
 
 You can optionnaly generate a pre-shared key to increase security:
 
-.Generate a Preshared key per peer pair
+.Generate a preshared key for this peer pair
 [source,bash]
 ----
-$ wg genpsk > fcos_client_one_psk
+wg genpsk > fcos_client_psk
 ----
 
-The PresharedKey will be referenced as `fcos_client_one_psk` from here on out in this guide.
+[NOTE]
+====
+You should generate a pre-shared key for each peer pair.
+====
 
-NOTE: The `wg genpsk` command generates a PresharedKey that can only be used once per peer pair. Every peer you add to the FCOS server will need to generate a unique PresharedKey.
+== Configuring WireGuard on Fedora CoreOS
 
-== Configure WireGuard on FCOS
+You can now modify your Butane config to create the `wg0` configuration file:
 
-You can now configure your Ignition config to create the `wg0` configuration file:
-
-.Example FCOS WireGuard configuration
+.Example Butane config with a WireGuard configuration file
 [source,yaml,subs="attributes"]
 ----
 variant: fcos
@@ -74,14 +76,16 @@ storage:
           ListenPort = 51820
 
           [Peer]
-          PublicKey = <client_one_public_key>
-          PresharedKey = <fcos_client_one_psk>
+          PublicKey = <client_public_key>
+          PresharedKey = <fcos_client_psk>
           AllowedIPs = 192.168.71.2/32,fdc9:3c6b:21c7:e6bd::2/128
 ----
 
-=== Import the wireguard configuration to NetworkManager
+=== Using NetworkManager
 
-You can import the configuration with a simple oneshot unit :
+If you want to use the support in NetworkManager, you can import the WireGuard configuration with a oneshot unit:
+
+.Example systemd service unit to import the WireGuard configuration
 [source,yaml,subs="attributes"]
 ----
 systemd:
@@ -100,21 +104,28 @@ systemd:
         WantedBy=multi-user.target
 ----
 
-NOTE: NetworkManager will ignore `PostUp` and `PostDown` directives in the wiregaurd config.
-      If you have firewall configuration to apply, make sure to apply it with a separate unit, or manually.
+[NOTE]
+====
+NetworkManager will ignGre `PostUp` and `PostDown` directives in the WireGuard config.
+If you have firewall configuration to apply, make sure to apply it with a separate unit, or manually.
+====
 
-NOTE: If you need to make further changes to update Wireguard's configuration, delete the connection and re-import it from the updated configuration file.
+[NOTE]
+====
+If you need to make further changes to update WireGuard's configuration, delete the connection and re-import it from the updated configuration file.
 
-.Re-import updated Wireguard configuration on FCOS
-[source,bash]
+.Re-import updated WireGuard configuration
+[source,console]
 ----
-[core@wireguard-demo ~]$ sudo nmcli con delete wg0 && sudo nmcli con import type wireguard file /etc/wireguard/wg0.conf
+$ sudo nmcli con delete wg0 && sudo nmcli con import type wireguard file /etc/wireguard/wg0.conf
 Connection 'wg0' (1e4f869e-f95c-4221-b2b9-99726ffde92b) successfully deleted.
 Connection 'wg0' (18cd8e61-1cc2-43a2-9f2e-467b75cd99da) successfully added.
 ----
-
+====
 
 === Using wg-quick
+
+If you want to use `wg-quick` instead of the support in NetworkManager, you can add the following to your Butane config:
 
 [source,yaml,subs="attributes"]
 ----
@@ -124,14 +135,25 @@ systemd:
       enabled: true
 ----
 
-NOTE: If you need to make further changes to Wireguard's configuration, reload the service with `systemctl reload wg-quick@wg0.conf`.
+[NOTE]
+====
+If you need to make further changes to WireGuard's configuration, reload the service with:
 
-Boot FCOS and log in. When you run `sudo wg show` you should see this:
-
-.Check WireGuard configuration on FCOS
 [source,bash]
 ----
-[core@wireguard-demo ~]$ sudo wg show
+systemctl reload wg-quick@wg0.conf
+----
+====
+
+== Verifying the configuration on the Fedora CoreOS system
+
+Boot Fedora CoreOS and log in.
+When you run `sudo wg show` you should see this:
+
+.Check WireGuard configuration
+[source,console]
+----
+[core@server ~]$ sudo wg show
 interface: wg0
   public key: <fcos_public_key>
   private key: (hidden)
@@ -142,7 +164,7 @@ peer: <client_one_public_key>
   endpoint: <Client IP Address>:51821
   allowed ips: 192.168.71.0/24, fdc9:3c6b:21c7:e6bd::/64
 
-[core@wireguard-demo ~]$ sudo ip a s wg0
+[core@server ~]$ sudo ip addr show wg0
 12: wg0: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1420 qdisc noqueue state UNKNOWN group default qlen 1000
     link/none
     inet 192.168.71.1/24 scope global wg0
@@ -151,36 +173,50 @@ peer: <client_one_public_key>
        valid_lft forever preferred_lft forever
 ----
 
-NOTE: <Client IP address> above is the IP or FQDN of the Client computer.
+[NOTE]
+====
+<Client IP address> above is the IP or FQDN of the Client computer.
+====
 
-== Configure WireGuard on a client
+== Configuring WireGuard on a client
 
-You will now want to configure WireGuard on your client computer with the following configuration:
+You will now have to configure WireGuard on your client computer with the following configuration:
 
 .Client WireGuard configuration
 [source,ini]
 ----
 [Interface]
 Address = 192.168.71.2/24,fdc9:3c6b:21c7:e6bd::2/64
-PrivateKey = <client_one_private_key>
+PrivateKey = <client_private_key>
 ListenPort = 51821
 
 [Peer]
 PublicKey = <fcos_public_key>
-PresharedKey = <fcos_client_one_psk>
+PresharedKey = <fcos_client_psk>
 Endpoint = <FCOS IP address>:51820
 AllowedIPs = 192.168.71.0/24,fdc9:3c6b:21c7:e6bd::/64
 ----
 
-NOTE: <FCOS IP address> is the IP or FQDN of the FCOS server.
+[NOTE]
+====
+<FCOS IP address> is the IP or FQDN of the FCOS server.
+====
 
-Write the above config to `/etc/wireguard/wg0.conf` and `chmod 0600 /etc/wireguard/wg0.conf` on your client.
-Run `nmcli con import type wireguard file /etc/wireguard/wg0.conf` and then check your configuration:
+Write the above config to `/etc/wireguard/wg0.conf`, set the access mode on the configuration file and then import the configuration on your client:
 
-.Check WireGuard configuration on a client
+.Import the WireGuard configuration on the client
+[source,console]
+----
+[core@client ~]$ sudo chmod 0600 /etc/wireguard/wg0.conf
+[core@client ~]$ sudo nmcli con import type wireguard file /etc/wireguard/wg0.conf
+----
+
+Then check your configuration:
+
+.Check WireGuard configuration on the client
 [source,bash]
 ----
-[core@wireguard-client ~]$ sudo wg show
+[core@client ~]$ sudo wg show
 interface: wg0
   public key: <client_one_public_key>
   private key: (hidden)
@@ -191,7 +227,7 @@ peer: <fcos_public_key>
   endpoint: <FCOS IP address>:51820
   allowed ips: 192.168.71.0/24, fdc9:3c6b:21c7:e6bd::/64
 
-[core@wireguard-client ~]$ sudo ip addr show wg0
+[core@client ~]$ sudo ip addr show wg0
 21: wg0: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1420 qdisc noqueue state UNKNOWN group default qlen 1000
     link/none
     inet 192.168.71.2/24 scope global wg0
@@ -200,14 +236,14 @@ peer: <fcos_public_key>
        valid_lft forever preferred_lft forever
 ----
 
-== Test the WireGuard connection
+== Testing the WireGuard connection
 
-You can now ping the FCOS server's WireGuard IP address:
+You can now ping the Fedora CoreOS server's WireGuard IP address:
 
-.Ping the FCOS server over WireGuard from client
+.Ping the Fedora CoreOS server over WireGuard from the client
 [source,bash]
 ----
-[core@wireguard-client ~]$ ping 192.168.71.1
+[core@client ~]$ ping 192.168.71.1
 PING 192.168.71.1 (192.168.71.1) 56(84) bytes of data.
 64 bytes from 192.168.71.1: icmp_seq=1 ttl=64 time=0.439 ms
 64 bytes from 192.168.71.1: icmp_seq=2 ttl=64 time=0.422 ms
@@ -217,7 +253,7 @@ PING 192.168.71.1 (192.168.71.1) 56(84) bytes of data.
 3 packets transmitted, 3 received, 0% packet loss, time 2027ms
 rtt min/avg/max/mdev = 0.383/0.414/0.439/0.023 ms
 
-[core@wireguard-client ~]$ ping6 fdc9:3c6b:21c7:e6bd::1
+[core@client ~]$ ping6 fdc9:3c6b:21c7:e6bd::1
 PING fdc9:3c6b:21c7:e6bd::1(fdc9:3c6b:21c7:e6bd::1) 56 data bytes
 64 bytes from fdc9:3c6b:21c7:e6bd::1: icmp_seq=1 ttl=64 time=1.55 ms
 64 bytes from fdc9:3c6b:21c7:e6bd::1: icmp_seq=2 ttl=64 time=0.454 ms
@@ -234,7 +270,7 @@ When you run `sudo wg show` on your client you should see a recent handshake and
 .Verify handshake and transfer metrics
 [source,bash]
 ----
-[core@wireguard-client ~]$ sudo wg show
+[core@client ~]$ sudo wg show
 interface: wg0
   public key: <client_one_public_key>
   private key: (hidden)
@@ -248,11 +284,11 @@ peer: <fcos_public_key>
   transfer: 22.02 KiB received, 22.28 KiB sent
 ----
 
-== Route all traffic over WireGuard
+== Routing all traffic over WireGuard
 
-If you plan on forwarding all of your client's traffic through the FCOS instance you will need to enable IP Forwarding and set some PostUp and PostDown directives:
+If you plan on forwarding all of your client's traffic through the Fedora CoreOS instance, you will need to enable IP Forwarding and set some PostUp and PostDown directives:
 
-.Example FCOS WireGuard configuration with IP forwarding
+.Example Fedora CoreOS WireGuard configuration with IP forwarding
 [source,yaml,subs="attributes"]
 ----
 variant: fcos
@@ -284,39 +320,34 @@ storage:
           PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o enp1s0 -j MASQUERADE; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -D POSTROUTING -o enp1s0 -j MASQUERADE
 
           [Peer]
-          PublicKey = <client_one_public_key>
-          PresharedKey = <fcos_client_one_psk>
+          PublicKey = <client_public_key>
+          PresharedKey = <fcos_client_psk>
           AllowedIPs = 192.168.71.0/24,fdc9:3c6b:21c7:e6bd::/64
+
 systemd:
   units:
-    - name: import-wireguard-config@wg0.service
+    - name: wg-quick@wg0.service
       enabled: true
-      contents: |
-        [Unit]
-        ConditionPathExists=!/etc/NetworkManager/system-connections/%i.nmconnection
-        Description=Import wireguard configuration at %I to NetworkManager
-        [Service]
-        Type=oneshot
-        RemainAfterExit=yes
-        ExecStart=nmcli connection import type wireguard file /etc/wireguard/%i.conf
-        [Install]
-        WantedBy=multi-user.target
 ----
 
-NOTE: FCOS uses https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/[predictable interface names] by https://lists.fedoraproject.org/archives/list/coreos-status@lists.fedoraproject.org/thread/6IPTZL57Z5NLBMPYMXNVSYAGLRFZBLIP/[default]. Please take care to use the correct interface name for your hardware in the above PostUp and PostDown commands!
+[NOTE]
+====
+Fedora CoreOS uses https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/[predictable interface names] by https://lists.fedoraproject.org/archives/list/coreos-status@lists.fedoraproject.org/thread/6IPTZL57Z5NLBMPYMXNVSYAGLRFZBLIP/[default].
+Make sure to use the correct interface name for your hardware in the above PostUp and PostDown commands.
+====
 
-and set `AllowedIPs = 0.0.0.0/0,::/0` in `/etc/wireguard/wg0.conf` on the client configuration to route all IPv4 and IPv6 the traffic on the client computer over the WireGuard interface:
+Then set `AllowedIPs = 0.0.0.0/0,::/0` in `/etc/wireguard/wg0.conf` in the client configuration to route all IPv4 and IPv6 traffic on the client computer over the WireGuard interface:
 
 .A configuration for routing all traffic on the client over WireGuard:
 ----
 [Interface]
 Address = 192.168.71.1/24,fdc9:3c6b:21c7:e6bd::2/64
-PrivateKey = <client_one_private_key>
+PrivateKey = <client_private_key>
 ListenPort = 51821
 
 [Peer]
 PublicKey = <fcos_public_key>
-PresharedKey = <fcos_client_one_psk>
+PresharedKey = <fcos_client_psk>
 Endpoint = <FCOS IP Address>:51820
 AllowedIPs = 0.0.0.0/0,::/0
 ----
