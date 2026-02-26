@@ -11,5 +11,5 @@ asciidoc:
     stable-version: 43.20260202.3.1
     ignition-version: 2.26.0
     butane-version: 0.26.0
-    butane-latest-stable-spec: 1.6.0
+    butane-latest-stable-spec: 1.7.0
     ignition-latest-stable-spec: 3.6.0
