@@ -177,7 +177,7 @@ done
 .Mark as compatible with appropriate VM shapes.
 [source, bash]
 ----
-shapes_info=$(oci compute shape list --compartment-id $COMPARTMENT_ID | jq -r '.data[]')
+shapes_info=$(oci compute shape list --all --compartment-id $COMPARTMENT_ID | jq -r '.data[]')
 
 # Limit to VM shapes only
 # https://github.com/coreos/fedora-coreos-tracker/issues/414#issuecomment-1795808614
