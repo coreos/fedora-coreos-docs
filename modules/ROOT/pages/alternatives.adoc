@@ -1,8 +1,18 @@
 = Setting alternatives
 
+[WARNING]
+====
+*Deprecated Content*
+
+This page documents the `iptables-legacy` alternative, which was *removed in Fedora CoreOS 43 and later*.
+The examples and instructions on this page are *no longer applicable* to current versions of Fedora CoreOS.
+This content is retained for historical reference only.
+====
+
 Due to an https://github.com/fedora-sysv/chkconfig/issues/9[ongoing issue] in how alternatives configurations are stored on the system, Fedora CoreOS systems can not use the usual `alternatives` commands to configure them.
 
-Instead, until this issue is resolved, you can set the symlinks directly in `/etc/alternatives`. For example, to use the legacy-based variants of the `iptables` commands:
+Instead, until this issue is resolved, you can set the symlinks directly in `/etc/alternatives`.
+For example, to use the legacy-based variants of the `iptables` commands:
 
 [source,yaml,subs="attributes"]
 ----
@@ -36,11 +46,11 @@ storage:
       hard: false
 ----
 
-== Using alternatives commands
+== Using `alternatives` commands
 
 Starting with Fedora CoreOS based on Fedora 41, you can use `alternatives` commands to configure the default command.
 
-.Example Butane config using a systemd unit to configure the default iptables backend
+.Example Butane config using a systemd unit to configure the default `iptables` backend
 [source,yaml,subs="attributes"]
 ----
 variant: fcos
@@ -59,21 +69,29 @@ systemd:
         WantedBy=multi-user.target
 ----
 
-NOTE: We don't recommend configuring the default iptables backend to `iptables-legacy`. This is just an example.
+[NOTE]
+====
+We don't recommend configuring the default `iptables` backend to `iptables-legacy`.
+This is just an example.
+====
 
 You can also manually run the `alternatives` commands to configure the default command runtime.
+The following examples demonstrate how to manually configure the default `iptables` backend. 
 
-.Example to manually configure the default iptables backend
-[source,bash]
+.Check the link info
+[source,console]
 ----
-# Check the link info
-alternatives --display iptables
-iptables --version
-
-# Configure iptables to point to iptables-nft
-sudo alternatives --set iptables /usr/sbin/iptables-nft
-
-# Verify iptables version is iptables-nft
-alternatives --display iptables
-iptables --version
+$ alternatives --display iptables
+$ iptables --version
+----
+.Configure iptables to point to iptables-nft
+[source,console]
+----
+$ sudo alternatives --set iptables /usr/sbin/iptables-nft
+----
+.Verify iptables version is iptables-nft
+[source,console]
+----
+$ alternatives --display iptables
+$ iptables --version
 ----

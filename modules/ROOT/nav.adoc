@@ -44,7 +44,6 @@
 ** xref:sysconfig-configure-swaponzram.adoc[Configuring SwapOnZRAM]
 ** xref:sysconfig-configure-wireguard.adoc[Configuring WireGuard]
 ** xref:kernel-args.adoc[Modifying Kernel Arguments]
-** xref:alternatives.adoc[Setting alternatives]
 ** xref:counting.adoc[Node counting]
 ** xref:time-zone.adoc[Configuring Time Zone]
 ** xref:grub-password.adoc[Setting a GRUB password]
