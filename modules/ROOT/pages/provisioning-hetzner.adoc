@@ -24,7 +24,8 @@ If you do not have one, see xref:producing-ign.adoc[Producing an Ignition File].
 NOTE: Fedora CoreOS has a default `core` user that can be used to explore the OS.
       If you want to use it, finalize its xref:authentication.adoc[configuration] by providing e.g. an SSH key.
 
-If you do not want to use Ignition to get started, you can make use of the https://coreos.github.io/afterburn/platforms/[Afterburn support] and only configure SSH keys.
+NOTE: If you do not want to use Ignition to get started, you can make use of the https://coreos.github.io/afterburn/platforms/[Afterburn support].
+      You can ssh into the default `core` user with the ssh keys Hetzner adds to any new instance.
 
 You also need to have access to a Hetzner account.
 The examples below use the https://github.com/hetznercloud/cli[hcloud] command-line tool, the https://github.com/apricote/hcloud-upload-image[hcloud-upload-image] tool and https://stedolan.github.io/jq/[jq] as a command-line JSON processor.
