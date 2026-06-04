@@ -191,6 +191,8 @@ If you want to replicate the boot disk across multiple drives for resiliency to 
 variant: fcos
 version: {butane-latest-stable-spec}
 boot_device:
+  # Change to match target architecture (aarch64, ppc64le, etc.)
+  layout: x86_64
   mirror:
     devices:
       - /dev/sda
@@ -506,6 +508,8 @@ This example configures a mirrored boot disk with a TPM2-encrypted root filesyst
 variant: fcos
 version: {butane-latest-stable-spec}
 boot_device:
+  # Change to match target architecture (aarch64, ppc64le, etc.)
+  layout: x86_64
   luks:
     tpm2: true
   mirror:
