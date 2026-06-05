@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# pylint: disable=missing-module-docstring
 #
 # Find all Butane configs in the doc tree, use the podman Butane container
 # to run them through butane --strict, and fail on any errors.
@@ -36,6 +37,7 @@ parser.add_argument('-v', '--verbose', action='store_true',
 args = parser.parse_args()
 
 def handle_error(e):
+    # pylint: disable=missing-function-docstring
     raise e
 
 # Arbitrary number (current number of tests) to set a bar where we should
@@ -47,13 +49,15 @@ tested_config_count = 0
 tmpfiles = {
     # tutorial-services.adoc
     os.path.join('public-ipv4.sh'): '#!/bin/bash\ntrue',
-    os.path.join('issuegen-public-ipv4.service'): '[Unit]\nBefore=systemd-user-sessions.service\n[Install]\nWantedBy=multi-user.target',
+    os.path.join('issuegen-public-ipv4.service'):
+        '[Unit]\nBefore=systemd-user-sessions.service\n[Install]\nWantedBy=multi-user.target',
     # authentication.adoc
     os.path.join('users', 'core', 'id_rsa.pub'): 'ssh-rsa AAAAB',
     os.path.join('users', 'jlebon', 'id_rsa.pub'): 'ssh-rsa AAAAB',
     os.path.join('users', 'jlebon', 'id_ed25519.pub'): 'ssh-ed25519 AAAAC',
     os.path.join('users', 'miabbott', 'id_rsa.pub'): 'ssh-rsa AAAAB',
-    # tutorial-containers.adoc, tutorial-setup.adoc, tutorial-updates.adoc, tutorial-user-systemd-unit-on-boot.adoc
+    # tutorial-containers.adoc, tutorial-setup.adoc, tutorial-updates.adoc,
+    # tutorial-user-systemd-unit-on-boot.adoc
     os.path.join('ssh-key.pub'): 'ssh-rsa AAAAB',
 }
 
@@ -69,7 +73,7 @@ ret = 0
 with tempfile.TemporaryDirectory() as tmpdocs:
     for path, contents in tmpfiles.items():
         os.makedirs(os.path.join(tmpdocs, os.path.dirname(path)), exist_ok=True)
-        with open(os.path.join(tmpdocs, path), 'w') as fh:
+        with open(os.path.join(tmpdocs, path), 'w', encoding="utf-8") as fh:
             fh.write(contents)
     for dirpath, dirnames, filenames in os.walk('.', onerror=handle_error):
         dirnames.sort()  # walk in sorted order
@@ -77,7 +81,7 @@ with tempfile.TemporaryDirectory() as tmpdocs:
             filepath = os.path.join(dirpath, filename)
             if not filename.endswith('.adoc'):
                 continue
-            with open(filepath) as fh:
+            with open(filepath, encoding="utf-8") as fh:
                 filedata = fh.read()
             # Iterate over YAML source blocks
             for match in matcher.finditer(filedata):
@@ -99,7 +103,8 @@ with tempfile.TemporaryDirectory() as tmpdocs:
                     universal_newlines=True,  # can be spelled "text" on >= 3.7
                     input=bu,
                     stdout=subprocess.DEVNULL,
-                    stderr=subprocess.PIPE)
+                    stderr=subprocess.PIPE,
+                    check=False)
                 if result.returncode != 0:
                     formatted = textwrap.indent(result.stderr.strip(), '  ')
                     # Not necessary for ANSI terminals, but required by GitHub's
