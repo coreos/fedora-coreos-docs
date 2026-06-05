@@ -6,14 +6,13 @@ NOTE: FCOS does not support https://cloud.ibm.com/docs/cloud-infrastructure?topi
 
 == Prerequisites
 
-Before provisioning an FCOS machine, you must have an Ignition configuration file containing your customizations. If you do not have one, see xref:producing-ign.adoc[Producing an Ignition File].
+include::provisioning-afterburn.adoc[]
 
-NOTE: Fedora CoreOS has a default `core` user that can be used to explore the OS. If you want to use it, finalize its xref:authentication.adoc[configuration] by providing e.g. an SSH key.
-
-If you do not want to use Ignition to get started, you can make use of the https://coreos.github.io/afterburn/platforms/[Afterburn support].
-
-You also need to have access to an https://cloud.ibm.com/login[IBM Cloud account]. The examples below use the https://cloud.ibm.com/docs/cli?topic=cli-getting-started[`ibmcloud`] command-line tool, which must be separately installed and configured beforehand.
-Follow the directions at https://cloud.ibm.com/docs/cli?topic=cli-install-ibmcloud-cli to install the ibmcloud CLI. You'll need both the `cloud-object-storage` and `infrastructure-service` plugins installed. This can be done with:
+You need to have access to an https://cloud.ibm.com/login[IBM Cloud account].
+The examples below use the https://cloud.ibm.com/docs/cli?topic=cli-getting-started[`ibmcloud`] command-line tool, which must be separately installed and configured beforehand.
+Follow the directions at https://cloud.ibm.com/docs/cli?topic=cli-install-ibmcloud-cli to install the ibmcloud CLI.
+You'll need both the `cloud-object-storage` and `infrastructure-service` plugins installed.
+This can be done with:
 
  * `ibmcloud plugin install cloud-object-storage`
  * `ibmcloud plugin install infrastructure-service`

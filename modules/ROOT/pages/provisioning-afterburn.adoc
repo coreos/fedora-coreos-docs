@@ -1,0 +1,6 @@
+:page-partial:
+
+Fedora CoreOS supports configuring access via SSH keys using https://coreos.github.io/afterburn/platforms/[Afterburn] on this platform.
+Once you have configured your SSH Key in the platform configuration, you can provision and access Fedora CoreOS instances with the default user `core`, without using an Ignition config.
+
+We recommend xref:producing-ign.adoc[using an Ignition config] once you are more familiar with Fedora CoreOS and want to automate the deployment of systems.

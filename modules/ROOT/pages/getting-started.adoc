@@ -21,6 +21,10 @@ Each platform has specific logic to retrieve and apply the first boot configurat
 
 For more information on configuration, refer to the documentation for xref:producing-ign.adoc[Producing an Ignition File].
 
+NOTE: While we recommend using Ignition to configure Fedora CoreOS, it is not required to get started
+      using Fedora CoreOS on most platforms. You can use the platform native SSH key configuration
+      mechanisms instead to configure access to your system.
+
 == Quickstart
 
 === Booting on a cloud VM (AWS example)

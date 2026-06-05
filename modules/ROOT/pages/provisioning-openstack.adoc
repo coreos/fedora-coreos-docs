@@ -7,18 +7,13 @@ The steps below were tested against the OpenStack Victoria release.
 
 == Prerequisites
 
-Before provisioning an FCOS machine, you must have an Ignition configuration file containing your customizations. If you do not have one, see xref:producing-ign.adoc[Producing an Ignition File].
+include::provisioning-afterburn.adoc[]
 
-NOTE: Fedora CoreOS has a default `core` user that can be used to explore the OS. If you want to use it, finalize its xref:authentication.adoc[configuration] by providing e.g. an SSH key.
-
-If you do not want to use Ignition to get started, you can make use of the https://coreos.github.io/afterburn/platforms/[Afterburn support].
-
-You also need to have access to an OpenStack environment and a functioning
+You need to have access to an OpenStack environment and a functioning
 https://docs.openstack.org/python-designateclient/latest/user/shell-v2.html[`openstack` CLI].
-Typically, you'll https://docs.openstack.org/python-openstackclient/latest/configuration/index.html[configure the client]
-by using a `clouds.yaml` file or via environment variables. If you're starting from scratch, this
-environment may need networks, SSH key pairs, security groups, etc.. set up. Please consult the
-https://docs.openstack.org/[OpenStack Documentation] to learn more.
+Typically, you'll https://docs.openstack.org/python-openstackclient/latest/configuration/index.html[configure the client] by using a `clouds.yaml` file or via environment variables.
+If you're starting from scratch, this environment may need networks, SSH key pairs, security groups, etc... set up.
+Please consult the https://docs.openstack.org/[OpenStack Documentation] to learn more.
 
 == Downloading an OpenStack Image
 
