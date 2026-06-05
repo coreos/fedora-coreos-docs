@@ -38,6 +38,10 @@ args = parser.parse_args()
 def handle_error(e):
     raise e
 
+# Arbitrary number (current number of tests) to set a bar where we should
+# verify that the CI still works
+EXPECTED_CONFIG_COUNT = 99
+tested_config_count = 0
 
 # List of files required during verification
 tmpfiles = {
@@ -98,4 +102,11 @@ with tempfile.TemporaryDirectory() as tmpdocs:
                     formatted = ERR + formatted.replace('\n', '\n' + ERR)
                     print(f'{ERR}Invalid Butane config at {filepath}:{buline}:\n{formatted}{RESET}')
                     ret = 1
+                tested_config_count += 1
+
+if tested_config_count < EXPECTED_CONFIG_COUNT:
+    print(f'Only {tested_config_count} configs tested ({EXPECTED_CONFIG_COUNT} expected).')
+    print('Something likely went wrong. Check this script!')
+    ret = 1
+
 sys.exit(ret)
