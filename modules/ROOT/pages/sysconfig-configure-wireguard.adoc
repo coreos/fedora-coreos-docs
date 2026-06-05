@@ -86,7 +86,7 @@ storage:
 If you want to use the support in NetworkManager, you can import the WireGuard configuration with a oneshot unit:
 
 .Example systemd service unit to import the WireGuard configuration
-[source,yaml,subs="attributes"]
+[source,yaml]
 ----
 systemd:
   units:
@@ -127,7 +127,7 @@ Connection 'wg0' (18cd8e61-1cc2-43a2-9f2e-467b75cd99da) successfully added.
 
 If you want to use `wg-quick` instead of the support in NetworkManager, you can add the following to your Butane config:
 
-[source,yaml,subs="attributes"]
+[source,yaml]
 ----
 systemd:
   units:
