@@ -52,6 +52,14 @@ tmpfiles = {
     os.path.join('ssh-key.pub'): 'ssh-rsa AAAAB',
 }
 
+# Get spec version from antora.yml
+with open("antora.yml", encoding="utf-8") as stream:
+    try:
+        antora = yaml.safe_load(stream)
+    except yaml.YAMLError as exc:
+        print(exc)
+butane_latest_spec = antora.get("asciidoc").get("attributes").get("butane-latest-stable-spec")
+
 ret = 0
 with tempfile.TemporaryDirectory() as tmpdocs:
     for path, contents in tmpfiles.items():
@@ -69,6 +77,7 @@ with tempfile.TemporaryDirectory() as tmpdocs:
             # Iterate over YAML source blocks
             for match in matcher.finditer(filedata):
                 bu = match.group(1)
+                bu = bu.replace('{butane-latest-stable-spec}', butane_latest_spec)
                 buline = filedata.count('\n', 0, match.start(1)) + 1
                 if not bu.startswith('variant:'):
                     print(f'{WARN}Ignoring non-Butane YAML at {filepath}:{buline}{RESET}')
