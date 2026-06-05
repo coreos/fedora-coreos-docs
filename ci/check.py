@@ -20,13 +20,14 @@ import subprocess
 import sys
 import tempfile
 import textwrap
+import yaml
 
 ERR = '\x1b[1;31m'
 WARN = '\x1b[1;33m'
 RESET = '\x1b[0m'
 
 container = os.getenv('BUTANE_CONTAINER', 'quay.io/coreos/butane:release')
-matcher = re.compile(r'^\[source,\s*yaml\]\n----\n(.+?\n)----$',
+matcher = re.compile(r'^\[source,yaml,subs="attributes"\]\n----\n(.+?\n)----$',
         re.MULTILINE | re.DOTALL)
 
 parser = argparse.ArgumentParser(description='Run validations on docs.')
