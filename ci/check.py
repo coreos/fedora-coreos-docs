@@ -90,7 +90,12 @@ with tempfile.TemporaryDirectory() as tmpdocs:
                 if args.verbose:
                     print(f'Checking Butane config at {filepath}:{buline}')
                 result = subprocess.run(
-                    ['podman', 'run', '--rm', '-i', '-v=' + tmpdocs + ':/files-dir', container, '--strict', '--files-dir=/files-dir'],
+                        ['podman', 'run',
+                         '--rm', '--interactive',
+                         '--security-opt', 'label=disable',
+                         '--volume=' + tmpdocs + ':/files-dir',
+                         container,
+                         '--strict', '--files-dir=/files-dir'],
                     universal_newlines=True,  # can be spelled "text" on >= 3.7
                     input=bu,
                     stdout=subprocess.DEVNULL,
