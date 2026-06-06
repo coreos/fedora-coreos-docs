@@ -94,7 +94,7 @@ SSH_KEY_NAME="fedora-coreos-hetzner"  # See: hcloud ssh-key list
 DATACENTER="fsn1-dc14"                # See: hcloud datacenter list
 TYPE="cx22"                           # See: hcloud server-type list
 NAME="fedora-coreos-test"
-IGNITION_CONFIG="./config.ign"
+IGNITION_CONFIG="./config.ign"        # optional, see prerequisites.
 hcloud server create \
     --name "$NAME" \
     --type "$TYPE" \
