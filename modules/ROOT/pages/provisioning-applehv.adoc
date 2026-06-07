@@ -35,6 +35,16 @@ This section shows how to boot a new VM with vfkit. Vfkit is known to work with 
 
 Fetch the latest image suitable for your target stream (or https://fedoraproject.org/coreos/download/[download and verify] it from the web).  Remember to download the appropriate image based on the architecture of your Mac.  Once downloaded, you will also need to decompress the image.
 
+TIP: If you want to keep a copy of the image file, use `cp` with the `-c` flag.
+
+[source, bash]
+```
+cp -c image.raw image.raw.original
+```
+
+This copies the file using clonefile(2), thus creating a Copy-on-Write (CoW) clone of the file.
+Less disk space will be used for storing the file `image.raw.original`.
+
 === Setting up a new VM
 
 Vfkit is not a stateful virtual machine framework. You simply need to run the vfkit binary to start a virtual machine. The following command line will launch a VM with:
@@ -73,3 +83,13 @@ When FCOS is completed booting, you will see the IP address of the VM displayed 
 ----
 ssh core@192.168.64.5
 ----
+
+=== Increasing disk size
+
+To have more free disk space available inside the image, you can increase the size of the image after downloading it.
+
+.Increase the size of the disk image by 10 GB
+[source, bash]
+```
+truncate -c -s +10G image.raw
+```
