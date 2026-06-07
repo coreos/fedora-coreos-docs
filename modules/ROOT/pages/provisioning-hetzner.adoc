@@ -79,7 +79,7 @@ SSH_KEY_NAME="fedora-coreos-hetzner"
 hcloud ssh-key create --name "$SSH_KEY_NAME" --public-key "$SSH_PUBKEY"
 ----
 +
-. Launch a server. You can create a server from the snapshot created in the previous in the web console and skip passing user data if you just want SSH access. This provides an easy way to test out FCOS without first creating an Ignition config. To use an Ignition configuration, pass it to the VM as user data as below.
+. Launch a server. You can create a server in the web console from the snapshot we just created and skip passing an Ignition file if you just want SSH access. This provides an easy way to test out FCOS without first creating an Ignition config. To use an Ignition configuration, pass it to the VM as user data as below.
 +
 .Example launching FCOS on Hetzner using an Ignition configuration file and SSH key
 [source, bash]
