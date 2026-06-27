@@ -12,6 +12,8 @@ You also need to have access to a host machine with `libvirt`. The examples belo
 
 TIP: If running on a host with SELinux enabled (use the `sestatus` command to check SELinux status), make sure your OS image and Ignition file are labeled as `svirt_home_t`. You can do this by placing them under `~/.local/share/libvirt/images/` or running `chcon -t svirt_home_t /path/to/file`.
 
+TIP: If running on a host with AppArmor enabled, you may need to change the AppArmor profile for libvirt. Add `/absolute/path/to/ignition/file.ign rk,` to the `LIBVIRT_TEMPLATE` profile that can be found in `/etc/apparmor.d/libvirt/TEMPLATE.qemu`.
+
 == Launching a VM instance
 
 include::getting-started-libvirt.adoc[]
