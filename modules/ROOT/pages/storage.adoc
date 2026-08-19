@@ -482,9 +482,6 @@ systemd:
         Where=/var/mnt/data
         Type=nfs4
 
-        [Install]
-        WantedBy=multi-user.target
-
     - name: var-mnt-data.automount
       enabled: true
       contents: |
@@ -498,6 +495,8 @@ systemd:
         [Install]
         WantedBy=multi-user.target
 ----
+
+Only the `.automount` unit is enabled. It activates the `.mount` unit on demand when the mount point is accessed.
 
 == Advanced examples
 
