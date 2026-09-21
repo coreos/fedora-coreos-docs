@@ -1,4 +1,4 @@
-= Provisioning Fedora CoreOS on the Raspberry Pi 4
+= Provisioning Fedora CoreOS on the Raspberry Pi 4/3
 
 Fedora CoreOS produces 64-bit ARM (`aarch64`) artifacts. These images can be used as the Operating System for the Raspberry Pi 4 device. Before trying to get FCOS up and running on your Raspberry Pi 4 you'll want to xref:#_updating_eeprom_on_raspberry_pi_4[Update the EEPROM] to the latest version and choose how you want to boot the Raspberry Pi 4. There are two options:
 
@@ -83,6 +83,37 @@ Now take the USB/SD card and attach it to the RPi4 and boot.
 
 TIP: It can take some time to boot, especially if the disk is slow. Be patient. You may not see anything on the screen for 20-30 seconds.
 
+== Adjust Partition Table on Raspberry Pi 3 models
+
+In contrast to RPi4 GPT-compatible EEPROM based bootloader, the RPi3 Chip utilizes a hardcoded boot routine that looks for the first FAT32/FAT16 partition in the MBR of the SD card.
+To support Core OS on these devices, on must configure a hybrid MBR enabling the chip to find the boot partition.
+
+[source, bash]
+----
+sudo gdisk
+
+Type device filename, or press <Enter> to exit: /dev/sdX
+
+r - recovery and transformation options
+h - make hybrid MBR
+
+Type from one to three GPT partition numbers, separated by spaces, to be
+added to the hybrid MBR, in sequence: 2
+
+Place EFI GPT (0xEE) partition first in MBR (good for GRUB)? (Y/N): N
+
+Creating entry for partition #2
+Enter an MBR hex code (default EE): 0E
+Set the bootable flag? (Y/N): Y
+
+Unused partition space(s) found. Use one to protect more partitions? (Y/N): N
+
+w - write table to disk and exit
+
+Confirm any questions with: Y
+----
+
+During the first boot, CoreOS overwrites the partition table, thus requiring a second creation of the hybrid MBR
 
 == Installing FCOS and Booting via EDK2
 
@@ -120,7 +151,6 @@ sudo umount /tmp/UEFIdisk
 Attaching this disk to your Pi4 you can now install FCOS as you would on any bare metal server.
 
 NOTE: The separate firmware disk will need to stay attached permanently for future boots to work.
-
 
 === EDK2: Combined Fedora CoreOS + EDK2 Firmware Disk
 
