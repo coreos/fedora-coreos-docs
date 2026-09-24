@@ -262,6 +262,38 @@ xref:storage.adoc[Configuring Storage] page for examples.
 See the xref:faq.adoc#_why_is_the_dnsmasq_service_systemd_unit_masked[Why is the `dnsmasq.service` systemd unit masked]
 entry for an example config to unmask this unit.
 
+== Why am I getting a warning about misplaced firstboot network configuration?
+
+When you log in to a Fedora CoreOS system and see a warning like:
+
+[source,text]
+----
+WARNING: MISPLACED FIRSTBOOT NETWORK CONFIGURATION DETECTED
+----
+
+It means the system was provisioned with an older version of `coreos-installer` that wrote firstboot network configuration files (from `--copy-network`) to the `/boot` partition, but the running Fedora CoreOS image expects that configuration to be embedded in the initramfs at `/etc/coreos-firstboot-network`.
+
+=== Why does this happen?
+
+Previously, `coreos-installer install --copy-network` placed network configuration files in `/boot/coreos-firstboot-network`. An early-boot service would then mount `/boot`, read those files, and copy them into the NetworkManager connections directory before networking came up.
+
+Newer versions of `coreos-installer` (see https://github.com/coreos/coreos-installer/issues/1758[coreos-installer#1758]) embed the network configuration directly into the initramfs instead. This simplifies the boot process by removing the dependency on the `/boot` partition and eliminates a chicken-and-egg problem on iSCSI-booted systems where `/boot` is only reachable after networking is already up, making it impossible to read network config from `/boot` in time to configure that same network.
+
+When a system provisioned by an older `coreos-installer` boots a newer Fedora CoreOS image, the new image does not look in `/boot` for network config by default. A backward-compatibility rescue service detects the misplaced configuration, copies it to the correct location, and displays the warning.
+
+=== What should I do?
+
+When provisioning new systems, or when re-provisioning existing systems use an updated version of `coreos-installer` that embeds network config in the initramfs instead of `/boot`.
+
+To dismiss the warning on an already-provisioned system:
+
+[source,bash]
+----
+sudo rm /etc/motd.d/coreos-warn-misplaced-network.motd
+----
+
+NOTE: The backward-compatibility rescue mechanism will be removed in a future release.
+
 [#wifi-fw]
 == How do I keep dropped wireless firmware?
 
