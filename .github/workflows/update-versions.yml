@@ -10,31 +10,44 @@ permissions:
 
 jobs:
   update-versions:
-    name: Update versions
+    name: Update versions (${{ matrix.group }})
     if: ${{ github.repository_owner == 'coreos' || github.event_name != 'schedule' }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - group: tools
+            branch: update-versions-tools
+            title: "antora: Update software versions ✨"
+          - group: fcos
+            branch: update-versions-fcos
+            title: "antora: Update Fedora CoreOS version ✨"
     steps:
       - name: Checkout
         uses: actions/checkout@v7
       - name: Update versions
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ci/update-versions.py
+          GROUP: ${{ matrix.group }}
+        run: ci/update-versions.py --group "${GROUP}"
       - name: Create commit
+        env:
+          TITLE: ${{ matrix.title }}
         run: |
           git config user.name 'CoreOS Bot'
           git config user.email coreosbot@fedoraproject.org
           if ! git diff --quiet --exit-code; then
-              git commit -am "antora: Update software versions ✨" \
+              git commit -am "${TITLE}" \
                   -m "Triggered by update-versions GitHub Action."
           fi
       - name: Open pull request
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.COREOSBOT_RELENG_TOKEN }}
-          branch: update-versions
+          branch: ${{ matrix.branch }}
           push-to-fork: coreosbot-releng/fedora-coreos-docs
-          title: "antora: Update software versions ✨"
+          title: ${{ matrix.title }}
           body: "Created by update-versions [GitHub workflow](${{ github.server_url }}/${{ github.repository }}/actions/workflows/update-versions.yml) ([source](${{ github.server_url }}/${{ github.repository }}/blob/main/.github/workflows/update-versions.yml))."
           committer: "CoreOS Bot <coreosbot@fedoraproject.org>"
           author: "CoreOS Bot <coreosbot@fedoraproject.org>"
