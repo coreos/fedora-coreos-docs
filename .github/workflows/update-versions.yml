@@ -25,7 +25,7 @@ jobs:
           git config user.name 'CoreOS Bot'
           git config user.email coreosbot@fedoraproject.org
           if ! git diff --quiet --exit-code; then
-              git commit -am "antora: update software versions ✨" \
+              git commit -am "antora: Update software versions ✨" \
                   -m "Triggered by update-versions GitHub Action."
           fi
       - name: Open pull request
@@ -34,7 +34,7 @@ jobs:
           token: ${{ secrets.COREOSBOT_RELENG_TOKEN }}
           branch: update-versions
           push-to-fork: coreosbot-releng/fedora-coreos-docs
-          title: "antora: update software versions ✨"
+          title: "antora: Update software versions ✨"
           body: "Created by update-versions [GitHub workflow](${{ github.server_url }}/${{ github.repository }}/actions/workflows/update-versions.yml) ([source](${{ github.server_url }}/${{ github.repository }}/blob/main/.github/workflows/update-versions.yml))."
           committer: "CoreOS Bot <coreosbot@fedoraproject.org>"
           author: "CoreOS Bot <coreosbot@fedoraproject.org>"
