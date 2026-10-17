@@ -13,6 +13,9 @@ jobs:
     name: Update versions (${{ matrix.group }})
     if: ${{ github.repository_owner == 'coreos' || github.event_name != 'schedule' }}
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ matrix.branch }}
+      cancel-in-progress: false
     strategy:
       fail-fast: false
       matrix:
