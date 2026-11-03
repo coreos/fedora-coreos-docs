@@ -21,6 +21,7 @@
 ** xref:provisioning-proxmoxve.adoc[Booting on Proxmox]
 ** xref:provisioning-qemu.adoc[Booting on QEMU]
 ** xref:provisioning-raspberry-pi4.adoc[Booting on Raspberry Pi 4]
+** xref:provisioning-stackit.adoc[Booting on STACKIT]
 ** xref:provisioning-virtualbox.adoc[Booting on VirtualBox]
 ** xref:provisioning-vmware.adoc[Booting on VMware]
 ** xref:provisioning-vultr.adoc[Booting on Vultr]
