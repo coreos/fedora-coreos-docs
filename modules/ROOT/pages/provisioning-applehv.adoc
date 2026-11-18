@@ -81,7 +81,7 @@ When FCOS is completed booting, you will see the IP address of the VM displayed 
 
 [source, bash]
 ----
-ssh core@192.168.64.5
+ssh core@192.168.64.6
 ----
 
 === Increasing disk size
