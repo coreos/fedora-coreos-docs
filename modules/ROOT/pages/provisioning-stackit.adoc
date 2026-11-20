@@ -1,0 +1,196 @@
+= Provisioning Fedora CoreOS on STACKIT
+
+This guide shows how to provision new Fedora CoreOS (FCOS) instances on https://www.stackit.de/en/[STACKIT].
+Fedora CoreOS images are currently not published for STACKIT.
+You must first convert a QEMU image to use the `stackit` platform ID, then upload it to your STACKIT project as a custom image.
+
+IMPORTANT: Support for Fedora CoreOS on STACKIT is considered emerging.
+           The source image must contain STACKIT support in both Ignition and Afterburn; changing the platform ID alone does not add that support.
+           Until these changes are available in an FCOS stream, use a locally built image containing them.
+           See https://github.com/coreos/fedora-coreos-tracker/issues/2175[issue #2175] for availability and implementation status.
+
+== Prerequisites
+
+include::provisioning-afterburn.adoc[]
+
+You need a STACKIT account and a project with permissions to manage images, servers, volumes, networks, security groups, and public IP addresses, and to create SSH key pairs.
+The examples below use the https://github.com/stackitcloud/stackit-cli[STACKIT CLI], https://jqlang.org/[jq], and https://libguestfs.org/guestfish.1.html[guestfish] (provided by the `libguestfs-tools` package on Fedora).
+This guide covers `x86_64` virtual machines.
+
+Authenticate and select your project and region:
+
+[source, bash]
+----
+PROJECT_ID="<project-id>"
+REGION="eu01"
+stackit auth login
+stackit config set --project-id "$PROJECT_ID" --region "$REGION"
+----
+
+== Preparing a STACKIT image
+
+Use a fresh, unbooted QEMU QCOW2 image containing the STACKIT support described above.
+Once that support is available in your chosen xref:update-streams.adoc[stream], you can download, verify, and decompress the image with https://coreos.github.io/coreos-installer/cmd/download/[coreos-installer]:
+
+[source, bash]
+----
+STREAM="stable"  # or "testing", "next"
+coreos-installer download --stream "$STREAM" --architecture x86_64 \
+    --platform qemu --format qcow2.xz --decompress
+----
+
+If you are using a locally built image, skip the download step and use your uncompressed QCOW2 image instead.
+
+Save the following script as `convert-image.sh`.
+It copies the image and changes `ignition.platform.id=qemu` to `ignition.platform.id=stackit` in its boot entry so that Ignition and Afterburn use the STACKIT metadata service.
+
+.QEMU to STACKIT image conversion script
+[source, bash]
+----
+#!/bin/bash
+set -euo pipefail
+
+if [[ $# -ne 2 ]]; then
+    echo "Usage: $0 <source-qemu.qcow2> <destination-stackit.qcow2>" >&2
+    exit 1
+fi
+
+source_image="$1"
+destination_image="$2"
+
+if [[ ! -f "$source_image" || -e "$destination_image" ]]; then
+    echo "The source must exist and the destination must not exist." >&2
+    exit 1
+fi
+
+command -v guestfish >/dev/null
+export LIBGUESTFS_BACKEND=direct
+workdir=$(mktemp -d)
+trap 'rm -rf "$workdir"' EXIT
+
+cp --reflink=auto "$source_image" "$destination_image"
+chmod u+w "$destination_image"
+
+# Partition 3 is /boot in the x86_64 QEMU image.
+guestfish --rw --format=qcow2 -a "$destination_image" -m /dev/sda3 \
+    download /loader/entries/ostree-1.conf "$workdir/boot-entry.conf"
+grep -q 'ignition.platform.id=qemu' "$workdir/boot-entry.conf"
+sed -i 's/ignition\.platform\.id=qemu/ignition.platform.id=stackit/g' \
+    "$workdir/boot-entry.conf"
+guestfish --rw --format=qcow2 -a "$destination_image" -m /dev/sda3 \
+    upload "$workdir/boot-entry.conf" /loader/entries/ostree-1.conf
+----
+
+Run the script with the image you prepared:
+
+[source, bash]
+----
+SOURCE_IMAGE="<path-to-uncompressed-qemu-image.qcow2>"
+IMAGE_FILE="fedora-coreos-stackit.x86_64.qcow2"
+bash convert-image.sh "$SOURCE_IMAGE" "$IMAGE_FILE"
+----
+
+== Uploading the image to STACKIT
+
+Upload the converted image with UEFI boot enabled:
+
+[source, bash]
+----
+IMAGE_ID=$(stackit image create \
+    --name fedora-coreos-stackit \
+    --disk-format qcow2 \
+    --architecture x86 \
+    --os linux \
+    --os-distro fedora \
+    --uefi \
+    --local-file-path "$IMAGE_FILE" \
+    --assume-yes --output-format json | jq -r '.id')
+stackit image describe "$IMAGE_ID"
+----
+
+Wait until the image status is `AVAILABLE` before creating a server.
+You can check the status by repeating `stackit image describe "$IMAGE_ID"`.
+
+== Preparing networking and SSH access
+
+Create a network and a security group that allows SSH from your public IPv4 address.
+Replace the example source CIDR with your own address or subnet.
+
+[source, bash]
+----
+NETWORK_ID=$(stackit network create \
+    --name fedora-coreos-network \
+    --assume-yes --output-format json | jq -r '.id')
+SECURITY_GROUP_ID=$(stackit security-group create \
+    --name fedora-coreos-ssh --stateful \
+    --assume-yes --output-format json | jq -r '.id')
+
+SSH_SOURCE_CIDR="<your-public-ipv4>/32"
+stackit security-group rule create \
+    --security-group-id "$SECURITY_GROUP_ID" \
+    --direction ingress --ether-type IPv4 --protocol-name tcp \
+    --port-range-min 22 --port-range-max 22 \
+    --ip-range "$SSH_SOURCE_CIDR"
+----
+
+Alternatively, set `NETWORK_ID` and `SECURITY_GROUP_ID` to existing resources.
+The network must provide DHCP and access to the metadata service, and its routing and security rules must allow SSH and outbound Internet access.
+
+Upload your SSH public key:
+
+[source, bash]
+----
+SSH_KEY_NAME="fedora-coreos"
+stackit key-pair create --name "$SSH_KEY_NAME" \
+    --public-key "@$HOME/.ssh/id_ed25519.pub"
+----
+
+== Launching a server
+
+Create a server using the uploaded image as the source of its boot volume.
+Choose a machine type that supports volumes and a boot volume large enough for the image.
+The example uses a 20 GiB boot volume and passes an Ignition configuration as user data.
+
+[source, bash]
+----
+NAME="fedora-coreos"
+MACHINE_TYPE="c2i.2"  # See: stackit server machine-type list
+IGNITION_CONFIG="./config.ign"
+SERVER_ID=$(stackit server create \
+    --name "$NAME" \
+    --machine-type "$MACHINE_TYPE" \
+    --boot-volume-source-type image \
+    --boot-volume-source-id "$IMAGE_ID" \
+    --boot-volume-size 20 \
+    --network-id "$NETWORK_ID" \
+    --security-groups "$SECURITY_GROUP_ID" \
+    --keypair-name "$SSH_KEY_NAME" \
+    --user-data "@$IGNITION_CONFIG" \
+    --assume-yes --output-format json | jq -r '.id')
+----
+
+NOTE: While STACKIT documentation refers to `cloud-init`, Fedora CoreOS accepts only Ignition configuration files.
+      Pass the Ignition JSON file, not the Butane YAML source.
+      The `@` prefix tells the STACKIT CLI to read the file; the CLI handles base64 encoding.
+
+If you only need SSH access, omit `--user-data`.
+Afterburn installs the selected SSH key for the default `core` user.
+Alternatively, omit `--keypair-name` if your Ignition configuration provides an SSH key.
+
+Assign a public IP address to the server's network interface:
+
+[source, bash]
+----
+NIC_ID=$(stackit server network-interface list \
+    --server-id "$SERVER_ID" --output-format json | jq -r '.[0].id')
+PUBLIC_IP=$(stackit public-ip create \
+    --associated-resource-id "$NIC_ID" \
+    --assume-yes --output-format json | jq -r '.ip')
+----
+
+Once the server has booted, connect using the corresponding SSH private key:
+
+[source, bash]
+----
+ssh -i "$HOME/.ssh/id_ed25519" "core@$PUBLIC_IP"
+----
